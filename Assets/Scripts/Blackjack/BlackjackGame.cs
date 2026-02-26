@@ -59,7 +59,7 @@ public class BlackjackGame : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(1f);
 
-        DealInitialCards();
+        yield return StartCoroutine(DealInitialCards());
         EnableButtons();
     }
 
@@ -153,12 +153,19 @@ public class BlackjackGame : MonoBehaviour
     // ---------------------------------------------------------
     //  INITIAL DEAL
     // ---------------------------------------------------------
-    void DealInitialCards()
+    IEnumerator DealInitialCards()
     {
         DrawCardToPlayer();
+        yield return new WaitForSecondsRealtime(0.4f);
+
         DrawCardToDealer(true);
+        yield return new WaitForSecondsRealtime(0.4f);
+
         DrawCardToPlayer();
+        yield return new WaitForSecondsRealtime(0.4f);
+
         DrawCardToDealer(false);
+        yield return new WaitForSecondsRealtime(0.4f);
 
         if (playerScore == 21 && playerCards.Count == 2)
         {
@@ -170,6 +177,7 @@ public class BlackjackGame : MonoBehaviour
             StartCoroutine(EndWin());
         }
     }
+
 
     // ---------------------------------------------------------
     //  DRAW CARDS

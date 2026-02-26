@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a385f67d314f7e4b8137c92739547c9, type: 3}
-  m_Name: Player Stats
+  m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
   startHealth: 7
   maxHealth: 12
