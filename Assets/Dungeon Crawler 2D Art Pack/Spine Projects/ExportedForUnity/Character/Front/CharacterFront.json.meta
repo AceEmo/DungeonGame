@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4f69a2e9a1344174faca1877f6eb34af
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 130827
+  packageName: Dungeon Crawler 2D Art Pack
+  packageVersion: 1.1
+  assetPath: Assets/Dungeon Crawler 2D Art Pack/Spine Projects/ExportedForUnity/Character/Front/CharacterFront.json
+  uploadId: 533780

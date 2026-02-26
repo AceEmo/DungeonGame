@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b51522e4b54507c4bba4893cd7fe8759
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 130827
+  packageName: Dungeon Crawler 2D Art Pack
+  packageVersion: 1.1
+  assetPath: Assets/Dungeon Crawler 2D Art Pack/Animations/Flying Monster/Left_Hit.anim
+  uploadId: 533780
