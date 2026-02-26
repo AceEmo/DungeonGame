@@ -1,469 +1,221 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using DG.Tweening;
 
 public class BlackjackGame : MonoBehaviour
 {
-    [Header("UI")]
-    public Transform playerCardArea;
-    public Transform dealerCardArea;
-    public GameObject cardPrefab;
-    public TextMeshProUGUI resultText;
-
-    public Button hitButton;
-    public Button standButton;
-    public Button exitButton;
-    [Header("Sounds")]
-    public AudioSource audioSource;
-    public AudioClip dealSound;
-    public AudioClip flipSound;
-    [Header("Root Canvas")]
-    public GameObject blackjackRoot;
-
-    [Header("Sprites")]
     public Sprite[] cardSprites;
-    public Sprite backCardSprite;
 
-    [Header("Reward")]
-    public GameObject rewardPrefab;
-    public Transform rewardSpawnPoint;
+    private BlackjackDeck deck;
+    private BlackjackHand playerHand;
+    private BlackjackHand dealerHand;
 
-    private List<Card> deck = new List<Card>();
-    private List<Card> dealerCards = new List<Card>();
-    private List<Card> playerCards = new List<Card>();
+    private BlackjackUI ui;
+    private BlackjackRewardSystem rewardSystem;
 
-    private int playerScore;
-    private int dealerScore;
+    private GameObject hiddenDealerCard;
 
-    private bool gameStarted;
     private bool gameOver;
-    private bool dealerTurn;
+    private bool rewardProcessing;
 
-    private GameObject hiddenDealerCardGO;
+    private void Awake()
+    {
+        deck = new BlackjackDeck();
+        playerHand = new BlackjackHand();
+        dealerHand = new BlackjackHand();
+
+        ui = GetComponent<BlackjackUI>();
+        rewardSystem = GetComponent<BlackjackRewardSystem>();
+    }
 
     public void StartBlackjack()
     {
-        StartCoroutine(GameStartSequence());
+        StartCoroutine(GameFlow());
     }
 
-    IEnumerator GameStartSequence()
+    IEnumerator GameFlow()
     {
-        if (gameStarted) yield break;
-        PrepareGame();
-        if (!gameStarted) yield break;
+        ui.SetExitButton(false);
+        ui.ClearTable();
 
-        DisableButtons();
+        deck.Setup(cardSprites);
+
+        playerHand.Clear();
+        dealerHand.Clear();
+
+        gameOver = false;
+        rewardProcessing = false;
+
+        ui.EnableButtons(false);
 
         yield return new WaitForSecondsRealtime(1f);
 
-        yield return StartCoroutine(DealInitialCards());
-        EnableButtons();
+        yield return StartCoroutine(InitialDeal());
+
+        CheckForInitialBlackjack();
+
+        if (!gameOver)
+            ui.EnableButtons(true);
     }
 
-    void PrepareGame()
+    IEnumerator InitialDeal()
     {
-        if (playerCardArea == null || dealerCardArea == null || cardPrefab == null)
-        {
-            Debug.LogError("BlackjackGame: UI references missing.");
-            gameStarted = false;
-            return;
-        }
-
-        if (resultText == null || hitButton == null || standButton == null || exitButton == null)
-        {
-            Debug.LogError("BlackjackGame: Buttons or resultText missing.");
-            gameStarted = false;
-            return;
-        }
-
-        if (cardSprites == null || cardSprites.Length == 0)
-        {
-            Debug.LogError("BlackjackGame: No card sprites assigned.");
-            gameStarted = false;
-            return;
-        }
-
-        if (backCardSprite == null)
-        {
-            Debug.LogError("BlackjackGame: backCardSprite missing.");
-            gameStarted = false;
-            return;
-        }
-
-        ClearTable();
-        SetupDeck();
-
-        if (deck.Count == 0)
-        {
-            Debug.LogError("BlackjackGame: Deck empty after setup.");
-            gameStarted = false;
-            return;
-        }
-
-        playerCards.Clear();
-        dealerCards.Clear();
-
-        playerScore = 0;
-        dealerScore = 0;
-
-        gameOver = false;
-        dealerTurn = false;
-        gameStarted = true;
-
-        resultText.text = "";
-        exitButton.interactable = false;
-        gameStarted = true;
+        yield return DealToPlayer();
+        yield return DealToDealer(true);
+        yield return DealToPlayer();
+        yield return DealToDealer(false);
     }
 
-    // ---------------------------------------------------------
-    //  DECK SETUP
-    // ---------------------------------------------------------
-    void SetupDeck()
+    IEnumerator DealToPlayer()
     {
-        deck.Clear();
+        Card card = deck.Draw();
+        playerHand.AddCard(card);
 
-        foreach (Sprite s in cardSprites)
-        {
-            if (s == null) continue;
-            if (s.name == "cardBackRed") continue;
-
-            int value = GetCardValueFromName(s.name);
-            deck.Add(new Card(s.name, value, s));
-        }
-    }
-
-    int GetCardValueFromName(string name)
-    {
-        int underscoreIndex = name.LastIndexOf('_');
-        string rank = name.Substring(underscoreIndex + 1);
-
-        if (rank == "A") return 11;
-        if (rank == "K" || rank == "Q" || rank == "J") return 10;
-
-        int parsed;
-        if (!int.TryParse(rank, out parsed))
-            return 0;
-
-        return parsed;
-    }
-
-    // ---------------------------------------------------------
-    //  INITIAL DEAL
-    // ---------------------------------------------------------
-    IEnumerator DealInitialCards()
-    {
-        DrawCardToPlayer();
+        ui.SpawnCard(card.sprite, ui.playerCardArea);
         yield return new WaitForSecondsRealtime(0.4f);
-
-        DrawCardToDealer(true);
-        yield return new WaitForSecondsRealtime(0.4f);
-
-        DrawCardToPlayer();
-        yield return new WaitForSecondsRealtime(0.4f);
-
-        DrawCardToDealer(false);
-        yield return new WaitForSecondsRealtime(0.4f);
-
-        if (playerScore == 21 && playerCards.Count == 2)
-        {
-            RevealDealerCard();
-
-            resultText.text = "BLACKJACK!";
-            resultText.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0), 0.4f, 10, 1).SetUpdate(true);
-
-            StartCoroutine(EndWin());
-        }
     }
 
-
-    // ---------------------------------------------------------
-    //  DRAW CARDS
-    // ---------------------------------------------------------
-    void DrawCardToPlayer()
+    IEnumerator DealToDealer(bool hidden)
     {
-        Card card = DrawCard();
-        if (card == null) return;
+        Card card = deck.Draw();
+        dealerHand.AddCard(card);
 
-        playerCards.Add(card);
-        SpawnCard(card.sprite, playerCardArea);
-
-        playerScore = CalculateScore(playerCards);
-    }
-
-    void DrawCardToDealer(bool hidden)
-    {
-        Card card = DrawCard();
-        if (card == null) return;
-
-        dealerCards.Add(card);
-
-        GameObject go = SpawnCard(hidden ? backCardSprite : card.sprite, dealerCardArea);
+        GameObject go = ui.SpawnCard(hidden ? ui.backCardSprite : card.sprite, ui.dealerCardArea);
 
         if (hidden)
-            hiddenDealerCardGO = go;
+            hiddenDealerCard = go;
 
-        if (!hidden)
-            dealerScore = CalculateScore(dealerCards);
+        yield return new WaitForSecondsRealtime(0.4f);
     }
 
-    Card DrawCard()
+    void CheckForInitialBlackjack()
     {
-        if (deck.Count == 0) return null;
+        bool playerBJ = playerHand.HasBlackjack();
+        bool dealerBJ = dealerHand.HasBlackjack();
 
-        int index = Random.Range(0, deck.Count);
-        Card card = deck[index];
-        deck.RemoveAt(index);
-        return card;
+        if (!playerBJ && !dealerBJ)
+            return;
+
+        gameOver = true;
+        ui.EnableButtons(false);
+
+        StartCoroutine(InitialBlackjackFlow(playerBJ, dealerBJ));
     }
 
-    // ---------------------------------------------------------
-    //  SPAWN CARD WITH DOTWEEN ANIMATION
-    // ---------------------------------------------------------
-    GameObject SpawnCard(Sprite sprite, Transform parent)
+    IEnumerator InitialBlackjackFlow(bool playerBJ, bool dealerBJ)
     {
-        GameObject go = Instantiate(cardPrefab, parent);
+        ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
+        yield return new WaitForSecondsRealtime(1f);
 
-        Image img = go.GetComponent<Image>();
-        img.sprite = sprite;
+        rewardProcessing = true;
 
-        go.transform.localScale = Vector3.zero;
-        go.transform.localRotation = Quaternion.Euler(0, 0, Random.Range(-20f, 20f));
-
-        float volume = (playerCards.Count + dealerCards.Count < 4) ? 0.25f : 1f;
-
-        if (audioSource && dealSound)
-            audioSource.PlayOneShot(dealSound, volume);
-
-        go.transform.DOScale(1f, 0.35f)
-            .SetEase(Ease.OutBack)
-            .SetUpdate(true);
-
-        return go;
-    }
-
-    // ---------------------------------------------------------
-    //  ACE LOGIC
-    // ---------------------------------------------------------
-    int CalculateScore(List<Card> cards)
-    {
-        int total = 0;
-        int aces = 0;
-
-        foreach (Card c in cards)
+        if (playerBJ && dealerBJ)
         {
-            total += c.value;
-            if (c.value == 11) aces++;
+            ui.SetResult("DRAW!");
+        }
+        else if (playerBJ)
+        {
+            ui.SetResult("BLACKJACK!");
+            yield return rewardSystem.WinRoutine(ui);
+        }
+        else
+        {
+            ui.SetResult("YOU LOSE!");
+            yield return rewardSystem.LoseRoutine(ui, transform);
         }
 
-        while (total > 21 && aces > 0)
-        {
-            total -= 10;
-            aces--;
-        }
-
-        return total;
+        rewardProcessing = false;
+        ui.SetExitButton(true);
     }
 
-    // ---------------------------------------------------------
-    //  PLAYER ACTIONS
-    // ---------------------------------------------------------
     public void Hit()
     {
-        if (!gameStarted || gameOver || dealerTurn) return;
+        if (gameOver || rewardProcessing) return;
 
-        DrawCardToPlayer();
+        StartCoroutine(HitRoutine());
+    }
+
+    IEnumerator HitRoutine()
+    {
+        yield return DealToPlayer();
+
+        int playerScore = playerHand.GetScore();
 
         if (playerScore > 21)
         {
-            StartCoroutine(PlayerBust());
-            return;
-        }
+            gameOver = true;
+            ui.EnableButtons(false);
 
-        // Ако играчът направи точно 21 с повече от 2 карти → автоматичен Stand
-        if (playerScore == 21 && playerCards.Count > 2)
+            ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
+            yield return new WaitForSecondsRealtime(1f);
+
+            ui.SetResult("YOU LOSE!");
+
+            rewardProcessing = true;
+            yield return rewardSystem.LoseRoutine(ui, transform);
+            rewardProcessing = false;
+
+            ui.SetExitButton(true);
+        }
+        else if (playerScore == 21)
         {
             StartCoroutine(DealerTurn());
-            return;
         }
-    }
-
-
-    IEnumerator PlayerBust()
-    {
-        gameOver = true;
-        DisableButtons();
-
-        resultText.text = "YOU LOSE!";
-
-        yield return new WaitForSecondsRealtime(1f);
-
-        RevealDealerCard();
-
-        yield return new WaitForSecondsRealtime(1f);
-
-        yield return StartCoroutine(EndLose());
     }
 
     public void Stand()
     {
-        if (!gameStarted || gameOver || dealerTurn) return;
+        if (gameOver || rewardProcessing) return;
 
         StartCoroutine(DealerTurn());
     }
 
-    // ---------------------------------------------------------
-    //  DEALER TURN
-    // ---------------------------------------------------------
     IEnumerator DealerTurn()
     {
-        dealerTurn = true;
-        DisableButtons();
+        ui.EnableButtons(false);
 
-        RevealDealerCard();
+        ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
         yield return new WaitForSecondsRealtime(1f);
 
-        while (dealerScore < 17)
+        while (dealerHand.GetScore() < 17)
         {
-            DrawCardToDealer(false);
-            yield return new WaitForSecondsRealtime(0.8f);
+            yield return DealToDealer(false);
         }
 
-        DetermineWinner();
+        yield return DetermineWinner();
     }
 
-    // ---------------------------------------------------------
-    //  FLIP ANIMATION
-    // ---------------------------------------------------------
-    void RevealDealerCard()
-    {
-        if (dealerCards.Count == 0 || hiddenDealerCardGO == null) return;
-
-        Card hiddenCard = dealerCards[0];
-        Image img = hiddenDealerCardGO.GetComponent<Image>();
-
-        // 🔊 Flip sound
-        if (audioSource && flipSound)
-            audioSource.PlayOneShot(flipSound);
-
-        hiddenDealerCardGO.transform
-            .DORotate(new Vector3(0, 90, 0), 0.2f)
-            .SetUpdate(true)
-            .OnComplete(() =>
-            {
-                img.sprite = hiddenCard.sprite;
-                hiddenDealerCardGO.transform
-                    .DORotate(Vector3.zero, 0.2f)
-                    .SetUpdate(true);
-            });
-
-        dealerScore = CalculateScore(dealerCards);
-    }
-    // ---------------------------------------------------------
-    //  END GAME LOGIC
-    // ---------------------------------------------------------
-    void DetermineWinner()
+    IEnumerator DetermineWinner()
     {
         gameOver = true;
+        rewardProcessing = true;
 
-        if (dealerScore > 21)
-            Win();
-        else if (playerScore > dealerScore)
-            Win();
+        int playerScore = playerHand.GetScore();
+        int dealerScore = dealerHand.GetScore();
+
+        if (dealerScore > 21 || playerScore > dealerScore)
+        {
+            ui.SetResult("YOU WIN!");
+            yield return rewardSystem.WinRoutine(ui);
+        }
         else if (playerScore < dealerScore)
-            Lose();
+        {
+            ui.SetResult("YOU LOSE!");
+            yield return rewardSystem.LoseRoutine(ui, transform);
+        }
         else
-            Push();
-    }
+        {
+            ui.SetResult("DRAW!");
+        }
 
-    void Win()
-    {
-        resultText.text = "YOU WIN!";
-        resultText.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0), 0.4f, 10, 1).SetUpdate(true);
-
-        StartCoroutine(EndWin());
-    }
-
-
-    void Lose()
-    {
-        resultText.text = "YOU LOSE!";
-        StartCoroutine(EndLose());
-    }
-
-    void Push()
-    {
-        resultText.text = "PUSH!";
-        StartCoroutine(EndPush());
-    }
-
-    IEnumerator EndWin()
-    {
-        yield return new WaitForSecondsRealtime(1.5f);
-
-        if (rewardPrefab != null)
-            Instantiate(rewardPrefab, rewardSpawnPoint.position, Quaternion.identity);
-
-        EnableExitButton();
-    }
-
-    IEnumerator EndLose()
-    {
-        yield return new WaitForSecondsRealtime(1.5f);
-
-        PlayerHealth playerHealth = FindFirstObjectByType<PlayerHealth>();
-        if (playerHealth != null)
-            playerHealth.TakeDamage(2, transform.position);
-
-        EnableExitButton();
-    }
-
-    IEnumerator EndPush()
-    {
-        yield return new WaitForSecondsRealtime(1.5f);
-        EnableExitButton();
-    }
-
-    void EnableExitButton()
-    {
-        exitButton.interactable = true;
+        rewardProcessing = false;
+        ui.SetExitButton(true);
     }
 
     public void ExitGame()
     {
-        if (!gameOver) return;
+        if (!gameOver || rewardProcessing) return;
 
         Time.timeScale = 1f;
-
-        if (blackjackRoot != null)
-            blackjackRoot.SetActive(false);
-        else
-            gameObject.SetActive(false);
-    }
-
-    // ---------------------------------------------------------
-    //  UI HELPERS
-    // ---------------------------------------------------------
-    void DisableButtons()
-    {
-        hitButton.interactable = false;
-        standButton.interactable = false;
-    }
-
-    void EnableButtons()
-    {
-        hitButton.interactable = true;
-        standButton.interactable = true;
-    }
-
-    void ClearTable()
-    {
-        foreach (Transform child in playerCardArea)
-            Destroy(child.gameObject);
-
-        foreach (Transform child in dealerCardArea)
-            Destroy(child.gameObject);
+        gameObject.SetActive(false);
     }
 }

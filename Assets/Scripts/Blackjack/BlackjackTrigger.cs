@@ -4,6 +4,7 @@ public class BlackjackTrigger : MonoBehaviour
 {
     public GameObject blackjackCanvas;
     private bool playerInside;
+    private bool alreadyPlayed;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -27,9 +28,12 @@ public class BlackjackTrigger : MonoBehaviour
 
     void OpenBlackjack()
     {
+        if (alreadyPlayed) return;
+
         blackjackCanvas.SetActive(true);
         Time.timeScale = 0f;
 
         blackjackCanvas.GetComponent<BlackjackGame>().StartBlackjack();
+        alreadyPlayed = true;
     }
 }
