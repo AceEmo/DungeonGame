@@ -22,20 +22,16 @@ public class LevelGenerator : MonoBehaviour
     {
         rooms.Clear();
 
-        // 1️⃣ Starter
         CreateRoom(Vector2Int.zero, StarterRoomPrefab, true);
 
-        // 2️⃣ Random rooms around starter
         for (int i = 0; i < RoomCount - 3; i++)
         {
             Vector2Int randomPos = GetRandomAdjacentPosition();
             CreateRoom(randomPos, NormalRoomPrefab, false);
         }
 
-        // 3️⃣ Boss
         CreateRoom(GetRandomAdjacentPosition(), BossRoomPrefab, false);
 
-        // 4️⃣ Blackjack
         CreateRoom(GetRandomAdjacentPosition(), BlackjackRoomPrefab, false);
 
         ConnectRooms();
