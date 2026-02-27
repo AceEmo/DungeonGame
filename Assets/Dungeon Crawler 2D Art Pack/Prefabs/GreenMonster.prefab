@@ -159,7 +159,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc22f52fb7e28d40b9c4636ec520dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 3
+  MaxHealth: 3
+  HitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  Animator: {fileID: 95075513044117048}
 --- !u!60 &5924150262823269808
 PolygonCollider2D:
   m_ObjectHideFlags: 0
