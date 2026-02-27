@@ -3,86 +3,76 @@ using System.Collections;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
-    [SerializeField] private int maxHealth = 3;
-    [SerializeField] private Color hitColor = new Color(1f, 0.5f, 0.5f);
-    [SerializeField] private Animator animator;
+    public event System.Action<EnemyHealth> OnEnemyDied;
 
-    private int currentHealth;
-    private bool isDead;
-    private SpriteRenderer sr;
-    private Collider2D col;
-    private MonoBehaviour movementScript;
-    private Color originalColor;
+    public int MaxHealth = 3;
+    public Color HitColor = new Color(1f, 0.5f, 0.5f);
+    public Animator Animator;
+
+    private int CurrentHealth;
+    private bool IsDead = false;
+    private SpriteRenderer Sr;
+    private Collider2D Col;
+
+    private Color OriginalColor;
 
     private void Awake()
     {
-        currentHealth = maxHealth;
-        sr = GetComponent<SpriteRenderer>();
-        col = GetComponent<Collider2D>();
-        movementScript = GetComponent<MonoBehaviour>();
-        if (sr != null) originalColor = sr.color;
+        CurrentHealth = MaxHealth;
+        Sr = GetComponent<SpriteRenderer>();
+        Col = GetComponent<Collider2D>();
+        if (Sr != null) OriginalColor = Sr.color;
     }
 
     public void TakeDamage(int amount)
     {
-        if (isDead) return;
-
-        currentHealth -= amount;
-
+        if (IsDead) return;
+        CurrentHealth -= amount;
         StopCoroutine("HitFlash");
         StartCoroutine(HitFlash());
 
-        if (animator != null)
-            animator.SetTrigger("Hit");
+        if (Animator != null)
+            Animator.SetTrigger("Hit");
 
-        if (currentHealth <= 0)
+        if (CurrentHealth <= 0)
             Die();
     }
 
     private IEnumerator HitFlash()
     {
-        if (sr == null) yield break;
-
-        sr.color = hitColor;
+        if (Sr == null) yield break;
+        Sr.color = HitColor;
         yield return new WaitForSeconds(0.1f);
-        sr.color = originalColor;
+        Sr.color = OriginalColor;
     }
 
     private void Die()
     {
-        if (isDead) return;
-        isDead = true;
+        if (IsDead) return;
+        IsDead = true;
 
         StopCoroutine("HitFlash");
-
-        if (animator != null)
-            animator.SetTrigger("Die");
-
-        if (movementScript != null)
-            movementScript.enabled = false;
-
-        if (col != null)
-            col.enabled = false;
+        if (Animator != null) Animator.SetTrigger("Die");
+        if (Col != null) Col.enabled = false;
 
         StartCoroutine(FadeAndDestroy());
+        OnEnemyDied?.Invoke(this);
     }
 
     private IEnumerator FadeAndDestroy()
     {
         float duration = 1.5f;
         float t = 0f;
-        Color startColor = sr != null ? sr.color : Color.white;
+        Color startColor = Sr != null ? Sr.color : Color.white;
 
         while (t < duration)
         {
             t += Time.deltaTime;
-
-            if (sr != null)
+            if (Sr != null)
             {
                 float alpha = Mathf.Lerp(1f, 0f, t / duration);
-                sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                Sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
             }
-
             yield return null;
         }
 
