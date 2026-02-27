@@ -212,11 +212,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4052641267887088, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.86366
+      value: -0.9
       objectReference: {fileID: 0}
     - target: {fileID: 4052641267887088, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -19.98511
+      value: -1.7
       objectReference: {fileID: 0}
     - target: {fileID: 4052641267887088, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -726,11 +726,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
-  far clip plane: 5000
-  field of view: 60
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -755,7 +755,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.8048091, y: -1.2599988, z: -10}
+  m_LocalPosition: {x: -0.75, y: -0.75, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1223,8 +1223,8 @@ MonoBehaviour:
   NormalRoomPrefab: {fileID: 1575628707851836, guid: 0af5bb5816678244b818066575f7e674, type: 3}
   BossRoomPrefab: {fileID: 1645482502123220, guid: 89c34bf03e751b346b5b806a385f7ed9, type: 3}
   BlackjackRoomPrefab: {fileID: 1289456404150176, guid: b9ca87a16fee4f04a91215304cca5772, type: 3}
-  RoomCount: 6
-  RoomSize: 20
+  RoomCount: 8
+  RoomSize: 40
 --- !u!4 &1701671616
 Transform:
   m_ObjectHideFlags: 0
