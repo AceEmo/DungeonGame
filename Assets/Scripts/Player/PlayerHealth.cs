@@ -35,12 +35,6 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.H))
-            TakeDamage(1, Vector3.zero);
-    }
-
     public void TakeDamage(float amount, Vector2 source)
     {
         if (isInvincible || currentHealth <= 0)
