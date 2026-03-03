@@ -12,7 +12,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private int CurrentHealth;
     private bool IsDead = false;
     private SpriteRenderer Sr;
-    private Collider2D Col;
+    private Collider2D[] Colliders;
 
     private Color OriginalColor;
 
@@ -20,7 +20,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     {
         CurrentHealth = MaxHealth;
         Sr = GetComponent<SpriteRenderer>();
-        Col = GetComponent<Collider2D>();
+        Colliders = GetComponents<Collider2D>();
         if (Sr != null) OriginalColor = Sr.color;
     }
 
@@ -52,8 +52,34 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         IsDead = true;
 
         StopCoroutine("HitFlash");
-        if (Animator != null) Animator.SetTrigger("Die");
-        if (Col != null) Col.enabled = false;
+
+        if (Animator != null)
+            Animator.SetTrigger("Die");
+
+        if (Colliders != null)
+        {
+            foreach (Collider2D col in Colliders)
+                col.enabled = false;
+        }
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.simulated = false;
+        }
+
+        IEnemyMovement movement = GetComponent<IEnemyMovement>();
+        if (movement != null)
+            ((MonoBehaviour)movement).enabled = false;
+
+        EnemyDamage damage = GetComponent<EnemyDamage>();
+        if (damage != null)
+            damage.enabled = false;
+
+        EnemyAnimation animation = GetComponent<EnemyAnimation>();
+        if (animation != null)
+            animation.enabled = false;
 
         StartCoroutine(FadeAndDestroy());
         OnEnemyDied?.Invoke(this);
@@ -78,4 +104,5 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         Destroy(gameObject);
     }
+    public bool IsEnemyDead() => IsDead;
 }

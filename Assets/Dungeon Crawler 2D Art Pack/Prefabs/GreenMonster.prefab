@@ -12,11 +12,14 @@ GameObject:
   - component: {fileID: 212221699170265904}
   - component: {fileID: 95075513044117048}
   - component: {fileID: 8936629835373602940}
-  - component: {fileID: 7248196770533748181}
   - component: {fileID: 5924150262823269808}
-  - component: {fileID: 8130047642303796668}
-  - component: {fileID: 4434400998022810309}
   - component: {fileID: 6316806423039373374}
+  - component: {fileID: 7248196770533748181}
+  - component: {fileID: 8130047642303796668}
+  - component: {fileID: 8577375770850790550}
+  - component: {fileID: 7857314835473078507}
+  - component: {fileID: 781208009765766679}
+  - component: {fileID: 8398231678095614688}
   m_Layer: 7
   m_Name: GreenMonster
   m_TagString: Enemy
@@ -147,21 +150,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &7248196770533748181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1718053648390686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3dc22f52fb7e28d40b9c4636ec520dbf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  MaxHealth: 3
-  HitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
-  Animator: {fileID: 95075513044117048}
 --- !u!60 &5924150262823269808
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -248,37 +236,6 @@ PolygonCollider2D:
       - {x: 0.175, y: -0.4525}
       - {x: 0.28, y: -0.4375}
   m_UseDelaunayMesh: 1
---- !u!114 &8130047642303796668
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1718053648390686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1204dacb09924a940a75b6ab2f798fe1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyDamage
-  damageAmount: 1
---- !u!114 &4434400998022810309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1718053648390686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b599f7657efdd4d4894b41bc48690e29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CustomEnemyPath
-  Speed: 3
-  RebuildTime: 0.5
-  PointDistance: 1.2
-  ObstacleAvoidanceForce: 2
-  animator: {fileID: 95075513044117048}
-  DirectionLockTime: 0.4
 --- !u!58 &6316806423039373374
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -313,5 +270,92 @@ CircleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.023774147, y: 0}
-  m_Radius: 0.4669304
+  m_Offset: {x: -0.019763887, y: 0.038098484}
+  m_Radius: 0.45690432
+--- !u!114 &7248196770533748181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dc22f52fb7e28d40b9c4636ec520dbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  MaxHealth: 4
+  HitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  Animator: {fileID: 95075513044117048}
+--- !u!114 &8130047642303796668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1204dacb09924a940a75b6ab2f798fe1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDamage
+  damageAmount: 1
+--- !u!114 &8577375770850790550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8882aee5ca2873641a8898965efb9f26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy
+--- !u!114 &7857314835473078507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40c0033506c4d0441babb1c95cabe53f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GroundMovement
+  speed: 3
+  steeringSmooth: 0.15
+  wallCheckDistance: 1
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  separationRadius: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 4224
+--- !u!114 &781208009765766679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf8885f0b5eb91d4fa53129ba00b7575, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ChaseBehaviour
+--- !u!114 &8398231678095614688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718053648390686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30d2593454d688144b9caa3d8caee198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimation
+  animator: {fileID: 95075513044117048}

@@ -1,39 +1,52 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EnemyManager : MonoBehaviour
 {
-    public Rooms Room;
-    public GameObject[] EnemyPrefabs;
+    [Header("Room & Enemy Settings")]
+    [SerializeField] private Rooms room;
+    [SerializeField] private GameObject[] enemyPrefabs;
 
-    private List<EnemyHealth> Enemies = new List<EnemyHealth>();
+    [Header("Spawn Settings")]
+    [SerializeField] private float initialSpawnDelay = 0.5f;
 
-    private void Start()
+    private List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
+    private bool hasSpawned = false;
+
+    public void SpawnEnemiesOnEnter()
     {
-        SpawnEnemies();
+        if (hasSpawned) return;
+        hasSpawned = true;
 
-        foreach (var enemy in Enemies)
-            enemy.OnEnemyDied += HandleEnemyDeath;
+        StartCoroutine(SpawnAllEnemies());
     }
 
-    private void SpawnEnemies()
+    private IEnumerator SpawnAllEnemies()
     {
-        foreach (var point in Room.EnemySpawnPoints)
+        yield return new WaitForSeconds(initialSpawnDelay);
+
+        foreach (Transform spawnPoint in room.EnemySpawnPoints)
         {
-            int rand = Random.Range(0, EnemyPrefabs.Length);
-            GameObject e = Instantiate(EnemyPrefabs[rand], point.position, Quaternion.identity, transform);
-            EnemyHealth eh = e.GetComponent<EnemyHealth>();
-            if (eh != null) Enemies.Add(eh);
+            GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+            GameObject enemyInstance = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity, transform);
+
+            if (enemyInstance.TryGetComponent(out EnemyHealth enemyHealth))
+            {
+                spawnedEnemies.Add(enemyHealth);
+                enemyHealth.OnEnemyDied += OnEnemyDied;
+            }
         }
     }
 
-    private void HandleEnemyDeath(EnemyHealth enemy)
+    private void OnEnemyDied(EnemyHealth enemy)
     {
-        Enemies.Remove(enemy);
+        enemy.OnEnemyDied -= OnEnemyDied;
+        spawnedEnemies.Remove(enemy);
 
-        if (Enemies.Count == 0)
+        if (spawnedEnemies.Count == 0)
         {
-            Room.OnRoomCleared();
+            room.OnRoomCleared();
         }
     }
 }

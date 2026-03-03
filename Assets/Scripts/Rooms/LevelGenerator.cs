@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
+    [Header("Room Prefabs")]
     public GameObject StarterRoomPrefab;
-    public GameObject NormalRoomPrefab;
     public GameObject BossRoomPrefab;
     public GameObject BlackjackRoomPrefab;
+    public GameObject[] NormalRoomPrefabs;
 
+    [Header("Level Settings")]
     public int RoomCount = 6;
     public float RoomSize = 20f;
 
@@ -18,7 +20,7 @@ public class LevelGenerator : MonoBehaviour
         GenerateLevel();
     }
 
-    void GenerateLevel()
+    private void GenerateLevel()
     {
         rooms.Clear();
 
@@ -27,18 +29,20 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < RoomCount - 3; i++)
         {
             Vector2Int randomPos = GetRandomAdjacentPosition();
-            CreateRoom(randomPos, NormalRoomPrefab, false);
+            GameObject normalPrefab = NormalRoomPrefabs[Random.Range(0, NormalRoomPrefabs.Length)];
+            CreateRoom(randomPos, normalPrefab, false);
         }
 
-        CreateRoom(GetRandomAdjacentPosition(), BossRoomPrefab, false);
-
         CreateRoom(GetRandomAdjacentPosition(), BlackjackRoomPrefab, false);
+
+        Vector2Int bossPos = GetSingleAdjacentPosition();
+        CreateRoom(bossPos, BossRoomPrefab, false);
 
         ConnectRooms();
         SetPlayerStart();
     }
 
-    Vector2Int GetRandomAdjacentPosition()
+    private Vector2Int GetRandomAdjacentPosition()
     {
         List<Vector2Int> possible = new List<Vector2Int>();
 
@@ -55,7 +59,7 @@ public class LevelGenerator : MonoBehaviour
         return possible[Random.Range(0, possible.Count)];
     }
 
-    void CreateRoom(Vector2Int gridPos, GameObject prefab, bool isStarter)
+    private void CreateRoom(Vector2Int gridPos, GameObject prefab, bool isStarter)
     {
         Vector3 worldPos = new Vector3(gridPos.x * RoomSize, gridPos.y * RoomSize, 0);
         GameObject obj = Instantiate(prefab, worldPos, Quaternion.identity);
@@ -67,7 +71,7 @@ public class LevelGenerator : MonoBehaviour
         rooms.Add(gridPos, room);
     }
 
-    void ConnectRooms()
+    private void ConnectRooms()
     {
         foreach (var pair in rooms)
         {
@@ -81,7 +85,7 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    void ConnectDoor(Rooms room, Vector2Int pos, Vector2Int direction)
+    private void ConnectDoor(Rooms room, Vector2Int pos, Vector2Int direction)
     {
         Vector2Int neighbourPos = pos + direction;
 
@@ -115,38 +119,67 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    void HideDoor(Rooms room, Vector2Int direction)
+    private void HideDoor(Rooms room, Vector2Int direction)
     {
         if (direction == Vector2Int.left && room.LeftDoor != null)
             room.LeftDoor.gameObject.SetActive(false);
-
-        if (direction == Vector2Int.right && room.RightDoor != null)
+        else if (direction == Vector2Int.right && room.RightDoor != null)
             room.RightDoor.gameObject.SetActive(false);
-
-        if (direction == Vector2Int.up && room.TopDoor != null)
+        else if (direction == Vector2Int.up && room.TopDoor != null)
             room.TopDoor.gameObject.SetActive(false);
-
-        if (direction == Vector2Int.down && room.BottomDoor != null)
+        else if (direction == Vector2Int.down && room.BottomDoor != null)
             room.BottomDoor.gameObject.SetActive(false);
     }
 
-    void SetPlayerStart()
+    private void SetPlayerStart()
     {
         foreach (var room in rooms.Values)
         {
             if (room.IsStarter)
             {
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
-
                 if (player == null)
                 {
                     Debug.LogError("Player with tag 'Player' not found!");
                     return;
                 }
                 player.transform.position = room.transform.position;
-
                 break;
             }
         }
+    }
+
+    private Vector2Int GetSingleAdjacentPosition()
+    {
+        List<Vector2Int> candidates = new List<Vector2Int>();
+
+        foreach (var roomPos in rooms.Keys)
+        {
+            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+            foreach (var dir in directions)
+            {
+                Vector2Int potentialPos = roomPos + dir;
+
+                if (rooms.ContainsKey(potentialPos)) continue;
+
+                int neighborCount = 0;
+                foreach (var checkDir in directions)
+                {
+                    if (rooms.ContainsKey(potentialPos + checkDir))
+                        neighborCount++;
+                }
+
+                if (neighborCount == 1)
+                    candidates.Add(potentialPos);
+            }
+        }
+
+        if (candidates.Count == 0)
+        {
+            return Vector2Int.zero;
+        }
+
+        return candidates[Random.Range(0, candidates.Count)];
     }
 }
