@@ -1,11 +1,5 @@
 fileFormatVersion: 2
 guid: 50321915525801d459aaaa941579bdd0
-NativeFormatImporter:
-  externalObjects: {}
-  mainObjectFileID: 9100000
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
   productId: 130827
@@ -13,3 +7,9 @@ AssetOrigin:
   packageVersion: 1.1
   assetPath: Assets/Dungeon Crawler 2D Art Pack/Animations/Boss/Boss.controller
   uploadId: 533780
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

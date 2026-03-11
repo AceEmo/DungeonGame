@@ -54,6 +54,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         StopCoroutine("HitFlash");
 
         if (Animator != null)
+            Animator.ResetTrigger("Hit");
             Animator.SetTrigger("Die");
 
         if (Colliders != null)
