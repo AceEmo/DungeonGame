@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4743888642208868}
   - component: {fileID: 212566779830679720}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftDoorBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4663338910920084}
   - component: {fileID: 212735962709415184}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftDoor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: 4567383840840816}
   - component: {fileID: 58029627877242054}
   - component: {fileID: 6057563725978904987}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Right_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -292,7 +292,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4135264431747798}
   - component: {fileID: 212721551952650868}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoorBackside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -556,7 +556,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4036672540745146}
   - component: {fileID: 212098372510523516}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +647,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4796670871329966}
   - component: {fileID: 212692344301856938}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TopDoor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -773,7 +773,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4216360795964902}
   - component: {fileID: 212110223234621084}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftDoor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -865,7 +865,7 @@ GameObject:
   - component: {fileID: 4699549394441958}
   - component: {fileID: 71962094776334585}
   - component: {fileID: 3660380061017163368}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Left_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -964,7 +964,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4568868073740696}
   - component: {fileID: 212595313557191332}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftDoor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2335,7 +2335,7 @@ GameObject:
   - component: {fileID: 4959062397807656}
   - component: {fileID: 1453864721053230855}
   - component: {fileID: 1455268691810195940}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Top_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2434,7 +2434,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4810736612646482}
   - component: {fileID: 212628809501546068}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RightDoorBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2525,7 +2525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4921401962055770}
   - component: {fileID: 212259743981182098}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RightDoorBackside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2616,7 +2616,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4995570304421552}
   - component: {fileID: 212115465861632638}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2707,7 +2707,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4463087310275404}
   - component: {fileID: 212152749636420976}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TopDoor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2799,8 +2799,6 @@ GameObject:
   - component: {fileID: 4147784773578770}
   - component: {fileID: 1917690530965039088}
   - component: {fileID: 5989514205168006753}
-  - component: {fileID: 8730955067663357030}
-  - component: {fileID: 3798987254279224889}
   m_Layer: 0
   m_Name: BossRoom
   m_TagString: Untagged
@@ -2827,7 +2825,6 @@ Transform:
   - {fileID: 4471084794095220}
   - {fileID: 4668790942722460}
   - {fileID: 2422891156119190395}
-  - {fileID: 6125761414058695417}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1917690530965039088
@@ -2877,32 +2874,6 @@ MonoBehaviour:
   - {fileID: 1548593766413804, guid: a2a3dd4b2b2a74041a57a6a0639b13b9, type: 3}
   - {fileID: 1718053648390686, guid: 1216e50d03d43984fade47dd49bfffd2, type: 3}
   initialSpawnDelay: 1
---- !u!114 &8730955067663357030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1645482502123220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62a00a4ea031b6b4fbdab0942cfe74a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelExit
-  nextSceneIndex: 1
---- !u!114 &3798987254279224889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1645482502123220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfeed559412fab84c8e3d24cb16db9e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BossRoomController
-  levelExit: {fileID: 8730955067663357030}
 --- !u!1 &1662579255390144
 GameObject:
   m_ObjectHideFlags: 0
@@ -2913,7 +2884,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4266706331941408}
   - component: {fileID: 212912824557355834}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RightDoor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3004,7 +2975,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4442285209406170}
   - component: {fileID: 212974425528880718}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3096,7 +3067,7 @@ GameObject:
   - component: {fileID: 4756155928858450}
   - component: {fileID: 7244401012649452392}
   - component: {fileID: 7080440893052961710}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Bottom_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3195,7 +3166,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4355649294864130}
   - component: {fileID: 212440856543842260}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RightDoor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3286,7 +3257,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4808365429514186}
   - component: {fileID: 212814114498548084}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoorBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3515,7 +3486,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4334593000303780}
   - component: {fileID: 212201233900776770}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TopDoorBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3744,7 +3715,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4617201811192574}
   - component: {fileID: 212735696218207432}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftDoorBackside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3955,7 +3926,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4392865335385324}
   - component: {fileID: 212196455458545944}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TopDoorBackside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4046,7 +4017,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4218602703788850}
   - component: {fileID: 212848890198507998}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RightDoor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4137,7 +4108,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4054918806232698}
   - component: {fileID: 212175162349110480}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TopDoor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4255,74 +4226,6 @@ Transform:
   - {fileID: 1671131422147907452}
   m_Father: {fileID: 4147784773578770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &295289407086696420
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6125761414058695417}
-  - component: {fileID: 2944848971238399047}
-  m_Layer: 0
-  m_Name: LevelExit
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6125761414058695417
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295289407086696420}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4147784773578770}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!58 &2944848971238399047
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295289407086696420}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: -0.71621394, y: -3.8282077}
-  m_Radius: 1.2100112
 --- !u!1 &443760021801985751
 GameObject:
   m_ObjectHideFlags: 0

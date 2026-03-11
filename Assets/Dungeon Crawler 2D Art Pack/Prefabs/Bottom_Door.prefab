@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4510810460008348}
   - component: {fileID: 212023732566018336}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoorBackside
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4598977779177018}
   - component: {fileID: 212296499073919788}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4399389168839582}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Bottom_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,7 +228,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4665791860296636}
   - component: {fileID: 212609174181716668}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoorBorder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -319,7 +319,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4439555724189152}
   - component: {fileID: 212426550679705414}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -410,7 +410,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4432498605469402}
   - component: {fileID: 212244139116899242}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BottomDoor2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
