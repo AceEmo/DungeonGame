@@ -19,10 +19,9 @@ public class BossData : ScriptableObject
 
     [Header("Dash")]
     public float dashSpeed = 4.5f;         
-    public float dashDuration = 0.2f;      
-    public float dashTriggerDistance = 10f;  
+    public float dashDuration = 0.5f;      
+    public float dashTriggerDistance = 20f;  
     public float dashChance = 0.15f;        
     public float dashCooldown = 2f;         
     public float dashWindup = 0.2f;         
-
 }

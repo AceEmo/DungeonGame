@@ -1,30 +1,31 @@
-using UnityEngine;
-
 public class AttackState : IBossState
 {
-    private bool attacked = false;
+    private bool attacked;
 
-    public void EnterState(Boss boss)
+    public void EnterState(BossContext context)
     {
-        boss.StopMoving();
-        boss.AnimatorComponent.SetTrigger("Attack");
         attacked = false;
+
+        context.Movement.Stop();
+
+        context.Animator.SetTrigger("Attack");
     }
 
-    public void UpdateState(Boss boss)
+
+    public void UpdateState(BossContext context)
     {
-        if (boss.IsDead) return;
+        if (context.IsDead)
+            return;
+
         if (!attacked)
         {
             attacked = true;
-            boss.DealDamageToPlayer();
+
+            context.Combat.DealDamage(context);
         }
 
-        if (attacked && !boss.AnimatorComponent.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
-        {
-            boss.SetState(new ChaseState());
-        }
+        context.Brain.ChangeState(new ChaseState());
     }
 
-    public void ExitState(Boss boss) { }
+    public void ExitState(BossContext context) { }
 }

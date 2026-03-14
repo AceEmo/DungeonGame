@@ -1,6 +1,6 @@
 public interface IBossState
 {
-    void EnterState(Boss boss);
-    void UpdateState(Boss boss);
-    void ExitState(Boss boss);
+    void EnterState(BossContext context);
+    void UpdateState(BossContext context);
+    void ExitState(BossContext context);
 }

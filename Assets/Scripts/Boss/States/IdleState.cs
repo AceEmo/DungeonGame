@@ -2,21 +2,17 @@ using UnityEngine;
 
 public class IdleState : IBossState
 {
-    public void EnterState(Boss boss)
+    public void EnterState(BossContext context)
     {
-        boss.StopMoving();
+        context.Movement.Stop();
     }
 
-    public void UpdateState(Boss boss)
+    public void UpdateState(BossContext context)
     {
-        if (boss.IsDead || boss.Player == null) return;
-
-        float distance = Vector2.Distance(boss.transform.position, boss.Player.position);
-        if (distance < boss.Data.attackRange * 3)
-        {
-            boss.SetState(new ChaseState());
-        }
+        if (context.IsDead)
+            return;
+        context.Brain.ChangeState(new ChaseState());
     }
 
-    public void ExitState(Boss boss) { }
+    public void ExitState(BossContext context) { }
 }

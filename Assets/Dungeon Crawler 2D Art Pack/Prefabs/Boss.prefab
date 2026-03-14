@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3341798647166314481}
   - component: {fileID: 933311675424932154}
   - component: {fileID: 459191824537591527}
-  - component: {fileID: 5317355253904395960}
+  - component: {fileID: 818545005391538282}
   m_Layer: 7
   m_Name: Boss
   m_TagString: Enemy
@@ -241,7 +241,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.9698389, y: 1.6731707}
   m_EdgeRadius: 0
---- !u!114 &5317355253904395960
+--- !u!114 &818545005391538282
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -250,19 +250,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1674528916550958}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f74ed5c332495644cbc9f70e933be69f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5efb887ecf4879546a606cd45a8dfcac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boss
   data: {fileID: 11400000, guid: c2b3036ca1875544987a2d09b61b7847, type: 2}
-  steeringSmooth: 0.15
-  wallCheckDistance: 1
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 2048
-  separationRadius: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 4224
   attackPointUp: {fileID: 2552714539305206480}
   attackPointDown: {fileID: 7018950290986510234}
   attackPointLeft: {fileID: 172518448789409429}

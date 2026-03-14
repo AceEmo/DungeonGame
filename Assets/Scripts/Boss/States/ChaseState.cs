@@ -2,36 +2,52 @@ using UnityEngine;
 
 public class ChaseState : IBossState
 {
-    public void EnterState(Boss boss) { }
+    public void EnterState(BossContext context) { }
 
-    public void UpdateState(Boss boss)
+    public void UpdateState(BossContext context)
     {
-        if (boss.IsDead) return;
+        if (context.IsDead)
+            return;
 
-        float distance = Vector2.Distance(boss.transform.position, boss.Player.position);
-        
-        if (distance <= boss.Data.attackRange)
+        Vector2 bossPos = context.BossTransform.position;
+        Vector2 playerPos = context.Player.position;
+
+        float distance = Vector2.Distance(bossPos, playerPos);
+
+        if (distance <= context.Data.attackRange)
         {
-            boss.SetState(new AttackState());
+            context.Brain.ChangeState(new AttackState());
             return;
         }
 
-        bool canDash = Time.time >= boss.LastDashTime + boss.Data.dashCooldown;
-        bool closeEnough = distance <= boss.Data.dashTriggerDistance;
-        bool chance = Random.value <= boss.Data.dashChance;
+        bool canDash =
+            Time.time >= context.LastDashTime +
+            context.Data.dashCooldown;
 
-        if (canDash && closeEnough && chance)
+        bool closeEnough =
+            distance <= context.Data.dashTriggerDistance;
+
+        if (canDash && closeEnough)
         {
-            boss.SetState(new DashState());
-            return;
+            if (Random.value <= context.Data.dashChance)
+            {
+                context.Brain.ChangeState(new DashState());
+                return;
+            }
         }
 
-        Vector2 dir = (boss.Player.position - boss.transform.position).normalized;
-        boss.Move(dir); 
+        Vector2 dir = (playerPos - bossPos).normalized;
+
+        context.LastMoveDirection = dir;
+
+        context.Animator.SetFloat("MoveX", dir.x);
+        context.Animator.SetFloat("MoveY", dir.y);
+
+        context.Movement.Move(dir, context.Data.speed);
     }
 
-    public void ExitState(Boss boss)
+    public void ExitState(BossContext context)
     {
-        boss.StopMoving();
+        context.Movement.Stop();
     }
 }

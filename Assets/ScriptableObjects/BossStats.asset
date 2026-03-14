@@ -23,8 +23,8 @@ MonoBehaviour:
   rageDamageMultiplier: 1.5
   rageColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   dashSpeed: 4.5
-  dashDuration: 0.2
-  dashTriggerDistance: 10
+  dashDuration: 0.5
+  dashTriggerDistance: 20
   dashChance: 0.15
   dashCooldown: 2
   dashWindup: 0.2
