@@ -5,6 +5,11 @@ public class Rooms : MonoBehaviour
     [Header("Grid")]
     public Vector2Int GridPosition;
 
+    [Header("Boss Settings")]
+    public bool IsBossRoom = false;
+    public Transform BossSpawnPoint;
+    public GameObject BossPrefab;
+
     [Header("Room Info")]
     public bool IsStarter = false;
     public bool IsCleared = false;

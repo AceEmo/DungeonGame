@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4586179704964300}
   - component: {fileID: 212459707601042896}
   - component: {fileID: 1947987300976757709}
-  m_Layer: 8
+  m_Layer: 11
   m_Name: blocking_box
   m_TagString: Untagged
   m_Icon: {fileID: 0}

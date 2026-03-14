@@ -13,6 +13,7 @@ public class AttackState : IBossState
 
     public void UpdateState(Boss boss)
     {
+        if (boss.IsDead) return;
         if (!attacked)
         {
             attacked = true;

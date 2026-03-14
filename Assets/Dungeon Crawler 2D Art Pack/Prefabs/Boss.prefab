@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 95171608050424218}
   - component: {fileID: 3341798647166314481}
   - component: {fileID: 933311675424932154}
-  - component: {fileID: 5317355253904395960}
   - component: {fileID: 459191824537591527}
-  m_Layer: 0
+  - component: {fileID: 5317355253904395960}
+  m_Layer: 7
   m_Name: Boss
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.03, y: 0.07, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2552714539305206480}
@@ -86,8 +86,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -183448429
+  m_SortingLayer: 3
   m_SortingOrder: 9
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 7afd3d09d59e6a14b8ffd1ef49d2563e, type: 3}
@@ -195,23 +195,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.8316522, y: 0.9979558}
   m_EdgeRadius: 0
---- !u!114 &5317355253904395960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1674528916550958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f74ed5c332495644cbc9f70e933be69f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Boss
-  data: {fileID: 11400000, guid: c2b3036ca1875544987a2d09b61b7847, type: 2}
-  attackPointUp: {fileID: 2552714539305206480}
-  attackPointDown: {fileID: 7018950290986510234}
-  attackPointLeft: {fileID: 172518448789409429}
-  attackPointRight: {fileID: 7094246387602070532}
 --- !u!61 &459191824537591527
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -258,6 +241,32 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.9698389, y: 1.6731707}
   m_EdgeRadius: 0
+--- !u!114 &5317355253904395960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674528916550958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f74ed5c332495644cbc9f70e933be69f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Boss
+  data: {fileID: 11400000, guid: c2b3036ca1875544987a2d09b61b7847, type: 2}
+  steeringSmooth: 0.15
+  wallCheckDistance: 1
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  separationRadius: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 4224
+  attackPointUp: {fileID: 2552714539305206480}
+  attackPointDown: {fileID: 7018950290986510234}
+  attackPointLeft: {fileID: 172518448789409429}
+  attackPointRight: {fileID: 7094246387602070532}
 --- !u!1 &617470519937002030
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,7 +276,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 172518448789409429}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPointLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -298,7 +307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2552714539305206480}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPointUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,7 +324,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.16, y: 0.72, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4205740261019476}
@@ -329,7 +338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7018950290986510234}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPointDown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -360,7 +369,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7094246387602070532}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AttackPointRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}

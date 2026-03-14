@@ -4,6 +4,7 @@ using System.Collections;
 public class Boss : MonoBehaviour, IDamageable
 {
     public BossData data;
+    public event System.Action OnBossDied;
 
     [Header("Attack Points")]
     public Transform attackPointUp;
@@ -19,6 +20,8 @@ public class Boss : MonoBehaviour, IDamageable
     private int currentDamage;
     private bool isDead = false;
     private bool isRaging = false;
+    private float lastDashTime = -999f;
+
     private Vector2 lastMoveDir = Vector2.down;
 
     private Transform player;
@@ -83,11 +86,16 @@ public class Boss : MonoBehaviour, IDamageable
     }
 
     public Transform Player => player;
-
     public bool IsDead => isDead;
     public Animator AnimatorComponent => animator;
-
     public BossData Data => data;
+    public float LastDashTime => lastDashTime;
+    
+    public void StartDashCooldown()
+    {
+        lastDashTime = Time.time;
+    }
+
 
     public void TakeDamage(int amount)
     {
@@ -143,6 +151,7 @@ public class Boss : MonoBehaviour, IDamageable
             col.enabled = false;
 
         StartCoroutine(FadeAndDestroy());
+        OnBossDied?.Invoke();
     }
 
     private IEnumerator FadeAndDestroy()
