@@ -1,9 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
 public class Boss : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
@@ -12,6 +9,14 @@ public class Boss : MonoBehaviour, IDamageable
     public float attackRange = 2f;
     public int attackDamage = 2;
     public Color hitColor = new Color(1f, 0.5f, 0.5f);
+
+    [Header("Attack Points")]
+    public Transform attackPointUp;
+    public Transform attackPointDown;
+    public Transform attackPointLeft;
+    public Transform attackPointRight;
+
+    public float attackRadius = 0.8f;
 
     [Header("FSM")]
     private IBossState currentState;
@@ -150,18 +155,38 @@ public class Boss : MonoBehaviour, IDamageable
         Destroy(gameObject);
     }
 
+    private Transform GetCurrentAttackPoint()
+    {
+        if (Mathf.Abs(lastMoveDir.x) > Mathf.Abs(lastMoveDir.y))
+        {
+            if (lastMoveDir.x > 0)
+                return attackPointRight;
+            else
+                return attackPointLeft;
+        }
+        else
+        {
+            if (lastMoveDir.y > 0)
+                return attackPointUp;
+            else
+                return attackPointDown;
+        }
+    }
+
     public void DealDamageToPlayer()
     {
-        if (player == null) return;
+        Transform point = GetCurrentAttackPoint();
+        if (point == null) return;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRange);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(point.position, attackRadius);
+
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Player"))
             {
-                PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
-                    playerHealth.TakeDamage(attackDamage, transform.position);
+                PlayerHealth ph = hit.GetComponent<PlayerHealth>();
+                if (ph != null)
+                    ph.TakeDamage(attackDamage, transform.position);
             }
         }
     }
