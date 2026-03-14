@@ -12,6 +12,16 @@ public class ChaseState : IBossState
         boss.Move(dir);
 
         float distance = Vector2.Distance(boss.transform.position, boss.Player.position);
+
+        if (distance > boss.Data.dashTriggerDistance)
+        {
+            if (Random.value < boss.Data.dashChance)
+            {
+                boss.SetState(new DashState());
+                return;
+            }
+        }
+
         if (distance < boss.Data.attackRange)
         {
             boss.SetState(new AttackState());

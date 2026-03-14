@@ -15,24 +15,30 @@ public class Boss : MonoBehaviour, IDamageable
     private IBossState currentState;
 
     private int currentHealth;
+    private float currentSpeed;
+    private int currentDamage;
     private bool isDead = false;
+    private bool isRaging = false;
     private Vector2 lastMoveDir = Vector2.down;
 
     private Transform player;
     private Animator animator;
-    private Rigidbody2D rb;
-    private SpriteRenderer sr;
-
+    private Rigidbody2D rigidBody;
+    private SpriteRenderer spriteRenderer;
+    private MaterialPropertyBlock materialPropertyBlock;
     private Color originalColor;
 
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
-        originalColor = sr != null ? sr.color : Color.white;
+        rigidBody = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
+        materialPropertyBlock = new MaterialPropertyBlock();
         currentHealth = data.MaxHealth;
+        currentSpeed = data.speed;
+        currentDamage = data.attackDamage;
     }
 
     private void Start()
@@ -44,6 +50,7 @@ public class Boss : MonoBehaviour, IDamageable
     {
         if (!isDead)
             currentState?.UpdateState(this);
+        CheckRage();
     }
 
     public void SetState(IBossState newState)
@@ -57,7 +64,7 @@ public class Boss : MonoBehaviour, IDamageable
 
     public void Move(Vector2 direction)
     {
-        rb.linearVelocity = direction * data.speed;
+        rigidBody.linearVelocity = direction * currentSpeed;
         if (direction != Vector2.zero)
             lastMoveDir = direction;
         UpdateAnimator(direction);
@@ -65,7 +72,7 @@ public class Boss : MonoBehaviour, IDamageable
 
     public void StopMoving()
     {
-        rb.linearVelocity = Vector2.zero;
+        rigidBody.linearVelocity = Vector2.zero;
         UpdateAnimator(Vector2.zero);
     }
 
@@ -99,11 +106,21 @@ public class Boss : MonoBehaviour, IDamageable
 
     private IEnumerator HitFlash()
     {
-        if (sr == null) yield break;
-        sr.color = data.hitColor;
+        if (spriteRenderer == null) yield break;
+
+        spriteRenderer.GetPropertyBlock(materialPropertyBlock);
+        Color baseColor = isRaging ? data.rageColor : originalColor;
+
+        Color flashColor = Color.Lerp(baseColor, data.hitColor, 0.7f);
+        materialPropertyBlock.SetColor("_Color", flashColor);
+        spriteRenderer.SetPropertyBlock(materialPropertyBlock);
+
         yield return new WaitForSeconds(0.1f);
-        sr.color = originalColor;
+
+        materialPropertyBlock.SetColor("_Color", baseColor);
+        spriteRenderer.SetPropertyBlock(materialPropertyBlock);
     }
+
 
     private void Die()
     {
@@ -118,8 +135,8 @@ public class Boss : MonoBehaviour, IDamageable
             animator.SetTrigger("Die");
         }
 
-        rb.linearVelocity = Vector2.zero;
-        rb.simulated = false;
+        rigidBody.linearVelocity = Vector2.zero;
+        rigidBody.simulated = false;
 
         Collider2D[] colliders = GetComponents<Collider2D>();
         foreach (Collider2D col in colliders)
@@ -132,18 +149,18 @@ public class Boss : MonoBehaviour, IDamageable
     {
         float duration = 1.5f;
         float t = 0f;
-        Color startColor = sr != null ? sr.color : Color.white;
+        Color startColor = spriteRenderer != null ? spriteRenderer.color : Color.white;
 
         while (t < duration)
         {
             t += Time.deltaTime;
-
-            if (sr != null)
+            if (spriteRenderer != null)
             {
                 float alpha = Mathf.Lerp(1f, 0f, t / duration);
-                sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+                spriteRenderer.GetPropertyBlock(materialPropertyBlock);
+                materialPropertyBlock.SetColor("_Color", new Color(startColor.r, startColor.g, startColor.b, alpha));
+                spriteRenderer.SetPropertyBlock(materialPropertyBlock);
             }
-
             yield return null;
         }
 
@@ -179,9 +196,29 @@ public class Boss : MonoBehaviour, IDamageable
         {
             if (hit.CompareTag("Player"))
             {
-                PlayerHealth ph = hit.GetComponent<PlayerHealth>();
-                if (ph != null)
-                    ph.TakeDamage(data.attackDamage, transform.position);
+                PlayerHealth playerHitBox = hit.GetComponent<PlayerHealth>();
+                if (playerHitBox != null)
+                    playerHitBox.TakeDamage(currentDamage, transform.position);
+            }
+        }
+    }
+    private void CheckRage()
+    {
+        if (isRaging) return;
+
+        float hpPercent = (float)currentHealth / data.MaxHealth;
+        if (hpPercent <= data.rageThreshold)
+        {
+            isRaging = true;
+
+            currentSpeed = data.speed * data.rageSpeedMultiplier;
+            currentDamage = Mathf.RoundToInt(data.attackDamage * data.rageDamageMultiplier);
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.GetPropertyBlock(materialPropertyBlock);
+                materialPropertyBlock.SetColor("_Color", data.rageColor);
+                spriteRenderer.SetPropertyBlock(materialPropertyBlock);
             }
         }
     }

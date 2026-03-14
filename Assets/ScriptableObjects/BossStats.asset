@@ -16,5 +16,13 @@ MonoBehaviour:
   speed: 3
   attackRange: 2
   attackDamage: 2
-  hitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
   attackRadius: 0.8
+  hitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
+  rageThreshold: 0.3
+  rageSpeedMultiplier: 1.5
+  rageDamageMultiplier: 1.5
+  rageColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  dashSpeed: 8
+  dashDuration: 0.4
+  dashTriggerDistance: 6
+  dashChance: 0.25
