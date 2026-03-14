@@ -3,7 +3,6 @@ using UnityEngine;
 public class GroundMovement : MonoBehaviour, IEnemyMovement
 {
     [Header("Movement")]
-    public float speed = 3f;
     public float steeringSmooth = 0.15f;
 
     [Header("Wall Avoidance")]
@@ -16,9 +15,11 @@ public class GroundMovement : MonoBehaviour, IEnemyMovement
 
     private Rigidbody2D rb;
     private Vector2 smoothedSteering;
+    private Enemy enemy;
 
     private void Awake()
     {
+        enemy = GetComponent<Enemy>();
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -41,7 +42,7 @@ public class GroundMovement : MonoBehaviour, IEnemyMovement
         if (smoothedSteering.sqrMagnitude > 1f)
             smoothedSteering.Normalize();
 
-        rb.linearVelocity = smoothedSteering * speed;
+        rb.linearVelocity = smoothedSteering * enemy.Data.speed;
     }
 
     private Vector2 WallAvoidance(Vector2 moveDir)

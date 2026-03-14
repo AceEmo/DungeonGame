@@ -12,7 +12,7 @@ public class IdleState : IBossState
         if (boss.IsDead || boss.Player == null) return;
 
         float distance = Vector2.Distance(boss.transform.position, boss.Player.position);
-        if (distance < boss.attackRange * 3)
+        if (distance < boss.Data.attackRange * 3)
         {
             boss.SetState(new ChaseState());
         }

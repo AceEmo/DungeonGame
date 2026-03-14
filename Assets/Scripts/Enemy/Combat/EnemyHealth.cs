@@ -5,11 +5,12 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 {
     public event System.Action<EnemyHealth> OnEnemyDied;
 
-    public int MaxHealth = 3;
-    public Color HitColor = new Color(1f, 0.5f, 0.5f);
+    private Enemy enemy;
+
     public Animator Animator;
 
     private int CurrentHealth;
+    private Color HitColor;
     private bool IsDead = false;
     private SpriteRenderer Sr;
     private Collider2D[] Colliders;
@@ -18,7 +19,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private void Awake()
     {
-        CurrentHealth = MaxHealth;
+        enemy = GetComponent<Enemy>();
+        CurrentHealth = enemy.Data.MaxHealth;
+        HitColor = enemy.Data.hitColor;
         Sr = GetComponent<SpriteRenderer>();
         Colliders = GetComponents<Collider2D>();
         if (Sr != null) OriginalColor = Sr.color;
@@ -54,8 +57,10 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         StopCoroutine("HitFlash");
 
         if (Animator != null)
+        {
             Animator.ResetTrigger("Hit");
             Animator.SetTrigger("Die");
+        }
 
         if (Colliders != null)
         {
@@ -78,9 +83,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (damage != null)
             damage.enabled = false;
 
-        EnemyAnimation animation = GetComponent<EnemyAnimation>();
-        if (animation != null)
-            animation.enabled = false;
+        Enemy enemyComponent = GetComponent<Enemy>();
+        if (enemyComponent != null)
+            enemyComponent.enabled = false;
 
         StartCoroutine(FadeAndDestroy());
         OnEnemyDied?.Invoke(this);

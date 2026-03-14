@@ -3,20 +3,13 @@ using System.Collections;
 
 public class Boss : MonoBehaviour, IDamageable
 {
-    [Header("Stats")]
-    public int MaxHealth = 20;
-    public float speed = 3f;
-    public float attackRange = 2f;
-    public int attackDamage = 2;
-    public Color hitColor = new Color(1f, 0.5f, 0.5f);
+    public BossData data;
 
     [Header("Attack Points")]
     public Transform attackPointUp;
     public Transform attackPointDown;
     public Transform attackPointLeft;
     public Transform attackPointRight;
-
-    public float attackRadius = 0.8f;
 
     [Header("FSM")]
     private IBossState currentState;
@@ -39,7 +32,7 @@ public class Boss : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         originalColor = sr != null ? sr.color : Color.white;
-        currentHealth = MaxHealth;
+        currentHealth = data.MaxHealth;
     }
 
     private void Start()
@@ -64,7 +57,7 @@ public class Boss : MonoBehaviour, IDamageable
 
     public void Move(Vector2 direction)
     {
-        rb.linearVelocity = direction * speed;
+        rb.linearVelocity = direction * data.speed;
         if (direction != Vector2.zero)
             lastMoveDir = direction;
         UpdateAnimator(direction);
@@ -87,6 +80,8 @@ public class Boss : MonoBehaviour, IDamageable
     public bool IsDead => isDead;
     public Animator AnimatorComponent => animator;
 
+    public BossData Data => data;
+
     public void TakeDamage(int amount)
     {
         if (isDead) return;
@@ -105,7 +100,7 @@ public class Boss : MonoBehaviour, IDamageable
     private IEnumerator HitFlash()
     {
         if (sr == null) yield break;
-        sr.color = hitColor;
+        sr.color = data.hitColor;
         yield return new WaitForSeconds(0.1f);
         sr.color = originalColor;
     }
@@ -178,7 +173,7 @@ public class Boss : MonoBehaviour, IDamageable
         Transform point = GetCurrentAttackPoint();
         if (point == null) return;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(point.position, attackRadius);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(point.position, data.attackRadius);
 
         foreach (var hit in hits)
         {
@@ -186,7 +181,7 @@ public class Boss : MonoBehaviour, IDamageable
             {
                 PlayerHealth ph = hit.GetComponent<PlayerHealth>();
                 if (ph != null)
-                    ph.TakeDamage(attackDamage, transform.position);
+                    ph.TakeDamage(data.attackDamage, transform.position);
             }
         }
     }

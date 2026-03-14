@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class RandomFlyingBehaviour : MonoBehaviour, IEnemyBehaviour
 {
-    public float changeDirectionInterval = 2f;
+    private Enemy enemy;
 
     private float timer;
     private Vector2 currentDirection;
 
     private void Start()
     {
+        enemy = GetComponent<Enemy>();
         PickNewDirection();
     }
 
@@ -16,7 +17,7 @@ public class RandomFlyingBehaviour : MonoBehaviour, IEnemyBehaviour
     {
         timer += Time.deltaTime;
 
-        if (timer >= changeDirectionInterval)
+        if (timer >= enemy.Data.changeDirectionInterval)
         {
             PickNewDirection();
             timer = 0f;
