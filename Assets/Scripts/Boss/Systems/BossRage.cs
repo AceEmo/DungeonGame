@@ -17,7 +17,6 @@ public class BossRage
         {
             raging = true;
 
-            // НЕ променяме context.Data, само инстанцията
             context.CurrentSpeed = context.Data.speed * context.Data.rageSpeedMultiplier;
             context.CurrentDamage = Mathf.RoundToInt(
                 context.Data.attackDamage * context.Data.rageDamageMultiplier);

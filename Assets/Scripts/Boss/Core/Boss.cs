@@ -4,9 +4,10 @@ using System.Collections;
 
 public class Boss : MonoBehaviour, IDamageable
 {
+    [Header("Boss Settings")]
     public BossData data;
-    private SpriteRenderer spriteRenderer;
 
+    [Header("Attack Points")]
     public Transform attackPointUp;
     public Transform attackPointDown;
     public Transform attackPointLeft;
@@ -14,45 +15,18 @@ public class Boss : MonoBehaviour, IDamageable
 
     public event Action OnBossDied;
 
-    private BossBrain brain;
-    private BossContext context;
-
+    private SpriteRenderer spriteRenderer;
     private MaterialPropertyBlock materialPropertyBlock;
     private Color originalColor;
 
+    private BossBrain brain;
+    private BossContext context;
+
     private void Awake()
     {
-        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        Animator animator = GetComponent<Animator>();
-        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
-
-        materialPropertyBlock = new MaterialPropertyBlock();
-        originalColor = sprite.color;
-
-        context = new BossContext
-        {
-            BossTransform = transform,
-            Player = player,
-            Data = data,
-
-            Animator = animator,
-            SpriteRenderer = sprite,
-
-            Health = new BossHealth(data.MaxHealth),
-            Movement = new BossMovement(rb),
-            Rage = new BossRage(),
-
-            Combat = new BossCombat(
-                attackPointUp,
-                attackPointDown,
-                attackPointLeft,
-                attackPointRight)
-        };
-
-        brain = new BossBrain(context);
-        context.Brain = brain;
+        InitializeComponents();
+        InitializeContext();
+        InitializeBrain();
     }
 
     private void Start()
@@ -65,40 +39,89 @@ public class Boss : MonoBehaviour, IDamageable
         brain.Update();
     }
 
+    private void InitializeComponents()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        materialPropertyBlock = new MaterialPropertyBlock();
+        originalColor = spriteRenderer.color;
+    }
+
+    private void InitializeContext()
+    {
+        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        context = new BossContext
+        {
+            BossTransform = transform,
+            Player = player,
+            Data = data,
+
+            Animator = GetComponent<Animator>(),
+            SpriteRenderer = spriteRenderer,
+
+            Health = new BossHealth(data.MaxHealth),
+            Movement = new BossMovement(GetComponent<Rigidbody2D>()),
+            Rage = new BossRage(),
+
+            Combat = new BossCombat(
+                attackPointUp,
+                attackPointDown,
+                attackPointLeft,
+                attackPointRight)
+        };
+    }
+
+    private void InitializeBrain()
+    {
+        brain = new BossBrain(context);
+        context.Brain = brain;
+    }
+
     public void TakeDamage(int amount)
     {
         if (context.IsDead)
             return;
 
         context.Health.TakeDamage(amount);
-
         StartCoroutine(HitFlash());
 
-       if (context.Health.IsDead)
+        if (context.Health.IsDead)
         {
-            context.Brain.ChangeState(new DeathState());
-            OnBossDied?.Invoke();
-        } else
+            HandleDeath();
+        }
+        else
         {
-            context.Animator.SetTrigger("Hit");
+            HandleHit();
         }
     }
 
-    private System.Collections.IEnumerator HitFlash()
+    private void HandleDeath()
     {
-        context.SpriteRenderer.GetPropertyBlock(materialPropertyBlock);
-
-        Color flashColor =
-            Color.Lerp(originalColor, data.hitColor, 0.7f);
-
-        materialPropertyBlock.SetColor("_Color", flashColor);
-        context.SpriteRenderer.SetPropertyBlock(materialPropertyBlock);
-
-        yield return new WaitForSeconds(0.1f);
-
-        materialPropertyBlock.SetColor("_Color", originalColor);
-        context.SpriteRenderer.SetPropertyBlock(materialPropertyBlock);
+        context.Brain.ChangeState(new DeathState());
+        OnBossDied?.Invoke();
     }
+
+    private void HandleHit()
+    {
+        context.Animator.SetTrigger("Hit");
+    }
+
+    private IEnumerator HitFlash()
+    {
+        Color flashColor = Color.Lerp(originalColor, data.hitColor, 0.7f);
+
+        SetSpriteColor(flashColor);
+        yield return new WaitForSeconds(0.1f);
+        SetSpriteColor(originalColor);
+    }
+
+    private void SetSpriteColor(Color color)
+    {
+        spriteRenderer.GetPropertyBlock(materialPropertyBlock);
+        materialPropertyBlock.SetColor("_Color", color);
+        spriteRenderer.SetPropertyBlock(materialPropertyBlock);
+    }
+
     public void StartFadeAndDestroy()
     {
         StartCoroutine(FadeAndDestroy());
@@ -107,18 +130,18 @@ public class Boss : MonoBehaviour, IDamageable
     private IEnumerator FadeAndDestroy()
     {
         float duration = 1.5f;
-        float t = 0f;
+        float animationTime = 0f;
+
         Color startColor = spriteRenderer.color;
 
-        while (t < duration)
+        while (animationTime < duration)
         {
-            t += Time.deltaTime;
+            animationTime += Time.deltaTime;
 
-            float alpha = Mathf.Lerp(1f, 0f, t / duration);
-            spriteRenderer.GetPropertyBlock(materialPropertyBlock);
-            materialPropertyBlock.SetColor("_Color", new Color(startColor.r, startColor.g, startColor.b, alpha));
-            spriteRenderer.SetPropertyBlock(materialPropertyBlock);
+            float alpha = Mathf.Lerp(1f, 0f, animationTime / duration);
+            Color newColor = new Color(startColor.r, startColor.g, startColor.b, alpha);
 
+            SetSpriteColor(newColor);
             yield return null;
         }
 

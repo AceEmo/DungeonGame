@@ -6,9 +6,9 @@ public class DeathState : IBossState
     {
         context.Movement.Stop();
 
-        var rb = context.BossTransform.GetComponent<Rigidbody2D>();
-        if (rb != null)
-            rb.simulated = false;
+        var rigidbody = context.BossTransform.GetComponent<Rigidbody2D>();
+        if (rigidbody != null)
+            rigidbody.simulated = false;
 
         if (context.Animator != null)
             context.Animator.SetTrigger("Die");

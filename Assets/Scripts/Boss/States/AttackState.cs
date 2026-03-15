@@ -11,7 +11,6 @@ public class AttackState : IBossState
         context.Animator.SetTrigger("Attack");
     }
 
-
     public void UpdateState(BossContext context)
     {
         if (context.IsDead)
