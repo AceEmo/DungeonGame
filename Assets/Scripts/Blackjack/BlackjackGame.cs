@@ -16,6 +16,7 @@ public class BlackjackGame : MonoBehaviour
 
     private bool gameOver;
     private bool rewardProcessing;
+    private bool dealerCardHidden;
 
     private void Awake()
     {
@@ -30,7 +31,7 @@ public class BlackjackGame : MonoBehaviour
     public void StartBlackjack()
     {
         if (ui != null)
-            ui.SetResult("");
+            ui.SetResult(" ");
         StartCoroutine(GameFlow());
     }
 
@@ -46,8 +47,11 @@ public class BlackjackGame : MonoBehaviour
 
         gameOver = false;
         rewardProcessing = false;
+        dealerCardHidden = false;
 
         ui.EnableButtons(false);
+
+        ui.UpdateScores(0, 0);
 
         yield return new WaitForSecondsRealtime(1f);
 
@@ -57,6 +61,16 @@ public class BlackjackGame : MonoBehaviour
 
         if (!gameOver)
             ui.EnableButtons(true);
+    }
+
+    private void UpdateAllScores()
+    {
+        int playerScore = playerHand.GetScore();
+        int dealerScore = dealerCardHidden
+            ? dealerHand.GetScoreWithoutFirstCard()
+            : dealerHand.GetScore();
+
+        ui.UpdateScores(playerScore, dealerScore);
     }
 
     IEnumerator InitialDeal()
@@ -73,6 +87,9 @@ public class BlackjackGame : MonoBehaviour
         playerHand.AddCard(card);
 
         ui.SpawnCard(card.sprite, ui.playerCardArea);
+
+        UpdateAllScores();
+
         yield return new WaitForSecondsRealtime(0.4f);
     }
 
@@ -84,7 +101,12 @@ public class BlackjackGame : MonoBehaviour
         GameObject go = ui.SpawnCard(hidden ? ui.backCardSprite : card.sprite, ui.dealerCardArea);
 
         if (hidden)
+        {
             hiddenDealerCard = go;
+            dealerCardHidden = true;
+        }
+
+        UpdateAllScores();
 
         yield return new WaitForSecondsRealtime(0.4f);
     }
@@ -106,6 +128,9 @@ public class BlackjackGame : MonoBehaviour
     IEnumerator InitialBlackjackFlow(bool playerBJ, bool dealerBJ)
     {
         ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
+        dealerCardHidden = false;
+        UpdateAllScores();            
+
         yield return new WaitForSecondsRealtime(1f);
 
         rewardProcessing = true;
@@ -117,7 +142,7 @@ public class BlackjackGame : MonoBehaviour
         else if (playerBJ)
         {
             ui.SetResult("BLACKJACK!");
-            yield return rewardSystem.WinRoutine(ui);
+            yield return rewardSystem.WinRoutine(ui, true);
         }
         else
         {
@@ -145,12 +170,17 @@ public class BlackjackGame : MonoBehaviour
 
         int playerScore = playerHand.GetScore();
 
+        UpdateAllScores();
+
         if (playerScore > 21)
         {
             gameOver = true;
             ui.EnableButtons(false);
 
             ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
+            dealerCardHidden = false;   
+            UpdateAllScores();          
+
             yield return new WaitForSecondsRealtime(1f);
 
             ui.SetResult("YOU LOSE!");
@@ -182,6 +212,9 @@ public class BlackjackGame : MonoBehaviour
         ui.EnableButtons(false);
 
         ui.FlipCard(hiddenDealerCard, dealerHand.Cards[0].sprite);
+        dealerCardHidden = false;
+        UpdateAllScores();          
+
         yield return new WaitForSecondsRealtime(1f);
 
         while (dealerHand.GetScore() < 17)
@@ -197,13 +230,15 @@ public class BlackjackGame : MonoBehaviour
         gameOver = true;
         rewardProcessing = true;
 
+        UpdateAllScores();
+
         int playerScore = playerHand.GetScore();
         int dealerScore = dealerHand.GetScore();
 
         if (dealerScore > 21 || playerScore > dealerScore)
         {
             ui.SetResult("YOU WIN!");
-            yield return rewardSystem.WinRoutine(ui);
+            yield return rewardSystem.WinRoutine(ui, false);
         }
         else if (playerScore < dealerScore)
         {
@@ -228,7 +263,7 @@ public class BlackjackGame : MonoBehaviour
 
         if (ui != null)
         {
-            ui.SetResult("");
+            ui.SetResult(" ");
             ui.ClearTable();
         }
     }

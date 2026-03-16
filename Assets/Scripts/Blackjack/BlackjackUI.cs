@@ -10,6 +10,8 @@ public class BlackjackUI : MonoBehaviour
     public Transform dealerCardArea;
     public GameObject cardPrefab;
     public TextMeshProUGUI resultText;
+    public TMPro.TextMeshProUGUI playerScoreText;
+    public TMPro.TextMeshProUGUI dealerScoreText;
 
     public Button hitButton;
     public Button standButton;
@@ -85,5 +87,14 @@ public class BlackjackUI : MonoBehaviour
     public void SetExitButton(bool state)
     {
         exitButton.interactable = state;
+    }
+
+    public void UpdateScores(int playerScore, int dealerScore)
+    {
+        if (playerScoreText != null)
+            playerScoreText.text = playerScore.ToString();
+
+        if (dealerScoreText != null)
+            dealerScoreText.text = dealerScore.ToString();
     }
 }

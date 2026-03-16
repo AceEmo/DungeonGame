@@ -250,33 +250,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 447092266994684863, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      propertyPath: stats
-      value: 
-      objectReference: {fileID: 11400000, guid: e0cb57d0a68b2844e9f68609a87dd496, type: 2}
-    - target: {fileID: 754120618793406831, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      propertyPath: stats
-      value: 
-      objectReference: {fileID: 11400000, guid: e0cb57d0a68b2844e9f68609a87dd496, type: 2}
-    - target: {fileID: 754120618793406831, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      propertyPath: verticalOffset
-      value: 0.25
+    - target: {fileID: 5121923361546780928, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
+      propertyPath: interactableLayer.m_Bits
+      value: 1024
       objectReference: {fileID: 0}
-    - target: {fileID: 4811354939043318432, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.65
-      objectReference: {fileID: 0}
-    - target: {fileID: 7406109688250902853, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      propertyPath: stats
-      value: 
-      objectReference: {fileID: 11400000, guid: e0cb57d0a68b2844e9f68609a87dd496, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1635833487047996, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1781143395}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
 --- !u!1 &113912048
 GameObject:
@@ -876,7 +857,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 447092266994684863, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
   m_PrefabInstance: {fileID: 55295001}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1781143388}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8c13534343f290458ee81bd4f7ddc2b, type: 3}
@@ -1715,6 +1696,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionHint
   hintPanel: {fileID: 1811396884}
   hintText: {fileID: 1586107746}
+  hintOffset: {x: 0, y: 30, z: 0}
 --- !u!1 &1126240442
 GameObject:
   m_ObjectHideFlags: 0
@@ -2626,10 +2608,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d57a6aba2235b084884fe80807e3c432, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  playerHealth: {fileID: 470893399}
-  gameOverPanel: {fileID: 382095874}
-  pausePanel: {fileID: 414626597}
-  hintPanel: {fileID: 1811396884}
 --- !u!4 &1746479962
 Transform:
   m_ObjectHideFlags: 0
@@ -2645,24 +2623,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1781143388 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1635833487047996, guid: 024497ca59b493545a9fe8b5720392e4, type: 3}
-  m_PrefabInstance: {fileID: 55295001}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1781143395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1781143388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b68093d7592656946a6f6b21e813670e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
-  interactRange: 1.5
 --- !u!1 &1811396884
 GameObject:
   m_ObjectHideFlags: 0
