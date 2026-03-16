@@ -9,4 +9,5 @@ public class PlayerStats : ScriptableObject
     public float fireRate = 0.5f;
     public float bulletSpeed = 10f;
     public int damage = 1;
+    public int scrap = 0;
 }

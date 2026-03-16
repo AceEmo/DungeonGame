@@ -2819,6 +2819,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4318325827416929694}
   - {fileID: 4132810360917177825}
   - {fileID: 3001262447494437755}
   - {fileID: 4208682863441680}
@@ -2842,6 +2843,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rooms
   GridPosition: {x: 0, y: 0}
+  ClosedChestPrefab: {fileID: 1998873333861008, guid: a566a4ec74b362446811254d0c887410, type: 3}
+  HealthPrefab: {fileID: 3044192955997078429, guid: 26dd60b06c55e1b4e9fbf9b86bc800de, type: 3}
+  Gear1Prefab: {fileID: 1267495385696220, guid: ddf140f8709ea9b4f97429c55753df8c, type: 3}
+  Gear2Prefab: {fileID: 1782623961747334, guid: 194b89998f398cf41ab5dd5ed37f2b5a, type: 3}
+  RewardSpawnPoints:
+  - {fileID: 4318325827416929694}
+  rewardSpawned: 0
   IsBossRoom: 1
   BossSpawnPoint: {fileID: 5493925021233269665}
   BossPrefab: {fileID: 1674528916550958, guid: dcf76343326e5514abbe873a7967f41b, type: 3}
@@ -4384,6 +4392,37 @@ Transform:
   - {fileID: 1034637836478123120}
   - {fileID: 5881786443935046995}
   - {fileID: 3777456430152934663}
+  m_Father: {fileID: 4147784773578770}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3632135065919908885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4318325827416929694}
+  m_Layer: 0
+  m_Name: RewardSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4318325827416929694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3632135065919908885}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.808, y: -3.748, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 4147784773578770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3879858424751218658

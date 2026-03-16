@@ -4,6 +4,15 @@ public class Rooms : MonoBehaviour
 {
     [Header("Grid")]
     public Vector2Int GridPosition;
+    [Header("Rewards")]
+    public GameObject ClosedChestPrefab;
+    public GameObject HealthPrefab;
+    public GameObject Gear1Prefab;
+    public GameObject Gear2Prefab;
+
+    [Header("Reward Spawns")]
+    public Transform[] RewardSpawnPoints;
+    [HideInInspector] public bool rewardSpawned = false;
 
     [Header("Boss Settings")]
     public bool IsBossRoom = false;
@@ -61,5 +70,43 @@ public class Rooms : MonoBehaviour
         if (RightDoor != null) RightDoor.Unlock();
         if (TopDoor != null) TopDoor.Unlock();
         if (BottomDoor != null) BottomDoor.Unlock();
+
+        SpawnReward();
+    }
+
+    private void SpawnReward()
+    {
+        if (rewardSpawned) return;
+        if (IsStarter) return;
+        if (RewardSpawnPoints == null || RewardSpawnPoints.Length == 0) return;
+
+        rewardSpawned = true;
+
+        Transform spawnPoint = RewardSpawnPoints[Random.Range(0, RewardSpawnPoints.Length)];
+
+        int roll = Random.Range(0, 2);
+
+        if (roll == 0)
+        {
+            Instantiate(ClosedChestPrefab, spawnPoint.position, Quaternion.identity);
+        }
+        else
+        {
+            SpawnDirectReward(spawnPoint.position);
+        }
+    }
+
+    private void SpawnDirectReward(Vector3 pos)
+    {
+        int reward = Random.Range(0, 3);
+
+        if (reward == 0)
+            Instantiate(HealthPrefab, pos, Quaternion.identity);
+
+        if (reward == 1)
+            Instantiate(Gear1Prefab, pos, Quaternion.identity);
+
+        if (reward == 2)
+            Instantiate(Gear2Prefab, pos, Quaternion.identity);
     }
 }

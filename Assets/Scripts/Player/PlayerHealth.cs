@@ -13,6 +13,8 @@ public class PlayerHealth : MonoBehaviour
 
     private float currentHealth;
     private bool isInvincible;
+    private int scrap;
+    public int Scrap => scrap;
     public float CurrentHealth => currentHealth;
     public float MaxHealth => stats.maxHealth;
 
@@ -102,11 +104,33 @@ public class PlayerHealth : MonoBehaviour
             animator.SetTrigger("Die");
 
         StartCoroutine(DeathSequence());
+        ResetScrap();
     }
 
     private IEnumerator DeathSequence()
     {
         yield return new WaitForSecondsRealtime(1.5f);
         OnPlayerDied?.Invoke();
+    }
+    
+    public void Heal(float amount)
+    {
+        if (currentHealth <= 0)
+            return;
+
+        currentHealth += amount;
+        currentHealth = Mathf.Min(currentHealth, MaxHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
+    }
+
+    public void AddScrap(int amount)
+    {
+        scrap += amount;
+    }
+
+    public void ResetScrap()
+    {
+        scrap = 0;
     }
 }
