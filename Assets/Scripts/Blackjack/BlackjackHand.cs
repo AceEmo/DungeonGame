@@ -21,11 +21,25 @@ public class BlackjackHand
 
     public int GetScore()
     {
+        return ComputeScore(0);
+    }
+
+    public int GetScoreWithoutFirstCard()
+    {
+        if (cards.Count <= 1)
+            return 0;
+
+        return ComputeScore(1);
+    }
+
+    private int ComputeScore(int startIndex)
+    {
         int total = 0;
         int aces = 0;
 
-        foreach (Card c in cards)
+        for (int i = startIndex; i < cards.Count; i++)
         {
+            Card c = cards[i];
             total += c.value;
             if (c.value == 11) aces++;
         }

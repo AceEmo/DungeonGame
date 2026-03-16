@@ -1,19 +1,26 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum GameState
+{
+    Gameplay,
+    Paused,
+    GameOver,
+    Blackjack
+}
+
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance;
-
-    [SerializeField] private PlayerHealth playerHealth;
-    [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject pausePanel;
-    [SerializeField] private GameObject hintPanel;
+    public static GameManager Instance { get; private set; }
 
     public int Scrap { get; private set; }
 
-    private bool isPaused = false;
-    private bool isGameOver = false;
+    private PlayerHealth playerHealth;
+    private GameObject gameOverPanel;
+    private GameObject pausePanel;
+    private GameObject blackjackCanvas;
+
+    private GameState currentState;
 
     private void Awake()
     {
@@ -21,22 +28,42 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
 
-    void FixEventSystem()
+    private void OnDestroy()
     {
-        var systems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(
-            FindObjectsSortMode.None
-        );
+        if (Instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+    }
 
+    private void Update()
+    {
+        HandleInput();
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        InitializeSceneData();
+    }
+
+    private void InitializeSceneData()
+    {
+        RemoveDuplicateEventSystems();
+        FindAndAssignSceneReferences();
+        SetGameState(GameState.Gameplay);
+    }
+
+    private void RemoveDuplicateEventSystems()
+    {
+        var systems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None);
         if (systems.Length > 1)
         {
             for (int i = 1; i < systems.Length; i++)
@@ -46,107 +73,114 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void FindAndAssignSceneReferences()
     {
-        SetupSceneReferences();
-    }
-
-    private void Start()
-    {
-        SetupSceneReferences();
-    }
-
-    private void SetupSceneReferences()
-    {
-        FixEventSystem();
-
         playerHealth = FindFirstObjectByType<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.OnPlayerDied += HandleGameOver;
+        }
 
         PausePanel pause = FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include);
+        if (pause != null) pausePanel = pause.gameObject;
+
         GameOverPanel gameOver = FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
-        HintPanel hint = FindFirstObjectByType<HintPanel>(FindObjectsInactive.Include);
-
-        if (hint != null)
-            hintPanel = hint.gameObject;
-
-        if (pause != null)
-            pausePanel = pause.gameObject;
-
-        if (gameOver != null)
-            gameOverPanel = gameOver.gameObject;
-
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);
-
-        if (hintPanel != null)
-            hintPanel.SetActive(false);
-
-        if (playerHealth != null)
-            playerHealth.OnPlayerDied += HandleGameOver;
-
-        Time.timeScale = 1f;
-        isPaused = false;
-        isGameOver = false;
+        if (gameOver != null) gameOverPanel = gameOver.gameObject;
     }
 
-    private void Update()
+    private void SetGameState(GameState newState)
+    {
+        currentState = newState;
+
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (blackjackCanvas != null) blackjackCanvas.SetActive(false);
+
+        if (InteractionUI.Instance != null)
+        {
+            InteractionUI.Instance.HideHint();
+        }
+
+        switch (currentState)
+        {
+            case GameState.Gameplay:
+                Time.timeScale = 1f;
+                break;
+
+            case GameState.Paused:
+                Time.timeScale = 0f;
+                if (pausePanel != null) pausePanel.SetActive(true);
+                break;
+
+            case GameState.GameOver:
+                Time.timeScale = 0f;
+                if (gameOverPanel != null) gameOverPanel.SetActive(true);
+                break;
+
+            case GameState.Blackjack:
+                Time.timeScale = 1f;
+                if (blackjackCanvas != null) blackjackCanvas.SetActive(true);
+                break;
+        }
+    }
+
+    private void HandleInput()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            GameObject blackjackCanvas = GameObject.Find("BlackjackCanvas");
-            bool blackjackOpen = blackjackCanvas != null && blackjackCanvas.activeSelf;
-
-            if (!isGameOver && !blackjackOpen)
+            if (currentState == GameState.Gameplay)
             {
-                TogglePause();
+                SetGameState(GameState.Paused);
+            }
+            else if (currentState == GameState.Paused)
+            {
+                SetGameState(GameState.Gameplay);
+            }
+            else if (currentState == GameState.Blackjack)
+            {
+                SetGameState(GameState.Gameplay);
             }
         }
     }
 
-    private void TogglePause()
-    {
-        if (pausePanel == null) return;
-
-        isPaused = !isPaused;
-
-        pausePanel.SetActive(isPaused);
-
-        Time.timeScale = isPaused ? 0f : 1f;
-    }
-
-    private void CloseBlackjackIfOpen()
-    {
-        GameObject blackjackCanvas = GameObject.Find("BlackjackCanvas");
-
-        if (blackjackCanvas != null)
-            blackjackCanvas.SetActive(false);
-    }
-
     private void HandleGameOver()
     {
-        isGameOver = true;
+        SetGameState(GameState.GameOver);
+    }
 
-        CloseBlackjackIfOpen();
+    public void RegisterBlackjackCanvas(GameObject canvas)
+    {
+        if (canvas == null) return;
+        blackjackCanvas = canvas;
+    }
 
-        if (pausePanel != null)
-            pausePanel.SetActive(false);
-
-        if (hintPanel != null)
+    public void UnregisterBlackjackCanvas(GameObject canvas)
+    {
+        if (canvas != null && blackjackCanvas == canvas)
         {
-            hintPanel.SetActive(false);
-
-            Transform hintText = hintPanel.transform.Find("HintText");
-            if (hintText != null)
-                hintText.gameObject.SetActive(false);
+            blackjackCanvas = null;
         }
+    }
 
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(true);
+    public void OpenBlackjack()
+    {
+        if (currentState != GameState.GameOver)
+        {
+            SetGameState(GameState.Blackjack);
+        }
+    }
 
-        Time.timeScale = 0f;
+    public void CloseBlackjack()
+    {
+        if (currentState == GameState.Blackjack)
+        {
+            SetGameState(GameState.Gameplay);
+        }
+    }
+
+    public bool IsGameplayActive()
+    {
+        return currentState == GameState.Gameplay;
     }
 
     public void AddScrap(int amount)
@@ -161,7 +195,6 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        Time.timeScale = 1f;
         ResetRun();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
