@@ -29,6 +29,8 @@ public class BlackjackGame : MonoBehaviour
 
     public void StartBlackjack()
     {
+        if (ui != null)
+            ui.SetResult("");
         StartCoroutine(GameFlow());
     }
 
@@ -127,10 +129,13 @@ public class BlackjackGame : MonoBehaviour
         ui.SetExitButton(true);
     }
 
+    private bool hitLocked = false;
+
     public void Hit()
     {
-        if (gameOver || rewardProcessing) return;
+        if (gameOver || rewardProcessing || hitLocked) return;
 
+        hitLocked = true;
         StartCoroutine(HitRoutine());
     }
 
@@ -160,6 +165,9 @@ public class BlackjackGame : MonoBehaviour
         {
             StartCoroutine(DealerTurn());
         }
+
+        yield return new WaitForSecondsRealtime(0.2f);
+        hitLocked = false;
     }
 
     public void Stand()
@@ -217,5 +225,11 @@ public class BlackjackGame : MonoBehaviour
 
         Time.timeScale = 1f;
         gameObject.SetActive(false);
+
+        if (ui != null)
+        {
+            ui.SetResult("");
+            ui.ClearTable();
+        }
     }
 }

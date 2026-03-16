@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject hintPanel;
 
     public int Scrap { get; private set; }
 
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
             return;
         }
     }
+
     void FixEventSystem()
     {
         var systems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(
@@ -62,6 +64,10 @@ public class GameManager : MonoBehaviour
 
         PausePanel pause = FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include);
         GameOverPanel gameOver = FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
+        HintPanel hint = FindFirstObjectByType<HintPanel>(FindObjectsInactive.Include);
+
+        if (hint != null)
+            hintPanel = hint.gameObject;
 
         if (pause != null)
             pausePanel = pause.gameObject;
@@ -75,6 +81,9 @@ public class GameManager : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
+        if (hintPanel != null)
+            hintPanel.SetActive(false);
+
         if (playerHealth != null)
             playerHealth.OnPlayerDied += HandleGameOver;
 
@@ -87,8 +96,13 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!isGameOver)
+            GameObject blackjackCanvas = GameObject.Find("BlackjackCanvas");
+            bool blackjackOpen = blackjackCanvas != null && blackjackCanvas.activeSelf;
+
+            if (!isGameOver && !blackjackOpen)
+            {
                 TogglePause();
+            }
         }
     }
 
@@ -103,12 +117,31 @@ public class GameManager : MonoBehaviour
         Time.timeScale = isPaused ? 0f : 1f;
     }
 
+    private void CloseBlackjackIfOpen()
+    {
+        GameObject blackjackCanvas = GameObject.Find("BlackjackCanvas");
+
+        if (blackjackCanvas != null)
+            blackjackCanvas.SetActive(false);
+    }
+
     private void HandleGameOver()
     {
         isGameOver = true;
 
+        CloseBlackjackIfOpen();
+
         if (pausePanel != null)
             pausePanel.SetActive(false);
+
+        if (hintPanel != null)
+        {
+            hintPanel.SetActive(false);
+
+            Transform hintText = hintPanel.transform.Find("HintText");
+            if (hintText != null)
+                hintText.gameObject.SetActive(false);
+        }
 
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);

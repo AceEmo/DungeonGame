@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Chest : MonoBehaviour
+public class ChestInteract : MonoBehaviour, IInteractable
 {
     public GameObject OpenChestPrefab;
 
@@ -8,25 +8,20 @@ public class Chest : MonoBehaviour
     public GameObject Gear1Prefab;
     public GameObject Gear2Prefab;
 
-    private bool playerNear = false;
     private bool opened = false;
 
-    private void Update()
+    public string GetHintText()
     {
-        if (!playerNear) return;
-        if (opened) return;
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            OpenChest();
-        }
+        return "[E] Open";
     }
 
-    private void OpenChest()
+    public void Interact()
     {
+        if (opened) return;
         opened = true;
 
-        Instantiate(OpenChestPrefab, transform.position, Quaternion.identity);
+        if (OpenChestPrefab != null)
+            Instantiate(OpenChestPrefab, transform.position, Quaternion.identity);
 
         int reward = Random.Range(0, 3);
 
@@ -43,17 +38,5 @@ public class Chest : MonoBehaviour
         }
 
         Destroy(gameObject);
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-            playerNear = true;
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-            playerNear = false;
     }
 }
