@@ -1094,11 +1094,11 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
-  far clip plane: 5000
-  field of view: 60
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 34
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.2
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1123,7 +1123,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.8048091, y: -1.2599988, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1960,7 +1960,10 @@ MonoBehaviour:
   NormalRoomPrefabs:
   - {fileID: 1289456404150176, guid: 2b774a0857fa9724fbe6137309d50f96, type: 3}
   - {fileID: 1575628707851836, guid: 0af5bb5816678244b818066575f7e674, type: 3}
-  RoomCount: 8
+  - {fileID: 1289456404150176, guid: d01487a92dcad494a867d24485faccdd, type: 3}
+  - {fileID: 1575628707851836, guid: 3c4b7222e312c5c4380e153c16b34f0f, type: 3}
+  - {fileID: 1289456404150176, guid: 2ba19b9f767d20a44919b26c51903f33, type: 3}
+  RoomCount: 10
   RoomSize: 30
 --- !u!4 &1701671616
 Transform:

@@ -2502,6 +2502,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
   GridPosition: {x: 0, y: 0}
+  IsBossRoom: 0
+  BossSpawnPoint: {fileID: 0}
+  BossPrefab: {fileID: 0}
   IsStarter: 0
   IsCleared: 0
   LeftDoor: {fileID: 5712760884607361031}
@@ -2518,7 +2521,6 @@ MonoBehaviour:
   - {fileID: 4243499248247253501}
   - {fileID: 7317811811886547669}
   - {fileID: 310471761624631014}
-  - {fileID: 9049113749713061034}
 --- !u!114 &252973721570615511
 MonoBehaviour:
   m_ObjectHideFlags: 0
