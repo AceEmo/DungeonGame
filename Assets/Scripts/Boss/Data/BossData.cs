@@ -11,6 +11,14 @@ public class BossData : ScriptableObject
 
     public Color hitColor = new Color(1f, 0.5f, 0.5f);
 
+    [Header("Chase")]
+    public float wallCheckDistance = 1f;
+    public float steeringSmooth = 0.15f;
+    public LayerMask wallLayer;
+
+    [Header("Pathfinding")]
+    public float bodyRadius = 0.6f;
+
     [Header("Rage")]
     public float rageThreshold = 0.3f;
     public float rageSpeedMultiplier = 1.5f;

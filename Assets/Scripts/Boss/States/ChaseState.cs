@@ -2,48 +2,147 @@ using UnityEngine;
 
 public class ChaseState : IBossState
 {
-    public void EnterState(BossContext context) { }
+    private Vector2 smoothedSteering;
+
+    public void EnterState(BossContext context)
+    {
+        smoothedSteering = Vector2.zero;
+    }
 
     public void UpdateState(BossContext context)
     {
         if (context.IsDead)
+        {
             return;
+        }
 
-        Vector2 bossPos = context.BossTransform.position;
-        Vector2 playerPos = context.Player.position;
+        if (TryTransitionToAttack(context))
+        {
+            return;
+        }
 
-        float distance = Vector2.Distance(bossPos, playerPos);
+        if (TryTransitionToDash(context))
+        {
+            return;
+        }
 
-        if (distance <= context.Data.attackRange)
+        ChasePlayer(context);
+    }
+
+    private bool TryTransitionToAttack(BossContext context)
+    {
+        float distanceToPlayer = GetDistanceToPlayer(context);
+        if (distanceToPlayer <= context.Data.attackRange)
         {
             context.Brain.ChangeState(new AttackState());
-            return;
+            return true;
         }
+        return false;
+    }
 
-        bool canDash =
-            Time.time >= context.LastDashTime +
-            context.Data.dashCooldown;
+    private bool TryTransitionToDash(BossContext context)
+    {
+        float distanceToPlayer = GetDistanceToPlayer(context);
+        bool isCooldownOver = Time.time >= context.LastDashTime + context.Data.dashCooldown;
+        bool isCloseEnough = distanceToPlayer <= context.Data.dashTriggerDistance;
+        bool shouldDash = Random.value <= context.Data.dashChance;
 
-        bool closeEnough =
-            distance <= context.Data.dashTriggerDistance;
-
-        if (canDash && closeEnough)
+        if (isCooldownOver && isCloseEnough && shouldDash)
         {
-            if (Random.value <= context.Data.dashChance)
+            context.Brain.ChangeState(new DashState());
+            return true;
+        }
+        return false;
+    }
+
+    private void ChasePlayer(BossContext context)
+    {
+        Vector2 desiredDirection = GetDirectionToPlayer(context);
+        Vector2 avoidanceForce = CalculateAvoidance(context, desiredDirection);
+        
+        Vector2 finalSteering = desiredDirection + avoidanceForce;
+        
+        ApplyMovement(context, finalSteering);
+    }
+
+    private Vector2 CalculateAvoidance(BossContext context, Vector2 desiredDirection)
+    {
+        Vector2 avoidance = Vector2.zero;
+
+        avoidance += GetAvoidanceFromCircleCast(context, desiredDirection, context.Data.wallCheckDistance, 1f);
+
+        Vector2 leftDirection = Quaternion.Euler(0, 0, 45f) * desiredDirection;
+        avoidance += GetAvoidanceFromCircleCast(context, leftDirection, context.Data.wallCheckDistance * 0.8f, 0.7f);
+
+        Vector2 rightDirection = Quaternion.Euler(0, 0, -45f) * desiredDirection;
+        avoidance += GetAvoidanceFromCircleCast(context, rightDirection, context.Data.wallCheckDistance * 0.8f, 0.7f);
+
+        return avoidance;
+    }
+
+    private Vector2 GetAvoidanceFromCircleCast(BossContext context, Vector2 direction, float distance, float weight)
+    {
+        RaycastHit2D hit = Physics2D.CircleCast(
+            context.BossTransform.position,
+            context.Data.bodyRadius,
+            direction,
+            distance,
+            context.Data.wallLayer
+        );
+
+        if (hit.collider != null)
+        {
+            Vector2 wallNormal = hit.normal;
+            Vector2 slideDirection = new Vector2(-wallNormal.y, wallNormal.x);
+            
+            float alignment = Vector2.Dot(slideDirection, direction);
+
+            if (Mathf.Abs(alignment) < 0.1f)
             {
-                context.Brain.ChangeState(new DashState());
-                return;
+                alignment = Vector2.Dot(slideDirection, context.LastMoveDirection);
+                
+                if (Mathf.Abs(alignment) < 0.1f)
+                {
+                    alignment = 1f; 
+                }
             }
+
+            if (alignment < 0)
+            {
+                slideDirection = -slideDirection;
+            }
+
+            return (wallNormal * 0.8f + slideDirection * 1.5f) * weight;
         }
 
-        Vector2 dir = (playerPos - bossPos).normalized;
+        return Vector2.zero;
+    }
 
-        context.LastMoveDirection = dir;
+    private void ApplyMovement(BossContext context, Vector2 steering)
+    {
+        smoothedSteering = Vector2.Lerp(smoothedSteering, steering, context.Data.steeringSmooth);
 
-        context.Animator.SetFloat("MoveX", dir.x);
-        context.Animator.SetFloat("MoveY", dir.y);
+        if (smoothedSteering.sqrMagnitude > 1f)
+        {
+            smoothedSteering.Normalize();
+        }
 
-        context.Movement.Move(dir, context.Data.speed);
+        context.LastMoveDirection = smoothedSteering;
+
+        context.Animator.SetFloat("MoveX", smoothedSteering.x);
+        context.Animator.SetFloat("MoveY", smoothedSteering.y);
+
+        context.Movement.Move(smoothedSteering, context.Data.speed);
+    }
+
+    private float GetDistanceToPlayer(BossContext context)
+    {
+        return Vector2.Distance(context.BossTransform.position, context.Player.position);
+    }
+
+    private Vector2 GetDirectionToPlayer(BossContext context)
+    {
+        return (context.Player.position - context.BossTransform.position).normalized;
     }
 
     public void ExitState(BossContext context)
