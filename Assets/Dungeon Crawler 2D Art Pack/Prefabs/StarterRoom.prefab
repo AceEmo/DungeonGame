@@ -1370,6 +1370,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rooms
   GridPosition: {x: 0, y: 0}
+  ClosedChestPrefab: {fileID: 0}
+  HealthPrefab: {fileID: 0}
+  Gear1Prefab: {fileID: 0}
+  Gear2Prefab: {fileID: 0}
+  RewardSpawnPoints: []
+  rewardSpawned: 0
+  IsBossRoom: 0
+  BossSpawnPoint: {fileID: 0}
+  BossPrefab: {fileID: 0}
   IsStarter: 1
   IsCleared: 1
   LeftDoor: {fileID: 465579656363804385}
