@@ -1,22 +1,45 @@
 using UnityEngine;
 
+public interface IInputProvider
+{
+    float GetAxisRaw(string axisName);
+}
+
+public class StandardInputProvider : MonoBehaviour, IInputProvider
+{
+    public float GetAxisRaw(string axisName)
+    {
+        return Input.GetAxisRaw(axisName);
+    }
+}
+
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerStats stats;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Animator animator;
 
+    private IInputProvider inputProvider;
     private Vector2 movement;
     private Vector2 lookDirection = new Vector2(0, -1);
 
+    private void Awake()
+    {
+        inputProvider = GetComponent<IInputProvider>();
+        if (inputProvider == null)
+        {
+            inputProvider = gameObject.AddComponent<StandardInputProvider>();
+        }
+    }
+
     private void Update()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        movement.x = inputProvider.GetAxisRaw("Horizontal");
+        movement.y = inputProvider.GetAxisRaw("Vertical");
 
         Vector2 shootingInput = new Vector2(
-            Input.GetAxisRaw("HorizontalArrows"),
-            Input.GetAxisRaw("VerticalArrows")
+            inputProvider.GetAxisRaw("HorizontalArrows"),
+            inputProvider.GetAxisRaw("VerticalArrows")
         );
 
         if (shootingInput.sqrMagnitude > 0)
@@ -24,16 +47,22 @@ public class PlayerMovement : MonoBehaviour
         else if (movement.sqrMagnitude > 0)
             lookDirection = movement;
 
-        animator.SetFloat("Horizontal", lookDirection.x);
-        animator.SetFloat("Vertical", lookDirection.y);
-        animator.SetFloat("Speed", movement.sqrMagnitude);
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            animator.SetFloat("Horizontal", lookDirection.x);
+            animator.SetFloat("Vertical", lookDirection.y);
+            animator.SetFloat("Speed", movement.sqrMagnitude);
+        }
     }
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position +
-            movement.normalized *
-            stats.moveSpeed *
-            Time.fixedDeltaTime);
+        if (rb != null && stats != null)
+        {
+            rb.MovePosition(rb.position +
+                movement.normalized *
+                stats.moveSpeed *
+                Time.fixedDeltaTime);
+        }
     }
 }

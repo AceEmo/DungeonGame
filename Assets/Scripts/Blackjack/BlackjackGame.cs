@@ -193,7 +193,7 @@ public class BlackjackGame : MonoBehaviour
         }
         else if (playerScore == 21)
         {
-            StartCoroutine(DealerTurn());
+            yield return StartCoroutine(DealerTurn());
         }
 
         yield return new WaitForSecondsRealtime(0.2f);

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2026-03-21_15-23-21" tag="">
+  <assembly name="Assembly-CSharp">
+    <class name="PlayerHealthTests" coveredlines="56" coverablelines="65" totallines="159" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

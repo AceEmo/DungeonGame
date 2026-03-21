@@ -17,9 +17,16 @@ public class PlayerShooting : MonoBehaviour
     [SerializeField] private float heightOffset = -0.4f;
 
     private float nextFireTime;
+    private IInputProvider inputProvider;
 
     private void Start()
     {
+        inputProvider = GetComponent<IInputProvider>();
+        if (inputProvider == null)
+        {
+            inputProvider = gameObject.AddComponent<StandardInputProvider>();
+        }
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -27,8 +34,10 @@ public class PlayerShooting : MonoBehaviour
 
     private void Update()
     {
-        float x = Input.GetAxisRaw("HorizontalArrows");
-        float y = Input.GetAxisRaw("VerticalArrows");
+        if (inputProvider == null || stats == null || bulletPrefab == null || firePoint == null) return;
+
+        float x = inputProvider.GetAxisRaw("HorizontalArrows");
+        float y = inputProvider.GetAxisRaw("VerticalArrows");
 
         if ((x != 0 || y != 0) && Time.time > nextFireTime)
         {
