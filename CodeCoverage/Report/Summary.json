@@ -1,24 +1,24 @@
 {
   "summary": {
-    "generatedon": "2026-03-21T17:23:40Z",
+    "generatedon": "2026-03-21T18:41:07Z",
     "parser": "MultiReportParser (4x OpenCoverParser)",
     "assemblies": 1,
     "classes": 53,
-    "files": 52,
-    "coveredlines": 1479,
-    "uncoveredlines": 327,
-    "coverablelines": 1806,
-    "totallines": 3175,
-    "linecoverage": 81.8,
+    "files": 53,
+    "coveredlines": 1513,
+    "uncoveredlines": 290,
+    "coverablelines": 1803,
+    "totallines": 3170,
+    "linecoverage": 83.9,
     "coveredbranches": 0,
     "totalbranches": 0,
-    "coveredmethods": 241,
+    "coveredmethods": 247,
     "totalmethods": 266,
-    "methodcoverage": 90.6
+    "methodcoverage": 92.8
  },
   "coverage": {
     "assemblies": [
-      { "name": "GameScripts", "classes": 53, "coverage": 81.8, "coveredlines": 1479, "coverablelines": 1806, "totallines": 3243, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 90.6, "coveredmethods": 241, "totalmethods": 266, "classesinassembly": [
+      { "name": "GameScripts", "classes": 53, "coverage": 83.9, "coveredlines": 1513, "coverablelines": 1803, "totallines": 3170, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 92.8, "coveredmethods": 247, "totalmethods": 266, "classesinassembly": [
         { "name": "AttackState", "coverage": 87.5, "coveredlines": 14, "coverablelines": 16, "totallines": 30, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 66.6, "coveredmethods": 2, "totalmethods": 3 },
         { "name": "BackgroundMusic", "coverage": 100, "coveredlines": 10, "coverablelines": 10, "totallines": 19, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 1, "totalmethods": 1 },
         { "name": "BlackjackDeck", "coverage": 100, "coveredlines": 27, "coverablelines": 27, "totallines": 46, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 4, "totalmethods": 4 },
@@ -44,7 +44,7 @@
         { "name": "DashState", "coverage": 61.9, "coveredlines": 13, "coverablelines": 21, "totallines": 43, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 66.6, "coveredmethods": 2, "totalmethods": 3 },
         { "name": "DeathState", "coverage": 92.3, "coveredlines": 12, "coverablelines": 13, "totallines": 23, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 66.6, "coveredmethods": 2, "totalmethods": 3 },
         { "name": "Door", "coverage": 88.4, "coveredlines": 23, "coverablelines": 26, "totallines": 50, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 83.3, "coveredmethods": 5, "totalmethods": 6 },
-        { "name": "Enemy", "coverage": 36.3, "coveredlines": 8, "coverablelines": 22, "totallines": 48, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 40, "coveredmethods": 2, "totalmethods": 5 },
+        { "name": "Enemy", "coverage": 81.8, "coveredlines": 18, "coverablelines": 22, "totallines": 48, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 5, "totalmethods": 5 },
         { "name": "EnemyDamage", "coverage": 100, "coveredlines": 11, "coverablelines": 11, "totallines": 21, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 2, "totalmethods": 2 },
         { "name": "EnemyData", "coverage": 100, "coveredlines": 5, "coverablelines": 5, "totallines": 15, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 1, "totalmethods": 1 },
         { "name": "EnemyHealth", "coverage": 90.5, "coveredlines": 67, "coverablelines": 74, "totallines": 114, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 7, "totalmethods": 7 },
@@ -53,16 +53,16 @@
         { "name": "GameManager", "coverage": 70.9, "coveredlines": 93, "coverablelines": 131, "totallines": 206, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 91.3, "coveredmethods": 21, "totalmethods": 23 },
         { "name": "GameOverPanel", "coverage": 65.3, "coveredlines": 17, "coverablelines": 26, "totallines": 44, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 75, "coveredmethods": 3, "totalmethods": 4 },
         { "name": "GearInteract", "coverage": 100, "coveredlines": 8, "coverablelines": 8, "totallines": 17, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 3, "totalmethods": 3 },
-        { "name": "GroundMovement", "coverage": 25, "coveredlines": 13, "coverablelines": 52, "totallines": 116, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 50, "coveredmethods": 3, "totalmethods": 6 },
+        { "name": "GroundMovement", "coverage": 71.1, "coveredlines": 37, "coverablelines": 52, "totallines": 116, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 83.3, "coveredmethods": 5, "totalmethods": 6 },
         { "name": "HealthBoxInteract", "coverage": 100, "coveredlines": 12, "coverablelines": 12, "totallines": 23, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 2, "totalmethods": 2 },
         { "name": "HeartUI", "coverage": 93, "coveredlines": 40, "coverablelines": 43, "totallines": 72, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 6, "totalmethods": 6 },
         { "name": "IdleState", "coverage": 88.8, "coveredlines": 8, "coverablelines": 9, "totallines": 18, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 3, "totalmethods": 3 },
         { "name": "InteractionUI", "coverage": 70, "coveredlines": 21, "coverablelines": 30, "totallines": 55, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 6, "totalmethods": 6 },
         { "name": "LevelGenerator", "coverage": 96.2, "coveredlines": 153, "coverablelines": 159, "totallines": 222, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 12, "totalmethods": 12 },
-        { "name": "PausePanel", "coverage": 65.3, "coveredlines": 17, "coverablelines": 26, "totallines": 43, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 75, "coveredmethods": 3, "totalmethods": 4 },
+        { "name": "PausePanel", "coverage": 53.8, "coveredlines": 14, "coverablelines": 26, "totallines": 43, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 75, "coveredmethods": 3, "totalmethods": 4 },
         { "name": "PlayerHealth", "coverage": 84.8, "coveredlines": 67, "coverablelines": 79, "totallines": 136, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 93.3, "coveredmethods": 14, "totalmethods": 15 },
         { "name": "PlayerInteraction", "coverage": 71.2, "coveredlines": 47, "coverablelines": 66, "totallines": 103, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 75, "coveredmethods": 6, "totalmethods": 8 },
-        { "name": "PlayerMovement", "coverage": 63.1, "coveredlines": 24, "coverablelines": 38, "totallines": 68, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 85.7, "coveredmethods": 6, "totalmethods": 7 },
+        { "name": "PlayerMovement", "coverage": 68.5, "coveredlines": 24, "coverablelines": 35, "totallines": 55, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 85.7, "coveredmethods": 6, "totalmethods": 7 },
         { "name": "PlayerShooting", "coverage": 69.4, "coveredlines": 41, "coverablelines": 59, "totallines": 79, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 7, "totalmethods": 7 },
         { "name": "PlayerStats", "coverage": 100, "coveredlines": 7, "coverablelines": 7, "totallines": 13, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 1, "totalmethods": 1 },
         { "name": "RandomFlyingBehaviour", "coverage": 100, "coveredlines": 25, "coverablelines": 25, "totallines": 49, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 4, "totalmethods": 4 },
@@ -70,7 +70,7 @@
         { "name": "Rooms", "coverage": 70.3, "coveredlines": 38, "coverablelines": 54, "totallines": 112, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 83.3, "coveredmethods": 5, "totalmethods": 6 },
         { "name": "RoomTrigger", "coverage": 100, "coveredlines": 21, "coverablelines": 21, "totallines": 35, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 3, "totalmethods": 3 },
         { "name": "ScrapUI", "coverage": 66.6, "coveredlines": 4, "coverablelines": 6, "totallines": 17, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 1, "totalmethods": 1 },
-        { "name": "StandardInputProvider", "coverage": 0, "coveredlines": 0, "coverablelines": 3, "totallines": 68, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 0, "coveredmethods": 0, "totalmethods": 1 },
+        { "name": "StandardInputProvider", "coverage": 100, "coveredlines": 3, "coverablelines": 3, "totallines": 8, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 1, "totalmethods": 1 },
         { "name": "StaticBackground", "coverage": 100, "coveredlines": 6, "coverablelines": 6, "totallines": 16, "branchcoverage": null, "coveredbranches": 0, "totalbranches": 0, "methodcoverage": 100, "coveredmethods": 2, "totalmethods": 2 } ] } ]
   }
 }

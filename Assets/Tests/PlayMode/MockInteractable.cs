@@ -66,10 +66,13 @@ public class PlayerInteractionTests
     [TearDown]
     public void Teardown()
     {
-        UnityEngine.Object.DestroyImmediate(playerObj);
-        UnityEngine.Object.DestroyImmediate(interactableObj);
-        UnityEngine.Object.DestroyImmediate(uiObj);
-        UnityEngine.Object.DestroyImmediate(gmObj);
+        Object.DestroyImmediate(playerObj);
+        Object.DestroyImmediate(interactableObj);
+        Object.DestroyImmediate(uiObj);
+        Object.DestroyImmediate(gmObj);
+
+        typeof(GameManager).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, null);
+        typeof(InteractionUI).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, null);
     }
 
     [UnityTest]

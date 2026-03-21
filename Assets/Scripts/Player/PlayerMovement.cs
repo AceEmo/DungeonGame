@@ -1,18 +1,5 @@
 using UnityEngine;
 
-public interface IInputProvider
-{
-    float GetAxisRaw(string axisName);
-}
-
-public class StandardInputProvider : MonoBehaviour, IInputProvider
-{
-    public float GetAxisRaw(string axisName)
-    {
-        return Input.GetAxisRaw(axisName);
-    }
-}
-
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerStats stats;
