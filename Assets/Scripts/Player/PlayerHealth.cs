@@ -12,11 +12,10 @@ public class PlayerHealth : MonoBehaviour
     public event Action OnPlayerDied;
 
     private float currentHealth;
-    private bool isInvincible;
-    private int scrap;
-    public int Scrap => scrap;
+
     public float CurrentHealth => currentHealth;
     public float MaxHealth => stats.maxHealth;
+    private bool isInvincible;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
@@ -31,22 +30,49 @@ public class PlayerHealth : MonoBehaviour
         animator = GetComponent<Animator>();
         col = GetComponent<Collider2D>();
         movement = GetComponent<PlayerMovement>();
+    }
 
+    private void Start()
+    {
+        InitializeHealth();
+    }
+
+    private void InitializeHealth()
+    {
         currentHealth = stats.startHealth;
+        isInvincible = false;
+
+        if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
+        if (col != null) col.enabled = true;
+        if (movement != null) movement.enabled = true;
 
         OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
     }
 
+    public void ResetHealth()
+    {
+        InitializeHealth();
+
+        if (animator != null)
+        {
+            animator.ResetTrigger("Die");
+
+            animator.SetFloat("Horizontal", 0f);
+            animator.SetFloat("Vertical", 0f);
+            animator.SetFloat("Speed", 0f);
+
+            animator.Play("IdleTree", 0, 0f);
+        }
+    }
+
     public void TakeDamage(float amount, Vector2 source)
     {
-        if (isInvincible || currentHealth <= 0)
-            return;
+        if (isInvincible || currentHealth <= 0) return;
 
         currentHealth -= amount;
         currentHealth = Mathf.Max(0, currentHealth);
 
         OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
-
         ApplyKnockback(source);
 
         if (currentHealth <= 0)
@@ -82,29 +108,18 @@ public class PlayerHealth : MonoBehaviour
         sr.color = c;
     }
 
-    public void ResetHealth()
-    {
-        currentHealth = MaxHealth;
-        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
-    }
-
     private void Die()
     {
         if (movement != null) movement.enabled = false;
-
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.bodyType = RigidbodyType2D.Static;
         }
-
         if (col != null) col.enabled = false;
-
-        if (animator != null)
-            animator.SetTrigger("Die");
+        if (animator != null) animator.SetTrigger("Die");
 
         StartCoroutine(DeathSequence());
-        ResetScrap();
     }
 
     private IEnumerator DeathSequence()
@@ -112,25 +127,14 @@ public class PlayerHealth : MonoBehaviour
         yield return new WaitForSecondsRealtime(1.5f);
         OnPlayerDied?.Invoke();
     }
-    
+
     public void Heal(float amount)
     {
-        if (currentHealth <= 0)
-            return;
+        if (currentHealth <= 0) return;
 
         currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, MaxHealth);
+        currentHealth = Mathf.Min(currentHealth, stats.maxHealth);
 
         OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
-    }
-
-    public void AddScrap(int amount)
-    {
-        scrap += amount;
-    }
-
-    public void ResetScrap()
-    {
-        scrap = 0;
     }
 }

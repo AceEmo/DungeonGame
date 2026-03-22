@@ -20,11 +20,11 @@ public class PlayerHealthTests
         playerObject.SetActive(false);
 
         playerRigidbody = playerObject.AddComponent<Rigidbody2D>();
+        playerRigidbody.bodyType = RigidbodyType2D.Dynamic;
+        
         playerObject.AddComponent<SpriteRenderer>();
         playerObject.AddComponent<BoxCollider2D>();
-        
-        PlayerMovement playerMovement = playerObject.AddComponent<PlayerMovement>();
-        playerMovement.enabled = false;
+        playerObject.AddComponent<PlayerMovement>();
 
         playerHealth = playerObject.AddComponent<PlayerHealth>();
 
@@ -45,73 +45,77 @@ public class PlayerHealthTests
         Object.DestroyImmediate(playerStats);
     }
 
-    [Test]
-    public void AwakeSetsInitialHealthCorrectly()
+    [UnityTest]
+    public IEnumerator StartSetsInitialHealthCorrectly()
     {
+        yield return null;
+
         Assert.AreEqual(6f, playerHealth.CurrentHealth);
         Assert.AreEqual(12f, playerHealth.MaxHealth);
     }
 
-    [Test]
-    public void TakeDamageReducesHealth()
+    [UnityTest]
+    public IEnumerator TakeDamageReducesHealth()
     {
+        yield return null;
+
         playerHealth.TakeDamage(2f, Vector2.zero);
 
         Assert.AreEqual(4f, playerHealth.CurrentHealth);
     }
 
-    [Test]
-    public void TakeDamageCannotReduceHealthBelowZero()
+    [UnityTest]
+    public IEnumerator TakeDamageCannotReduceHealthBelowZero()
     {
+        yield return null;
+
         playerHealth.TakeDamage(100f, Vector2.zero);
 
         Assert.AreEqual(0f, playerHealth.CurrentHealth);
     }
 
-    [Test]
-    public void TakeDamageAppliesKnockback()
+    [UnityTest]
+    public IEnumerator TakeDamageAppliesKnockback()
     {
-        Vector2 damageSource = new Vector2(5f, 0f);
+        yield return null;
 
+        Vector2 damageSource = new Vector2(5f, 0f);
         playerHealth.TakeDamage(1f, damageSource);
 
         Assert.IsTrue(playerRigidbody.linearVelocity.x < 0);
     }
 
-    [Test]
-    public void HealIncreasesHealth()
+    [UnityTest]
+    public IEnumerator HealIncreasesHealth()
     {
-        playerHealth.TakeDamage(4f, Vector2.zero);
+        yield return null;
 
+        playerHealth.TakeDamage(4f, Vector2.zero);
         playerHealth.Heal(3f);
 
         Assert.AreEqual(5f, playerHealth.CurrentHealth);
     }
 
-    [Test]
-    public void HealCannotExceedMaxHealth()
+    [UnityTest]
+    public IEnumerator HealCannotExceedMaxHealth()
     {
+        yield return null;
+
         playerHealth.Heal(50f);
 
         Assert.AreEqual(12f, playerHealth.CurrentHealth);
     }
 
-    [Test]
-    public void AddScrapIncreasesTotalScrapCount()
+    [UnityTest]
+    public IEnumerator ResetHealthRestoresStatsValue()
     {
-        playerHealth.AddScrap(5);
-        playerHealth.AddScrap(10);
+        yield return null;
 
-        Assert.AreEqual(15, playerHealth.Scrap);
-    }
+        playerHealth.TakeDamage(5f, Vector2.zero);
+        
+        MethodInfo resetMethod = typeof(PlayerHealth).GetMethod("InitializeHealth", BindingFlags.NonPublic | BindingFlags.Instance);
+        resetMethod.Invoke(playerHealth, null);
 
-    [Test]
-    public void ResetScrapClearsTotalScrapCount()
-    {
-        playerHealth.AddScrap(10);
-
-        playerHealth.ResetScrap();
-
-        Assert.AreEqual(0, playerHealth.Scrap);
+        Assert.AreEqual(6f, playerHealth.CurrentHealth);
     }
 }

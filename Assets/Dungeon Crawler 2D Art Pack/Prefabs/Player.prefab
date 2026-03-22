@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 95041813273560246}
   - component: {fileID: 1518512355776542468}
   - component: {fileID: 6829653584762424985}
+  - component: {fileID: 259703652217371318}
   - component: {fileID: 447092266994684863}
   - component: {fileID: 7406109688250902853}
   - component: {fileID: 754120618793406831}
@@ -194,6 +195,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &259703652217371318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635833487047996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fa1c13db63f29a4cb86e69574f1671d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::PlayerCore
 --- !u!114 &447092266994684863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +270,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
   interactRange: 1.5
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &1044660222522068115
 GameObject:
   m_ObjectHideFlags: 0

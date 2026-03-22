@@ -151,4 +151,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9e82905f5ab6d6438bcbf8765c2233f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GearPickup
+  playerStats: {fileID: 11400000, guid: e0cb57d0a68b2844e9f68609a87dd496, type: 2}
   scrapAmount: 10

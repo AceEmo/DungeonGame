@@ -6,10 +6,8 @@ public class InteractionUI : MonoBehaviour
     public static InteractionUI Instance { get; private set; }
 
     [SerializeField] private GameObject hintPanel;
-    [SerializeField] private TMP_Text hintText;
+    [SerializeField] private TextMeshProUGUI hintText;
     
-    [SerializeField] private Vector3 hintOffset = new Vector3(0f, 30f, 0f);
-
     private Camera mainCamera;
 
     private void Awake()
@@ -17,32 +15,30 @@ public class InteractionUI : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null); 
+            
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
-
-        mainCamera = Camera.main;
-        HideHint();
     }
 
     public void ShowHint(string text, Vector3 worldPosition)
     {
-        if (hintPanel == null || hintText == null) return;
-
-        if (GameManager.Instance != null && !GameManager.Instance.IsGameplayActive())
+        if (mainCamera == null)
         {
-            HideHint();
-            return;
+            mainCamera = Camera.main;
         }
 
-        hintPanel.SetActive(true);
+        if (mainCamera == null) return;
+
         hintText.text = text;
-        
-        Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-        hintPanel.transform.position = screenPosition + hintOffset;
+        hintPanel.SetActive(true);
+
+        Vector3 screenPos = mainCamera.WorldToScreenPoint(worldPosition);
+        hintPanel.transform.position = screenPos;
     }
 
     public void HideHint()

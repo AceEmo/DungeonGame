@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class GearInteract : MonoBehaviour, IInteractable
 {
+    [SerializeField] private PlayerStats playerStats;
     public int scrapAmount = 1;
 
     public string GetHintText()
@@ -11,7 +12,9 @@ public class GearInteract : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        GameManager.Instance.AddScrap(scrapAmount);
+        if (playerStats != null)
+            playerStats.AddScrap(scrapAmount);
+
         Destroy(gameObject);
     }
 }

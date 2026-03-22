@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    public int Scrap { get; private set; }
+    public PlayerStats playerStats;
 
     private PlayerHealth playerHealth;
     private GameObject gameOverPanel;
@@ -59,6 +59,11 @@ public class GameManager : MonoBehaviour
         RemoveDuplicateEventSystems();
         FindAndAssignSceneReferences();
         SetGameState(GameState.Gameplay);
+        if (playerHealth != null)
+        {
+            playerHealth.ResetHealth();
+            playerHealth.OnPlayerDied += HandleGameOver;
+        }
     }
 
     private void RemoveDuplicateEventSystems()
@@ -92,35 +97,32 @@ public class GameManager : MonoBehaviour
     {
         currentState = newState;
 
-        if (pausePanel != null) pausePanel.SetActive(false);
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (blackjackCanvas != null) blackjackCanvas.SetActive(false);
-
-        if (InteractionUI.Instance != null)
-        {
-            InteractionUI.Instance.HideHint();
-        }
+        UpdateUIStates();
 
         switch (currentState)
         {
             case GameState.Gameplay:
                 Time.timeScale = 1f;
                 break;
-
             case GameState.Paused:
-                Time.timeScale = 0f;
-                if (pausePanel != null) pausePanel.SetActive(true);
-                break;
-
             case GameState.GameOver:
                 Time.timeScale = 0f;
-                if (gameOverPanel != null) gameOverPanel.SetActive(true);
                 break;
-
             case GameState.Blackjack:
                 Time.timeScale = 1f;
-                if (blackjackCanvas != null) blackjackCanvas.SetActive(true);
                 break;
+        }
+    }
+
+    private void UpdateUIStates()
+    {
+        if (pausePanel != null) pausePanel.SetActive(currentState == GameState.Paused);
+        if (gameOverPanel != null) gameOverPanel.SetActive(currentState == GameState.GameOver);
+        if (blackjackCanvas != null) blackjackCanvas.SetActive(currentState == GameState.Blackjack);
+
+        if (currentState != GameState.Gameplay && InteractionUI.Instance != null)
+        {
+            InteractionUI.Instance.HideHint();
         }
     }
 
@@ -132,11 +134,7 @@ public class GameManager : MonoBehaviour
             {
                 SetGameState(GameState.Paused);
             }
-            else if (currentState == GameState.Paused)
-            {
-                SetGameState(GameState.Gameplay);
-            }
-            else if (currentState == GameState.Blackjack)
+            else if (currentState == GameState.Paused || currentState == GameState.Blackjack)
             {
                 SetGameState(GameState.Gameplay);
             }
@@ -146,20 +144,6 @@ public class GameManager : MonoBehaviour
     private void HandleGameOver()
     {
         SetGameState(GameState.GameOver);
-    }
-
-    public void RegisterBlackjackCanvas(GameObject canvas)
-    {
-        if (canvas == null) return;
-        blackjackCanvas = canvas;
-    }
-
-    public void UnregisterBlackjackCanvas(GameObject canvas)
-    {
-        if (canvas != null && blackjackCanvas == canvas)
-        {
-            blackjackCanvas = null;
-        }
     }
 
     public void OpenBlackjack()
@@ -178,25 +162,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool IsGameplayActive()
+    public void RegisterBlackjackCanvas(GameObject canvas)
     {
-        return currentState == GameState.Gameplay;
-    }
-
-    public void AddScrap(int amount)
-    {
-        Scrap += amount;
-    }
-
-    public void ResetRun()
-    {
-        Scrap = 0;
+        blackjackCanvas = canvas;
     }
 
     public void RestartGame()
     {
-        ResetRun();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (playerStats != null)
+        {
+            playerStats.ResetAll();
+        }
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("HubRoom");
+    }
+
+    public bool IsGameplayActive()
+    {
+        return currentState == GameState.Gameplay;
     }
 
     public void ExitGame()

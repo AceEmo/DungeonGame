@@ -2,19 +2,23 @@ using System.Collections;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 public class GameManagerTests
 {
     private GameObject gameManagerObj;
     private GameManager gameManager;
+    private PlayerStats testStats;
 
     [SetUp]
     public void Setup()
     {
         gameManagerObj = new GameObject("GameManager");
         gameManager = gameManagerObj.AddComponent<GameManager>();
+        
+        testStats = ScriptableObject.CreateInstance<PlayerStats>();
+        gameManager.playerStats = testStats;
+        
         Time.timeScale = 1f;
     }
 
@@ -28,7 +32,17 @@ public class GameManagerTests
             Object.DestroyImmediate(gameManagerObj);
         }
 
-        FieldInfo instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
+        if (testStats != null)
+        {
+            Object.DestroyImmediate(testStats);
+        }
+
+        FieldInfo instanceField = typeof(GameManager).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic);
+        if (instanceField == null)
+        {
+            instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
+        }
+
         if (instanceField != null)
         {
             instanceField.SetValue(null, null);
@@ -49,22 +63,15 @@ public class GameManagerTests
     }
 
     [Test]
-    public void AddScrapIncreasesTotalAmount()
+    public void RestartGameResetsPlayerStats()
     {
-        gameManager.AddScrap(10);
-        gameManager.AddScrap(5);
+        testStats.scrap = 50;
+        testStats.damage = 99;
 
-        Assert.AreEqual(15, gameManager.Scrap);
-    }
+        gameManager.RestartGame();
 
-    [Test]
-    public void ResetRunSetsScrapToZero()
-    {
-        gameManager.AddScrap(20);
-        
-        gameManager.ResetRun();
-
-        Assert.AreEqual(0, gameManager.Scrap);
+        Assert.AreEqual(0, testStats.scrap);
+        Assert.AreEqual(testStats.baseDamage, testStats.damage);
     }
 
     [Test]

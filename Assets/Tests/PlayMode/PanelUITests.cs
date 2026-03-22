@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Reflection;
 using NUnit.Framework;
-using TMPro;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
@@ -10,6 +9,7 @@ public class PanelUITests
 {
     private GameObject gameManagerObject;
     private GameManager gameManager;
+    private PlayerStats testStats;
     private GameObject panelObject;
 
     [SetUp]
@@ -17,7 +17,10 @@ public class PanelUITests
     {
         gameManagerObject = new GameObject("GameManager");
         gameManager = gameManagerObject.AddComponent<GameManager>();
-        
+
+        testStats = ScriptableObject.CreateInstance<PlayerStats>();
+        gameManager.playerStats = testStats;
+
         MethodInfo initMethod = typeof(GameManager).GetMethod("InitializeSceneData", BindingFlags.NonPublic | BindingFlags.Instance);
         initMethod.Invoke(gameManager, null);
 
@@ -32,8 +35,18 @@ public class PanelUITests
         {
             Object.DestroyImmediate(gameManagerObject);
         }
-        
-        FieldInfo instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
+
+        if (testStats != null)
+        {
+            Object.DestroyImmediate(testStats);
+        }
+
+        FieldInfo instanceField = typeof(GameManager).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic);
+        if (instanceField == null)
+        {
+            instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
+        }
+
         if (instanceField != null)
         {
             instanceField.SetValue(null, null);
@@ -54,12 +67,12 @@ public class PanelUITests
         MethodInfo startMethod = typeof(GameOverPanel).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance);
         startMethod.Invoke(gameOverPanel, null);
 
-        gameManager.AddScrap(10);
+        testStats.scrap = 10;
         
         restartButton.onClick.Invoke();
         yield return null;
 
-        Assert.AreEqual(0, gameManager.Scrap);
+        Assert.AreEqual(0, testStats.scrap);
 
         Object.DestroyImmediate(restartBtnObj);
     }
@@ -78,12 +91,12 @@ public class PanelUITests
         MethodInfo startMethod = typeof(PausePanel).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance);
         startMethod.Invoke(pausePanel, null);
 
-        gameManager.AddScrap(5);
+        testStats.scrap = 5;
         
         restartButton.onClick.Invoke();
         yield return null;
 
-        Assert.AreEqual(0, gameManager.Scrap);
+        Assert.AreEqual(0, testStats.scrap);
 
         Object.DestroyImmediate(restartBtnObj);
     }

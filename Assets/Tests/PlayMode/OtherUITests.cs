@@ -8,26 +8,31 @@ using UnityEngine.TestTools;
 public class OtherUITests
 {
     private GameObject uiObject;
+    private PlayerStats testStats;
 
     [SetUp]
     public void Setup()
     {
         uiObject = new GameObject("UI");
+        testStats = ScriptableObject.CreateInstance<PlayerStats>();
     }
 
     [TearDown]
     public void Teardown()
     {
         Object.DestroyImmediate(uiObject);
+        Object.DestroyImmediate(testStats);
+        
+        FieldInfo instanceField = typeof(GameManager).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic);
+        if (instanceField != null)
+        {
+            instanceField.SetValue(null, null);
+        }
     }
 
     [Test]
-    public void ScrapUIUpdatesTextWithManagerScrapValue()
+    public void ScrapUIUpdatesTextWhenStatsChange()
     {
-        GameObject gameManagerObject = new GameObject("GameManager");
-        GameManager gameManager = gameManagerObject.AddComponent<GameManager>();
-        gameManager.AddScrap(15);
-
         ScrapUI scrapUI = uiObject.AddComponent<ScrapUI>();
         
         GameObject textObj = new GameObject("Text");
@@ -36,14 +41,15 @@ public class OtherUITests
         FieldInfo textField = typeof(ScrapUI).GetField("scrapText", BindingFlags.NonPublic | BindingFlags.Instance);
         textField.SetValue(scrapUI, tmpText);
 
-        MethodInfo updateMethod = typeof(ScrapUI).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
-        updateMethod.Invoke(scrapUI, null);
+        FieldInfo statsField = typeof(ScrapUI).GetField("stats", BindingFlags.NonPublic | BindingFlags.Instance);
+        statsField.SetValue(scrapUI, testStats);
+
+        MethodInfo onEnableMethod = typeof(ScrapUI).GetMethod("OnEnable", BindingFlags.NonPublic | BindingFlags.Instance);
+        onEnableMethod.Invoke(scrapUI, null);
+
+        testStats.AddScrap(15);
 
         Assert.AreEqual("15", tmpText.text);
-
-        Object.DestroyImmediate(gameManagerObject);
-        FieldInfo instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
-        if (instanceField != null) instanceField.SetValue(null, null);
     }
 
     [UnityTest]
@@ -63,8 +69,9 @@ public class OtherUITests
         FieldInfo textField = typeof(InteractionUI).GetField("hintText", BindingFlags.NonPublic | BindingFlags.Instance);
         textField.SetValue(interactionUI, tmpText);
 
-        Camera mainCamera = new GameObject("MainCamera").AddComponent<Camera>();
-        mainCamera.tag = "MainCamera";
+        GameObject cameraObj = new GameObject("MainCamera");
+        Camera mainCamera = cameraObj.AddComponent<Camera>();
+        cameraObj.tag = "MainCamera";
         
         FieldInfo cameraField = typeof(InteractionUI).GetField("mainCamera", BindingFlags.NonPublic | BindingFlags.Instance);
         cameraField.SetValue(interactionUI, mainCamera);
@@ -76,6 +83,6 @@ public class OtherUITests
         Assert.IsTrue(panelObj.activeSelf);
         Assert.AreEqual("[E] Test", tmpText.text);
 
-        Object.DestroyImmediate(mainCamera.gameObject);
+        Object.DestroyImmediate(cameraObj);
     }
 }
