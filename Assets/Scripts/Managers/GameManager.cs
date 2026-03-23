@@ -6,7 +6,8 @@ public enum GameState
     Gameplay,
     Paused,
     GameOver,
-    Blackjack
+    Blackjack,
+    Terminal
 }
 
 public class GameManager : MonoBehaviour
@@ -19,8 +20,11 @@ public class GameManager : MonoBehaviour
     private GameObject gameOverPanel;
     private GameObject pausePanel;
     private GameObject blackjackCanvas;
-
+    private GameObject terminalPanel;
     private GameState currentState;
+
+    public void OpenTerminal() => SetGameState(GameState.Terminal);
+    public void CloseTerminal() => SetGameState(GameState.Gameplay);
 
     private void Awake()
     {
@@ -44,11 +48,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        HandleInput();
-    }
-
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         InitializeSceneData();
@@ -59,6 +58,7 @@ public class GameManager : MonoBehaviour
         RemoveDuplicateEventSystems();
         FindAndAssignSceneReferences();
         SetGameState(GameState.Gameplay);
+
         if (playerHealth != null)
         {
             playerHealth.ResetHealth();
@@ -81,22 +81,20 @@ public class GameManager : MonoBehaviour
     private void FindAndAssignSceneReferences()
     {
         playerHealth = FindFirstObjectByType<PlayerHealth>();
-        if (playerHealth != null)
-        {
-            playerHealth.OnPlayerDied += HandleGameOver;
-        }
 
         PausePanel pause = FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include);
         if (pause != null) pausePanel = pause.gameObject;
 
         GameOverPanel gameOver = FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
         if (gameOver != null) gameOverPanel = gameOver.gameObject;
+
+        TerminalPanel terminal = FindFirstObjectByType<TerminalPanel>(FindObjectsInactive.Include);
+        if (terminal != null) terminalPanel = terminal.gameObject;
     }
 
     private void SetGameState(GameState newState)
     {
         currentState = newState;
-
         UpdateUIStates();
 
         switch (currentState)
@@ -111,6 +109,9 @@ public class GameManager : MonoBehaviour
             case GameState.Blackjack:
                 Time.timeScale = 1f;
                 break;
+            case GameState.Terminal:
+                Time.timeScale = 0f;
+                break;
         }
     }
 
@@ -119,11 +120,12 @@ public class GameManager : MonoBehaviour
         if (pausePanel != null) pausePanel.SetActive(currentState == GameState.Paused);
         if (gameOverPanel != null) gameOverPanel.SetActive(currentState == GameState.GameOver);
         if (blackjackCanvas != null) blackjackCanvas.SetActive(currentState == GameState.Blackjack);
+        if (terminalPanel != null) terminalPanel.SetActive(currentState == GameState.Terminal);
+    }
 
-        if (currentState != GameState.Gameplay && InteractionUI.Instance != null)
-        {
-            InteractionUI.Instance.HideHint();
-        }
+    private void Update()
+    {
+        HandleInput();
     }
 
     private void HandleInput()
@@ -131,13 +133,9 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (currentState == GameState.Gameplay)
-            {
                 SetGameState(GameState.Paused);
-            }
             else if (currentState == GameState.Paused || currentState == GameState.Blackjack)
-            {
                 SetGameState(GameState.Gameplay);
-            }
         }
     }
 
@@ -149,17 +147,13 @@ public class GameManager : MonoBehaviour
     public void OpenBlackjack()
     {
         if (currentState != GameState.GameOver)
-        {
             SetGameState(GameState.Blackjack);
-        }
     }
 
     public void CloseBlackjack()
     {
         if (currentState == GameState.Blackjack)
-        {
             SetGameState(GameState.Gameplay);
-        }
     }
 
     public void RegisterBlackjackCanvas(GameObject canvas)
@@ -170,9 +164,7 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         if (playerStats != null)
-        {
             playerStats.ResetAll();
-        }
 
         Time.timeScale = 1f;
         SceneManager.LoadScene("HubRoom");

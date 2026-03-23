@@ -1,25 +1,25 @@
 ﻿# Summary
 |||
 |:---|:---|
-| Generated on: | 21.3.2026 г. - 20:41:07 |
+| Generated on: | 23.3.2026 г. - 14:05:48 |
 | Parser: | MultiReportParser (4x OpenCoverParser) |
 | Assemblies: | 1 |
-| Classes: | 53 |
-| Files: | 53 |
-| Covered lines: | 1513 |
-| Uncovered lines: | 290 |
-| Coverable lines: | 1803 |
-| Total lines: | 3170 |
-| Line coverage: | 83.9% (1513 of 1803) |
+| Classes: | 57 |
+| Files: | 57 |
+| Covered lines: | 1609 |
+| Uncovered lines: | 317 |
+| Coverable lines: | 1926 |
+| Total lines: | 3280 |
+| Line coverage: | 83.5% (1609 of 1926) |
 | Covered branches: | 0 |
 | Total branches: | 0 |
-| Covered methods: | 247 |
-| Total methods: | 266 |
-| Method coverage: | 92.8% (247 of 266) |
+| Covered methods: | 279 |
+| Total methods: | 304 |
+| Method coverage: | 91.7% (279 of 304) |
 
 |**Name**|**Covered**|**Uncovered**|**Coverable**|**Total**|**Line coverage**|**Covered**|**Total**|**Branch coverage**|**Covered**|**Total**|**Method coverage**|
 |:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-|**GameScripts**|**1513**|**290**|**1803**|**3170**|**83.9%**|**0**|**0**|****|**247**|**266**|**92.8%**|
+|**GameScripts**|**1609**|**317**|**1926**|**3280**|**83.5%**|**0**|**0**|****|**279**|**304**|**91.7%**|
 |AttackState|14|2|16|30|87.5%|0|0||2|3|66.6%|
 |BackgroundMusic|10|0|10|19|100%|0|0||1|1|100%|
 |BlackjackDeck|27|0|27|46|100%|0|0||4|4|100%|
@@ -51,25 +51,29 @@
 |EnemyHealth|67|7|74|114|90.5%|0|0||7|7|100%|
 |EnemyManager|57|0|57|89|100%|0|0||6|6|100%|
 |FlyingMovement|7|0|7|17|100%|0|0||2|2|100%|
-|GameManager|93|38|131|206|70.9%|0|0||21|23|91.3%|
+|GameManager|128|28|156|190|82%|0|0||32|34|94.1%|
 |GameOverPanel|17|9|26|44|65.3%|0|0||3|4|75%|
-|GearInteract|8|0|8|17|100%|0|0||3|3|100%|
+|GearInteract|12|0|12|20|100%|0|0||6|6|100%|
 |GroundMovement|37|15|52|116|71.1%|0|0||5|6|83.3%|
-|HealthBoxInteract|12|0|12|23|100%|0|0||2|2|100%|
-|HeartUI|40|3|43|72|93%|0|0||6|6|100%|
+|HealthBoxInteract|15|1|16|24|93.7%|0|0||2|2|100%|
+|HeartUI|43|0|43|72|100%|0|0||6|6|100%|
+|HubSpawnManager|0|7|7|15|0%|0|0||0|1|0%|
 |IdleState|8|1|9|18|88.8%|0|0||3|3|100%|
-|InteractionUI|21|9|30|55|70%|0|0||6|6|100%|
+|InteractionUI|25|15|40|51|62.5%|0|0||9|9|100%|
+|LevelEntrance|0|6|6|13|0%|0|0||0|1|0%|
 |LevelGenerator|153|6|159|222|96.2%|0|0||12|12|100%|
 |PausePanel|14|12|26|43|53.8%|0|0||3|4|75%|
-|PlayerHealth|67|12|79|136|84.8%|0|0||14|15|93.3%|
+|PlayerCore|0|10|10|19|0%|0|0||0|1|0%|
+|PlayerHealth|75|31|106|140|70.7%|0|0||27|28|96.4%|
 |PlayerInteraction|47|19|66|103|71.2%|0|0||6|8|75%|
-|PlayerMovement|24|11|35|55|68.5%|0|0||6|7|85.7%|
-|PlayerShooting|41|18|59|79|69.4%|0|0||7|7|100%|
-|PlayerStats|7|0|7|13|100%|0|0||1|1|100%|
+|PlayerMovement|24|5|29|55|82.7%|0|0||4|4|100%|
+|PlayerShooting|41|7|48|79|85.4%|0|0||4|4|100%|
+|PlayerStats|24|0|24|46|100%|0|0||5|5|100%|
 |RandomFlyingBehaviour|25|0|25|49|100%|0|0||4|4|100%|
 |RoomController|33|3|36|55|91.6%|0|0||5|5|100%|
-|Rooms|38|16|54|112|70.3%|0|0||5|6|83.3%|
+|Rooms|48|6|54|112|88.8%|0|0||6|6|100%|
 |RoomTrigger|21|0|21|35|100%|0|0||3|3|100%|
-|ScrapUI|4|2|6|17|66.6%|0|0||1|1|100%|
+|ScrapUI|16|9|25|40|64%|0|0||3|5|60%|
 |StandardInputProvider|3|0|3|8|100%|0|0||1|1|100%|
 |StaticBackground|6|0|6|16|100%|0|0||2|2|100%|
+|UIManager|0|11|11|19|0%|0|0||0|3|0%|
