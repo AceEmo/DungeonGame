@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     private GameObject terminalPanel;
     private GameState currentState;
 
+    private BlackjackInteract currentBlackjackTable;
+
     public void OpenTerminal() => SetGameState(GameState.Terminal);
     public void CloseTerminal() => SetGameState(GameState.Gameplay);
 
@@ -45,6 +47,7 @@ public class GameManager : MonoBehaviour
         if (Instance == this)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
+            Instance = null;
         }
     }
 
@@ -64,6 +67,8 @@ public class GameManager : MonoBehaviour
             playerHealth.ResetHealth();
             playerHealth.OnPlayerDied += HandleGameOver;
         }
+
+        currentBlackjackTable = null;
     }
 
     private void RemoveDuplicateEventSystems()
@@ -82,45 +87,63 @@ public class GameManager : MonoBehaviour
     {
         playerHealth = FindFirstObjectByType<PlayerHealth>();
 
-        PausePanel pause = FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include);
-        if (pause != null) pausePanel = pause.gameObject;
+        PausePanel pausePanelRef = FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include);
+        if (pausePanelRef != null) pausePanel = pausePanelRef.gameObject;
 
-        GameOverPanel gameOver = FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
-        if (gameOver != null) gameOverPanel = gameOver.gameObject;
+        GameOverPanel gameOverPanelRef = FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include);
+        if (gameOverPanelRef != null) gameOverPanel = gameOverPanelRef.gameObject;
 
-        TerminalPanel terminal = FindFirstObjectByType<TerminalPanel>(FindObjectsInactive.Include);
-        if (terminal != null) terminalPanel = terminal.gameObject;
+        TerminalPanel terminalPanelRef = FindFirstObjectByType<TerminalPanel>(FindObjectsInactive.Include);
+        if (terminalPanelRef != null) terminalPanel = terminalPanelRef.gameObject;
+
+        BlackjackGame blackjackGameRef = FindFirstObjectByType<BlackjackGame>(FindObjectsInactive.Include);
+        if (blackjackGameRef != null) blackjackCanvas = blackjackGameRef.gameObject;
     }
 
     private void SetGameState(GameState newState)
     {
         currentState = newState;
+        
+        UpdateTimeScale();
+        UpdateCursorState();
         UpdateUIStates();
+    }
 
-        switch (currentState)
+    private void UpdateTimeScale()
+    {
+        Time.timeScale = (currentState == GameState.Gameplay) ? 1f : 0f;
+    }
+
+    private void UpdateCursorState()
+    {
+        bool isGameplay = currentState == GameState.Gameplay;
+
+        if (isGameplay)
         {
-            case GameState.Gameplay:
-                Time.timeScale = 1f;
-                break;
-            case GameState.Paused:
-            case GameState.GameOver:
-                Time.timeScale = 0f;
-                break;
-            case GameState.Blackjack:
-                Time.timeScale = 0f;
-                break;
-            case GameState.Terminal:
-                Time.timeScale = 0f;
-                break;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
     private void UpdateUIStates()
     {
-        if (pausePanel != null) pausePanel.SetActive(currentState == GameState.Paused);
-        if (gameOverPanel != null) gameOverPanel.SetActive(currentState == GameState.GameOver);
-        if (blackjackCanvas != null) blackjackCanvas.SetActive(currentState == GameState.Blackjack);
-        if (terminalPanel != null) terminalPanel.SetActive(currentState == GameState.Terminal);
+        TogglePanel(pausePanel, currentState == GameState.Paused);
+        TogglePanel(gameOverPanel, currentState == GameState.GameOver);
+        TogglePanel(blackjackCanvas, currentState == GameState.Blackjack);
+        TogglePanel(terminalPanel, currentState == GameState.Terminal);
+    }
+
+    private void TogglePanel(GameObject panel, bool isActive)
+    {
+        if (panel != null)
+        {
+            panel.SetActive(isActive);
+        }
     }
 
     private void Update()
@@ -131,7 +154,7 @@ public class GameManager : MonoBehaviour
     private void HandleInput()
     {
         if (currentState == GameState.Blackjack)
-        return;
+            return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -147,35 +170,55 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.GameOver);
     }
 
+    public void RegisterBlackjackTable(BlackjackInteract table)
+    {
+        currentBlackjackTable = table;
+    }
+
     public void OpenBlackjack()
     {
-        if (currentState != GameState.GameOver)
-            SetGameState(GameState.Blackjack);
+        if (currentState == GameState.GameOver)
+            return;
+
+        if (blackjackCanvas == null || currentBlackjackTable == null)
+            return;
+
+        SetGameState(GameState.Blackjack);
+
+        var game = blackjackCanvas.GetComponent<BlackjackGame>();
+        if (game != null)
+        {
+            game.SetItemSpawnPoint(currentBlackjackTable.itemSpawnPoint);
+            game.StartBlackjack();
+        }
     }
 
     public void CloseBlackjack()
     {
         if (currentState == GameState.Blackjack)
+        {
             SetGameState(GameState.Gameplay);
-    }
-
-    public void RegisterBlackjackCanvas(GameObject canvas)
-    {
-        blackjackCanvas = canvas;
+        }
     }
 
     public void RestartGame()
     {
         if (playerStats != null)
+        {
             playerStats.ResetAll();
+        }
 
-        Time.timeScale = 1f;
         SceneManager.LoadScene("HubRoom");
     }
 
     public bool IsGameplayActive()
     {
         return currentState == GameState.Gameplay;
+    }
+
+    public void RegisterBlackjackCanvas(GameObject canvas)
+    {
+        blackjackCanvas = canvas;
     }
 
     public void ExitGame()

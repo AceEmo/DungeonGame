@@ -14,6 +14,7 @@ public class BlackjackGameTargetedTests
     private BlackjackUI ui;
     private BlackjackRewardSystem reward;
     private Sprite dummySprite;
+    private Transform itemSpawnPoint;
 
     [SetUp]
     public void Setup()
@@ -25,11 +26,14 @@ public class BlackjackGameTargetedTests
         ui = go.AddComponent<BlackjackUI>();
         ui.playerCardArea = new GameObject("PlayerArea").transform;
         ui.dealerCardArea = new GameObject("DealerArea").transform;
+
         ui.cardPrefab = new GameObject("CardPrefab");
         ui.cardPrefab.AddComponent<Image>();
+
         ui.resultText = new GameObject("ResultText").AddComponent<TextMeshProUGUI>();
         ui.playerScoreText = new GameObject("PlayerScore").AddComponent<TextMeshProUGUI>();
         ui.dealerScoreText = new GameObject("DealerScore").AddComponent<TextMeshProUGUI>();
+
         ui.hitButton = new GameObject("HitBtn").AddComponent<Button>();
         ui.standButton = new GameObject("StandBtn").AddComponent<Button>();
         ui.exitButton = new GameObject("ExitBtn").AddComponent<Button>();
@@ -39,17 +43,24 @@ public class BlackjackGameTargetedTests
         ui.backCardSprite = dummySprite;
 
         reward = go.AddComponent<BlackjackRewardSystem>();
-        reward.rewardSpawnPoint = new GameObject("Spawn").transform;
-        
+
         game = go.AddComponent<BlackjackGame>();
         game.cardSprites = new Sprite[] { dummySprite };
+
+        itemSpawnPoint = new GameObject("Spawn").transform;
+        game.SetItemSpawnPoint(itemSpawnPoint);
     }
 
     [TearDown]
     public void Teardown()
     {
         UnityEngine.Object.DestroyImmediate(go);
-        if (dummySprite != null) UnityEngine.Object.DestroyImmediate(dummySprite.texture);
+        if (dummySprite != null)
+        {
+            if (dummySprite.texture != null)
+                UnityEngine.Object.DestroyImmediate(dummySprite.texture);
+            UnityEngine.Object.DestroyImmediate(dummySprite);
+        }
     }
 
     private BlackjackHand GetHand(string handName)
@@ -63,7 +74,8 @@ public class BlackjackGameTargetedTests
         BlackjackDeck deck = new BlackjackDeck();
         FieldInfo deckList = typeof(BlackjackDeck).GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
         List<Card> list = new List<Card>();
-        for(int i = 0; i < count; i++) list.Add(new Card("rigged", value, dummySprite));
+        for (int i = 0; i < count; i++)
+            list.Add(new Card("rigged", value, dummySprite));
         deckList.SetValue(deck, list);
 
         FieldInfo gameDeck = typeof(BlackjackGame).GetField("deck", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -140,7 +152,7 @@ public class BlackjackGameTargetedTests
         yield return game.StartCoroutine((IEnumerator)hitRoutine.Invoke(game, null));
 
         Assert.AreEqual("YOU LOSE!", ui.resultText.text);
-        
+
         FieldInfo gameOverField = typeof(BlackjackGame).GetField("gameOver", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.IsTrue((bool)gameOverField.GetValue(game));
     }
@@ -148,7 +160,7 @@ public class BlackjackGameTargetedTests
     [UnityTest]
     public IEnumerator HitRoutine_PlayerHits21_AutoStartsDealerTurn()
     {
-        SetRiggedDeck(10, 5); 
+        SetRiggedDeck(10, 5);
         GetHand("playerHand").AddCard(new Card("p", 11, dummySprite));
         GetHand("dealerHand").AddCard(new Card("d", 5, dummySprite));
         SetupHiddenCardForTest();
@@ -162,7 +174,7 @@ public class BlackjackGameTargetedTests
     [UnityTest]
     public IEnumerator DealerTurn_DrawsUntil17()
     {
-        SetRiggedDeck(5, 10); 
+        SetRiggedDeck(5, 10);
         GetHand("dealerHand").AddCard(new Card("d", 10, dummySprite));
         GetHand("playerHand").AddCard(new Card("p", 20, dummySprite));
         SetupHiddenCardForTest();
@@ -178,7 +190,7 @@ public class BlackjackGameTargetedTests
     public IEnumerator InitialBlackjackFlow_PlayerBJ_Wins()
     {
         SetupHiddenCardForTest();
-        GetHand("dealerHand").AddCard(new Card("d", 10, dummySprite)); 
+        GetHand("dealerHand").AddCard(new Card("d", 10, dummySprite));
 
         MethodInfo flow = typeof(BlackjackGame).GetMethod("InitialBlackjackFlow", BindingFlags.NonPublic | BindingFlags.Instance);
         yield return game.StartCoroutine((IEnumerator)flow.Invoke(game, new object[] { true, false }));
@@ -190,7 +202,7 @@ public class BlackjackGameTargetedTests
     public IEnumerator InitialBlackjackFlow_BothBJ_Draw()
     {
         SetupHiddenCardForTest();
-        GetHand("dealerHand").AddCard(new Card("d", 10, dummySprite)); 
+        GetHand("dealerHand").AddCard(new Card("d", 10, dummySprite));
 
         MethodInfo flow = typeof(BlackjackGame).GetMethod("InitialBlackjackFlow", BindingFlags.NonPublic | BindingFlags.Instance);
         yield return game.StartCoroutine((IEnumerator)flow.Invoke(game, new object[] { true, true }));

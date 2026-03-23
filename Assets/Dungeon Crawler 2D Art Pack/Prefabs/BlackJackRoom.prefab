@@ -3927,10 +3927,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4166475102001758}
     m_Modifications:
-    - target: {fileID: 4622325958799604005, guid: 9a633844a719f384bb73772f2462fe62, type: 3}
-      propertyPath: rewardSpawnPoint
-      value: 
-      objectReference: {fileID: 5831474909659569220}
     - target: {fileID: 6170936724921548127, guid: 9a633844a719f384bb73772f2462fe62, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.34000015
@@ -3971,6 +3967,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6465864824627498303, guid: 9a633844a719f384bb73772f2462fe62, type: 3}
+      propertyPath: itemSpawnPoint
+      value: 
+      objectReference: {fileID: 5831474909659569220}
     - target: {fileID: 7089916109656482545, guid: 9a633844a719f384bb73772f2462fe62, type: 3}
       propertyPath: m_Name
       value: BlackJackPrefab

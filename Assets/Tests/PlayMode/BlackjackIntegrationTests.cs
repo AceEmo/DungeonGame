@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Linq;
 using NUnit.Framework;
 using TMPro;
 using UnityEngine;
@@ -18,6 +19,8 @@ public class BlackjackIntegrationTests
     private GameObject playerObject;
     private PlayerHealth playerHealth;
 
+    private Transform itemSpawnPoint;
+
     [SetUp]
     public void Setup()
     {
@@ -32,11 +35,14 @@ public class BlackjackIntegrationTests
 
         interactObject = new GameObject("InteractObj");
         interact = interactObject.AddComponent<BlackjackInteract>();
-        interact.blackjackCanvas = environmentObject;
+        GameManager.Instance.RegisterBlackjackCanvas(environmentObject);
+
 
         SetupUIMocks();
         SetupRewardMocks();
         SetupPlayerMock();
+
+        interact.itemSpawnPoint = itemSpawnPoint;
 
         environmentObject.SetActive(true);
     }
@@ -69,8 +75,9 @@ public class BlackjackIntegrationTests
 
     private void SetupRewardMocks()
     {
-        rewardSystem.rewardSpawnPoint = new GameObject("SpawnPoint").transform;
-        rewardSystem.rewardSpawnPoint.SetParent(environmentObject.transform);
+        itemSpawnPoint = new GameObject("ItemSpawnPoint").transform;
+        itemSpawnPoint.SetParent(environmentObject.transform);
+
         rewardSystem.rewardPrefab = new GameObject("RewardPrefab");
         rewardSystem.blackjackRewardPrefab = new GameObject("BJRewardPrefab");
     }
@@ -103,14 +110,20 @@ public class BlackjackIntegrationTests
     public void Teardown()
     {
         Time.timeScale = 1f;
+        
         Object.DestroyImmediate(environmentObject);
         Object.DestroyImmediate(interactObject);
         Object.DestroyImmediate(playerObject);
 
-        if (ui.backCardSprite != null)
+        if (ui != null && ui.backCardSprite != null)
         {
             Object.DestroyImmediate(ui.backCardSprite.texture);
             Object.DestroyImmediate(ui.backCardSprite);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            Object.DestroyImmediate(GameManager.Instance.gameObject);
         }
     }
 
@@ -146,10 +159,18 @@ public class BlackjackIntegrationTests
     [UnityTest]
     public IEnumerator RewardSystemWinRoutineSpawnsCorrectPrefab()
     {
-        yield return rewardSystem.WinRoutine(ui, true);
+        int before = Object
+            .FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+            .Count(go => go.name == "BJRewardPrefab");
 
+        yield return rewardSystem.WinRoutine(ui, true, itemSpawnPoint);
+
+        int after = Object
+            .FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+            .Count(go => go.name == "BJRewardPrefab");
+
+        Assert.AreEqual(before + 1, after);
         Assert.IsTrue(ui.exitButton.interactable);
-        Assert.AreEqual(1, rewardSystem.rewardSpawnPoint.childCount + Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).Length > 0 ? 1 : 0);
     }
 
     [UnityTest]

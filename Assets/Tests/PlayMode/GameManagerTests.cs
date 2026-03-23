@@ -36,17 +36,6 @@ public class GameManagerTests
         {
             Object.DestroyImmediate(testStats);
         }
-
-        FieldInfo instanceField = typeof(GameManager).GetField("instance", BindingFlags.Static | BindingFlags.NonPublic);
-        if (instanceField == null)
-        {
-            instanceField = typeof(GameManager).GetField("<Instance>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
-        }
-
-        if (instanceField != null)
-        {
-            instanceField.SetValue(null, null);
-        }
     }
 
     [UnityTest]

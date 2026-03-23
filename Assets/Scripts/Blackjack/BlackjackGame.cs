@@ -18,6 +18,10 @@ public class BlackjackGame : MonoBehaviour
     private bool rewardProcessing;
     private bool dealerCardHidden;
 
+    private Transform itemSpawnPoint;
+
+    private bool hitLocked = false;
+
     private void Awake()
     {
         deck = new BlackjackDeck();
@@ -28,10 +32,16 @@ public class BlackjackGame : MonoBehaviour
         rewardSystem = GetComponent<BlackjackRewardSystem>();
     }
 
+    public void SetItemSpawnPoint(Transform point)
+    {
+        itemSpawnPoint = point;
+    }
+
     public void StartBlackjack()
     {
         if (ui != null)
             ui.SetResult(" ");
+
         StartCoroutine(GameFlow());
     }
 
@@ -48,6 +58,7 @@ public class BlackjackGame : MonoBehaviour
         gameOver = false;
         rewardProcessing = false;
         dealerCardHidden = false;
+        hitLocked = false;
 
         ui.EnableButtons(false);
 
@@ -142,7 +153,7 @@ public class BlackjackGame : MonoBehaviour
         else if (playerBJ)
         {
             ui.SetResult("BLACKJACK!");
-            yield return rewardSystem.WinRoutine(ui, true);
+            yield return rewardSystem.WinRoutine(ui, true, itemSpawnPoint);
         }
         else
         {
@@ -153,8 +164,6 @@ public class BlackjackGame : MonoBehaviour
         rewardProcessing = false;
         ui.SetExitButton(true);
     }
-
-    private bool hitLocked = false;
 
     public void Hit()
     {
@@ -238,7 +247,7 @@ public class BlackjackGame : MonoBehaviour
         if (dealerScore > 21 || playerScore > dealerScore)
         {
             ui.SetResult("YOU WIN!");
-            yield return rewardSystem.WinRoutine(ui, false);
+            yield return rewardSystem.WinRoutine(ui, false, itemSpawnPoint);
         }
         else if (playerScore < dealerScore)
         {
@@ -258,13 +267,20 @@ public class BlackjackGame : MonoBehaviour
     {
         if (!gameOver || rewardProcessing) return;
 
-        Time.timeScale = 1f;
-        gameObject.SetActive(false);
-
         if (ui != null)
         {
             ui.SetResult(" ");
             ui.ClearTable();
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CloseBlackjack();
+        }
+        else
+        {
+            gameObject.SetActive(false);
+            Time.timeScale = 1f;
         }
     }
 }

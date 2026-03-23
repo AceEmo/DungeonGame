@@ -26,7 +26,7 @@ public class TerminalUIController : MonoBehaviour
         "<color=#FFCC00><b>>>> MISSION PARAMETERS: SECTOR ALPHA <<<</b></color>\n" +
         "<color=#404040>---------------------------------------</color>\n\n" +
         "<color=#FFFFFF>[OBJ-01]</color> Locate and eliminate the <color=#FF3333>SECTOR BOSS</color>.\n" +
-        "<color=#808080>Note: Boss elimination grants access to the next large sector.</color>\n\n" +
+        "<color=#808080>Note: Boss elimination grants access to the next large sector.</color>\n" +
         "<color=#FFFFFF>[OBJ-02]</color> Accumulate <color=#50C8FF>SCRAP METAL</color> from debris and enemies.\n" +
         "<color=#808080>Use resources for ship-wide upgrades in specialized zones.</color>\n\n" +
         "<color=#404040>.......................................</color>\n\n" +

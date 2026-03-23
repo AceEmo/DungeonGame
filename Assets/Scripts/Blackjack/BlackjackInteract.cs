@@ -3,8 +3,17 @@ using System.Collections;
 
 public class BlackjackInteract : MonoBehaviour, IInteractable
 {
-    public GameObject blackjackCanvas;
+    public Transform itemSpawnPoint;
+
     private bool canInteract = true;
+
+    private void Start()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterBlackjackTable(this);
+        }
+    }
 
     public string GetHintText()
     {
@@ -12,21 +21,15 @@ public class BlackjackInteract : MonoBehaviour, IInteractable
     }
 
     public void Interact()
-{
-    if (!canInteract) return;
+    {
+        if (!canInteract) return;
+        if (GameManager.Instance == null) return;
 
-    canInteract = false;
-    StartCoroutine(InteractionCooldown());
+        canInteract = false;
+        StartCoroutine(InteractionCooldown());
 
-    if (blackjackCanvas == null) return;
-
-    blackjackCanvas.SetActive(true);
-    Time.timeScale = 0f;
-
-    BlackjackGame game = blackjackCanvas.GetComponent<BlackjackGame>();
-    if (game != null)
-        game.StartBlackjack();
-}
+        GameManager.Instance.OpenBlackjack();
+    }
 
     IEnumerator InteractionCooldown()
     {
