@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour
                 Time.timeScale = 0f;
                 break;
             case GameState.Blackjack:
-                Time.timeScale = 1f;
+                Time.timeScale = 0f;
                 break;
             case GameState.Terminal:
                 Time.timeScale = 0f;
@@ -130,11 +130,14 @@ public class GameManager : MonoBehaviour
 
     private void HandleInput()
     {
+        if (currentState == GameState.Blackjack)
+        return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (currentState == GameState.Gameplay)
                 SetGameState(GameState.Paused);
-            else if (currentState == GameState.Paused || currentState == GameState.Blackjack)
+            else if (currentState == GameState.Paused)
                 SetGameState(GameState.Gameplay);
         }
     }
