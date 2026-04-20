@@ -7,6 +7,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject starterRoomPrefab;
     public GameObject bossRoomPrefab;
     public GameObject blackjackRoomPrefab;
+    public GameObject upgradeRoomPrefab;
     public GameObject[] normalRoomPrefabs;
 
     [Header("Level Settings")]
@@ -26,7 +27,7 @@ public class LevelGenerator : MonoBehaviour
 
         CreateRoom(Vector2Int.zero, starterRoomPrefab, true);
 
-        for (int i = 0; i < roomCount - 3; i++)
+        for (int i = 0; i < roomCount - 4; i++)
         {
             Vector2Int randomPos = GetRandomAdjacentPosition();
             GameObject normalPrefab = normalRoomPrefabs[Random.Range(0, normalRoomPrefabs.Length)];
@@ -34,6 +35,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         CreateRoom(GetRandomAdjacentPosition(), blackjackRoomPrefab, false);
+        CreateRoom(GetRandomAdjacentPosition(), upgradeRoomPrefab, false);
 
         Vector2Int bossPos = GetBossRoomPosition();
         CreateRoom(bossPos, bossRoomPrefab, false);

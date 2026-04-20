@@ -314,6 +314,7 @@ MonoBehaviour:
   starterRoomPrefab: {fileID: 1289456404150176, guid: 1ae258428d67704418079421f0331624, type: 3}
   bossRoomPrefab: {fileID: 1645482502123220, guid: 89c34bf03e751b346b5b806a385f7ed9, type: 3}
   blackjackRoomPrefab: {fileID: 1289456404150176, guid: b9ca87a16fee4f04a91215304cca5772, type: 3}
+  upgradeRoomPrefab: {fileID: 1289456404150176, guid: 32d91ea6af490e44397869cad5a2b201, type: 3}
   normalRoomPrefabs:
   - {fileID: 1289456404150176, guid: 2b774a0857fa9724fbe6137309d50f96, type: 3}
   - {fileID: 1575628707851836, guid: 0af5bb5816678244b818066575f7e674, type: 3}

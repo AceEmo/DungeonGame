@@ -7,7 +7,8 @@ public enum GameState
     Paused,
     GameOver,
     Blackjack,
-    Terminal
+    Terminal,
+    Upgrade
 }
 
 public class GameManager : MonoBehaviour
@@ -21,12 +22,15 @@ public class GameManager : MonoBehaviour
     private GameObject pausePanel;
     private GameObject blackjackCanvas;
     private GameObject terminalPanel;
+    private GameObject upgradePanel;
     private GameState currentState;
 
     private BlackjackInteract currentBlackjackTable;
 
     public void OpenTerminal() => SetGameState(GameState.Terminal);
     public void CloseTerminal() => SetGameState(GameState.Gameplay);
+    public void OpenUpgrade() => SetGameState(GameState.Upgrade);
+    public void CloseUpgrade() => SetGameState(GameState.Gameplay);
 
     private void Awake()
     {
@@ -96,6 +100,9 @@ public class GameManager : MonoBehaviour
         TerminalPanel terminalPanelRef = FindFirstObjectByType<TerminalPanel>(FindObjectsInactive.Include);
         if (terminalPanelRef != null) terminalPanel = terminalPanelRef.gameObject;
 
+        UpdatePanel upgradePanelRef = FindFirstObjectByType<UpdatePanel>(FindObjectsInactive.Include);
+        if (upgradePanelRef != null) upgradePanel = upgradePanelRef.gameObject;
+
         BlackjackGame blackjackGameRef = FindFirstObjectByType<BlackjackGame>(FindObjectsInactive.Include);
         if (blackjackGameRef != null) blackjackCanvas = blackjackGameRef.gameObject;
     }
@@ -136,6 +143,7 @@ public class GameManager : MonoBehaviour
         TogglePanel(gameOverPanel, currentState == GameState.GameOver);
         TogglePanel(blackjackCanvas, currentState == GameState.Blackjack);
         TogglePanel(terminalPanel, currentState == GameState.Terminal);
+        TogglePanel(upgradePanel, currentState == GameState.Upgrade);
     }
 
     private void TogglePanel(GameObject panel, bool isActive)

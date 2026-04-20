@@ -137,4 +137,12 @@ public class PlayerHealth : MonoBehaviour
 
         OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
     }
+
+    public void ApplyStats()
+    {
+        if (currentHealth > stats.maxHealth)
+            currentHealth = stats.maxHealth;
+
+        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
+    }
 }
