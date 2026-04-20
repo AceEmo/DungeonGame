@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Overview
+## 🚀 Overview - [Play the WebGL Prototype here!](https://play.unity.com/en/games/051750a9-c66d-4b59-bec7-05d01f585cb4/build)
 
 *Cosmic Gambit* is a Unity-based 2D roguelike game set in a sci-fi space universe. Players navigate procedurally generated levels, battling hostile alien forces, collecting upgrades, and facing randomized encounters. Along the journey, mini-games like **Blackjack** and **Roulette** allow players to gamble resources, unlock rare items, and change the tide of the game.  
  
