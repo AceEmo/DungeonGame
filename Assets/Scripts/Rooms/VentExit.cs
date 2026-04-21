@@ -1,13 +1,11 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class LevelEntrance : MonoBehaviour
+public class VentExit : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            GameManager.Instance.currentLevel = 0;
             GameManager.Instance.LoadNextLevel();
         }
     }

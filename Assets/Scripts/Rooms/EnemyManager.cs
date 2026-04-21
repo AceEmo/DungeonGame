@@ -13,8 +13,18 @@ public class EnemyManager : MonoBehaviour
 
     private List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
     private bool hasSpawned = false;
-
     private bool bossAlive = false;
+    
+    private BossRoomController bossRoomController;
+
+    private void Awake()
+    {
+        bossRoomController = GetComponentInParent<BossRoomController>();
+        if (bossRoomController == null)
+        {
+            bossRoomController = GetComponent<BossRoomController>();
+        }
+    }
 
     public void SpawnEnemiesOnEnter()
     {
@@ -37,6 +47,11 @@ public class EnemyManager : MonoBehaviour
             {
                 bossAlive = true;
                 boss.OnBossDied += OnBossDied;
+
+                if (bossRoomController != null)
+                {
+                    bossRoomController.InitializeBoss(boss);
+                }
             }
         }
 

@@ -38,12 +38,42 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            EnsureEventSystemExists();
+
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    private void EnsureEventSystemExists()
+    {
+        if (FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        {
+            GameObject es = new GameObject("EventSystem");
+            es.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            DontDestroyOnLoad(es);
+        }
+    }
+
+    public int currentLevel = 0;
+    public int maxLevels = 5;
+
+    public void LoadNextLevel()
+    {
+        currentLevel++;
+
+        if (currentLevel > maxLevels)
+        {
+            SceneManager.LoadScene("WinScreen");
+            return;
+        }
+
+        SceneManager.LoadScene("Level" + currentLevel);
     }
 
     private void OnDestroy()
@@ -62,7 +92,6 @@ public class GameManager : MonoBehaviour
 
     private void InitializeSceneData()
     {
-        RemoveDuplicateEventSystems();
         FindAndAssignSceneReferences();
         SetGameState(GameState.Gameplay);
 
@@ -73,18 +102,6 @@ public class GameManager : MonoBehaviour
         }
 
         currentBlackjackTable = null;
-    }
-
-    private void RemoveDuplicateEventSystems()
-    {
-        var systems = FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None);
-        if (systems.Length > 1)
-        {
-            for (int i = 1; i < systems.Length; i++)
-            {
-                Destroy(systems[i].gameObject);
-            }
-        }
     }
 
     private void FindAndAssignSceneReferences()
