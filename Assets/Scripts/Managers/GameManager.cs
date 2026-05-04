@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public enum GameState
 {
+    MainMenu,
     Gameplay,
     Paused,
     GameOver,
@@ -16,7 +17,6 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public PlayerStats playerStats;
-
     private PlayerHealth playerHealth;
     private GameObject gameOverPanel;
     private GameObject pausePanel;
@@ -87,7 +87,15 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        InitializeSceneData();
+        EnsureEventSystemExists();
+        if (scene.name == "MainMenu")
+        {
+            SetGameState(GameState.MainMenu);
+        }
+        else
+        {
+            InitializeSceneData();
+        }
     }
 
     private void InitializeSceneData()
@@ -140,6 +148,10 @@ public class GameManager : MonoBehaviour
 
     private void UpdateCursorState()
     {
+        bool isUIState = currentState != GameState.Gameplay;
+        Cursor.lockState = isUIState ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isUIState;
+
         bool isGameplay = currentState == GameState.Gameplay;
 
         if (isGameplay)
