@@ -2,6 +2,7 @@
     "name": "GameScripts",
     "references": [
     "Unity.TextMeshPro",
-    "Unity.Cinemachine"
+    "Unity.Cinemachine",
+    "Unity.InputSystem"
     ]
 }

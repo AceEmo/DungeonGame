@@ -21,6 +21,28 @@ public class PlayerShooting : MonoBehaviour
 
     private void Start()
     {
+        InitializeComponents();
+    }
+
+    private void Update()
+    {
+        if (IsMissingRequiredComponents()) 
+        {
+            return;
+        }
+
+        float horizontalInput = inputProvider.GetAxisRaw("HorizontalArrows");
+        float verticalInput = inputProvider.GetAxisRaw("VerticalArrows");
+
+        if (CanShoot(horizontalInput, verticalInput))
+        {
+            Shoot(horizontalInput, verticalInput);
+            nextFireTime = Time.time + stats.fireRate;
+        }
+    }
+
+    private void InitializeComponents()
+    {
         inputProvider = GetComponent<IInputProvider>();
         if (inputProvider == null)
         {
@@ -29,51 +51,73 @@ public class PlayerShooting : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
+        {
             audioSource = gameObject.AddComponent<AudioSource>();
-    }
-
-    private void Update()
-    {
-        if (inputProvider == null || stats == null || bulletPrefab == null || firePoint == null) return;
-
-        float x = inputProvider.GetAxisRaw("HorizontalArrows");
-        float y = inputProvider.GetAxisRaw("VerticalArrows");
-
-        if ((x != 0 || y != 0) && Time.time > nextFireTime)
-        {
-            Shoot(x, y);
-            nextFireTime = Time.time + stats.fireRate;
         }
     }
 
-    private void Shoot(float x, float y)
+    private bool IsMissingRequiredComponents()
     {
-        Vector3 offset = Vector3.zero;
-        if (Mathf.Abs(x) > Mathf.Abs(y))
+        return inputProvider == null || stats == null || bulletPrefab == null || firePoint == null;
+    }
+
+    private bool CanShoot(float horizontal, float vertical)
+    {
+        bool hasShootingInput = horizontal != 0 || vertical != 0;
+        return hasShootingInput && Time.time > nextFireTime;
+    }
+
+    private void Shoot(float horizontal, float vertical)
+    {
+        Vector3 spawnPosition = firePoint.position + CalculateSpawnOffset(horizontal, vertical);
+        PlayShootSound();
+
+        GameObject bullet = Instantiate(bulletPrefab, spawnPosition, Quaternion.identity);
+        SetupBulletPhysics(bullet, horizontal, vertical);
+        SetupBulletLogic(bullet);
+    }
+
+    private Vector3 CalculateSpawnOffset(float horizontal, float vertical)
+    {
+        if (Mathf.Abs(horizontal) > Mathf.Abs(vertical))
         {
-            offset = new Vector3(sideOffset * Mathf.Sign(x), heightOffset, 0f);
+            return new Vector3(sideOffset * Mathf.Sign(horizontal), heightOffset, 0f);
         }
-        else if (Mathf.Abs(y) > 0)
+        
+        if (Mathf.Abs(vertical) > 0)
         {
-            offset = new Vector3(0f, verticalOffset * Mathf.Sign(y), 0f);
+            return new Vector3(0f, verticalOffset * Mathf.Sign(vertical), 0f);
         }
 
-        Vector3 spawnPos = firePoint.position + offset;
+        return Vector3.zero;
+    }
 
-        if (shootSound != null)
+    private void PlayShootSound()
+    {
+        if (shootSound == null)
         {
-            audioSource.pitch = Random.Range(0.9f, 1.1f);
-            audioSource.PlayOneShot(shootSound, shootVolume);
+            return;
         }
 
-        GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
+        audioSource.pitch = Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(shootSound, shootVolume);
+    }
 
+    private void SetupBulletPhysics(GameObject bullet, float horizontal, float vertical)
+    {
         Rigidbody2D rigidBody = bullet.GetComponent<Rigidbody2D>();
         if (rigidBody != null)
-            rigidBody.linearVelocity = new Vector2(x, y).normalized * stats.bulletSpeed;
+        {
+            rigidBody.linearVelocity = new Vector2(horizontal, vertical).normalized * stats.bulletSpeed;
+        }
+    }
 
+    private void SetupBulletLogic(GameObject bullet)
+    {
         BulletLogic logic = bullet.GetComponent<BulletLogic>();
         if (logic != null)
+        {
             logic.SetDamage(stats.damage);
+        }
     }
 }

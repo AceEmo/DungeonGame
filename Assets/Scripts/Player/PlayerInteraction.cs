@@ -7,16 +7,22 @@ public class PlayerInteraction : MonoBehaviour
 
     private IInteractable currentTarget;
     private IInteractable previousTarget;
+    private IInputProvider inputProvider;
 
     private Collider2D[] hitColliders = new Collider2D[10];
     private ContactFilter2D interactableFilter;
 
     private void Start()
     {
+        inputProvider = GetComponent<IInputProvider>();
+        if (inputProvider == null)
+        {
+            inputProvider = gameObject.AddComponent<StandardInputProvider>();
+        }
+
         interactableFilter = new ContactFilter2D();
         interactableFilter.useLayerMask = true;
         interactableFilter.SetLayerMask(interactableLayer);
-    
         interactableFilter.useTriggers = true; 
     }
 
@@ -43,11 +49,9 @@ public class PlayerInteraction : MonoBehaviour
         for (int i = 0; i < hitCount; i++)
         {
             IInteractable interactable = hitColliders[i].GetComponent<IInteractable>();
-
             if (interactable != null)
             {
                 float distance = Vector2.Distance(transform.position, hitColliders[i].transform.position);
-
                 if (distance < minimumDistance)
                 {
                     minimumDistance = distance;
@@ -78,7 +82,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private void HandleInput()
     {
-        if (currentTarget != null && Input.GetKeyDown(KeyCode.E))
+        if (currentTarget != null && inputProvider.GetButtonDown("Interact"))
         {
             currentTarget.Interact();
             ClearInteraction();

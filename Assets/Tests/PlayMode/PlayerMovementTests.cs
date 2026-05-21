@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-public class MockInputProvider : MonoBehaviour, IInputProvider
+public class MockInputProvider : MonoBehaviour
 {
     public float horizontalMove;
     public float verticalMove;

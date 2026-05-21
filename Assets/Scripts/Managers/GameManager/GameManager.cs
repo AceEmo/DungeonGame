@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
@@ -63,7 +66,7 @@ public class GameManager : MonoBehaviour
     {
         if (stateManager.CurrentState == GameState.Blackjack) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             if (stateManager.CurrentState == GameState.Gameplay)
                 stateManager.SetState(GameState.Paused);
@@ -143,11 +146,11 @@ public class GameManager : MonoBehaviour
 
     private void EnsureEventSystemExists()
     {
-        if (FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+        if (FindFirstObjectByType<EventSystem>() == null)
         {
             GameObject es = new GameObject("EventSystem");
-            es.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            es.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            es.AddComponent<EventSystem>();
+            es.AddComponent<InputSystemUIInputModule>();
             DontDestroyOnLoad(es);
         }
     }

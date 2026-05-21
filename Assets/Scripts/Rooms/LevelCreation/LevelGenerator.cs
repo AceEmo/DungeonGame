@@ -14,8 +14,8 @@ public class LevelGenerator : MonoBehaviour
     public int roomCount = 10;
     public float roomSize = 30f;
 
+    public static event System.Action<Dictionary<Vector2Int, Rooms>> OnLevelGenerated;
     private readonly Dictionary<Vector2Int, Rooms> rooms = new Dictionary<Vector2Int, Rooms>();
-    
     private LevelLayoutCalculator layoutCalculator;
     private RoomConnector roomConnector;
 
@@ -51,6 +51,8 @@ public class LevelGenerator : MonoBehaviour
 
         roomConnector.ConnectAllRooms(rooms);
         SetPlayerStart();
+        
+        OnLevelGenerated?.Invoke(rooms);
     }
 
     private void CreateRoom(Vector2Int gridPos, GameObject prefab, bool isStarter)

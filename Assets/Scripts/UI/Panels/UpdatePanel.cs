@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class UpdatePanel : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class UpdatePanel : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             GameManager.Instance.CloseUpgrade();
         }
