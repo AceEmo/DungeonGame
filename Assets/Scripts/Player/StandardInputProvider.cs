@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class StandardInputProvider : MonoBehaviour, IInputProvider
 {
@@ -10,32 +11,14 @@ public class StandardInputProvider : MonoBehaviour, IInputProvider
             return 0f;
         }
 
-        switch (axisName)
+        return axisName switch
         {
-            case "Horizontal":
-                if (Keyboard.current.dKey.isPressed) return 1f;
-                if (Keyboard.current.aKey.isPressed) return -1f;
-                return 0f;
-
-            case "Vertical":
-                if (Keyboard.current.wKey.isPressed) return 1f;
-                if (Keyboard.current.sKey.isPressed) return -1f;
-                return 0f;
-
-            case "HorizontalArrows":
-                if (Keyboard.current.rightArrowKey.isPressed) return 1f;
-                if (Keyboard.current.leftArrowKey.isPressed) return -1f;
-                return 0f;
-
-            case "VerticalArrows":
-                if (Keyboard.current.upArrowKey.isPressed) return 1f;
-                if (Keyboard.current.downArrowKey.isPressed) return -1f;
-                return 0f;
-
-            default:
-                Debug.LogWarning($"Axis '{axisName}' is not supported.");
-                return 0f;
-        }
+            "Horizontal" => GetKeyAxis(Keyboard.current.dKey, Keyboard.current.aKey),
+            "Vertical" => GetKeyAxis(Keyboard.current.wKey, Keyboard.current.sKey),
+            "HorizontalArrows" => GetKeyAxis(Keyboard.current.rightArrowKey, Keyboard.current.leftArrowKey),
+            "VerticalArrows" => GetKeyAxis(Keyboard.current.upArrowKey, Keyboard.current.downArrowKey),
+            _ => LogUnsupportedAxis(axisName)
+        };
     }
 
     public bool GetButtonDown(string buttonName)
@@ -45,12 +28,39 @@ public class StandardInputProvider : MonoBehaviour, IInputProvider
             return false;
         }
 
-        switch (buttonName)
+        return buttonName switch
         {
-            case "Interact":
-                return Keyboard.current.eKey.wasPressedThisFrame;
-            default:
-                return false;
+            "Interact" => Keyboard.current.eKey.wasPressedThisFrame,
+            "Map" => Keyboard.current.tabKey.wasPressedThisFrame,
+            _ => false
+        };
+    }
+
+    public bool GetButton(string buttonName)
+    {
+        if (Keyboard.current == null)
+        {
+            return false;
         }
+
+        return buttonName switch
+        {
+            "Interact" => Keyboard.current.eKey.isPressed,
+            "Map" => Keyboard.current.tabKey.isPressed,
+            _ => false
+        };
+    }
+
+    private float GetKeyAxis(ButtonControl positiveKey, ButtonControl negativeKey)
+    {
+        if (positiveKey.isPressed) return 1f;
+        if (negativeKey.isPressed) return -1f;
+        return 0f;
+    }
+
+    private float LogUnsupportedAxis(string axisName)
+    {
+        Debug.LogWarning($"Axis '{axisName}' is not supported.");
+        return 0f;
     }
 }

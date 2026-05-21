@@ -42,7 +42,8 @@ public class TerminalUIController : MonoBehaviour
         "<color=#404040>---------------------------------------</color>\n\n" +
         "<color=#FFFFFF>[NAV]</color> Use <color=#50C8FF>WASD Keys</color> for omni-directional movement.\n" +
         "<color=#FFFFFF>[ATK]</color> Use <color=#FF3333>ARROW Keys</color> for multi-vector plasma fire.\n" +
-        "<color=#FFFFFF>[ACT]</color> Use <color=#FFCC00>[E] Key</color> for environmental interaction.\n\n" +
+        "<color=#FFFFFF>[ACT]</color> Use <color=#FFCC00>[E] Key</color> for environmental interaction.\n" +
+        "<color=#FFFFFF>[MAP]</color> Use <color=#50C8FF>[TAB] Key</color> for sector telemetry projection.\n\n" +
         "<color=#404040>.......................................</color>\n\n" +
         "<color=#FF3333><b>HAZARD ALERT: THE GALACTIC ROGUE</b></color>\n" +
         "<color=#FFFFFF>Entity may offer BLACKJACK games in exchange for SCRAP.</color>\n" +

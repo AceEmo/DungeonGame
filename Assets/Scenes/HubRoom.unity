@@ -352,11 +352,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 507069733}
-  - {fileID: 1889366289}
   - {fileID: 1849824136}
   - {fileID: 1644327195}
-  - {fileID: 339953935}
   - {fileID: 1927404633}
+  - {fileID: 339953935}
+  - {fileID: 1889366289}
   - {fileID: 1579730740}
   - {fileID: 1940825044}
   - {fileID: 1793074493}
@@ -1386,6 +1386,7 @@ GameObject:
   m_Component:
   - component: {fileID: 339953935}
   - component: {fileID: 339953936}
+  - component: {fileID: 339953937}
   m_Layer: 5
   m_Name: MinimapPanel
   m_TagString: Untagged
@@ -1400,7 +1401,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339953934}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1410,8 +1411,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -100, y: -75}
-  m_SizeDelta: {x: 200, y: 150}
+  m_AnchoredPosition: {x: -150, y: -150}
+  m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &339953936
 MonoBehaviour:
@@ -1425,11 +1426,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a7e4d87f6764ab43a10ff9ea0aba5f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::MinimapController
+  worldRoomSize: 30
+--- !u!114 &339953937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 339953934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c4880b51d21ee24abc55697ff87618a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::MinimapView
+  minimapPanel: {fileID: 339953935}
   gridContainer: {fileID: 1951097272}
   roomMinimapPrefab: {fileID: 9104050812260579267, guid: a191bc206b0f39442bea7f92185170f8, type: 3}
-  uiRoomSpacing: 35
-  currentRoomColor: {r: 1, g: 1, b: 1, a: 1}
-  visitedRoomColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  sprites:
+    normalRoom: {fileID: 4143999434768271741, guid: 309768594072a6947bc08b98d8dad39c, type: 3}
+    blackjackRoom: {fileID: -4660216949325745236, guid: e9dde0f69f8d40a44932028c52b5e893, type: 3}
+    upgradeRoom: {fileID: 3512016022008321974, guid: b1c37b8f25f09bd418cf316e49b71fa0, type: 3}
+    bossRoom: {fileID: -6151794050363912145, guid: 2210d489abd185347a838499cc2df701, type: 3}
+    unexploredRoom: {fileID: 2538526212440476837, guid: ed06755798359fa4db8c4b23ecb14658, type: 3}
+  uiRoomSpacing: 120
 --- !u!1 &349594465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.3137255}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.003921569}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -8704,10 +8723,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 450667462}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1963146881
 GameObject:

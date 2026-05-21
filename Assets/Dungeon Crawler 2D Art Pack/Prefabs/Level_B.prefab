@@ -2502,33 +2502,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aff7fe997a1c264fb5dc68be2d560ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Room
-  GridPosition: {x: 0, y: 0}
-  ClosedChestPrefab: {fileID: 1998873333861008, guid: a566a4ec74b362446811254d0c887410, type: 3}
-  HealthPrefab: {fileID: 3044192955997078429, guid: 26dd60b06c55e1b4e9fbf9b86bc800de, type: 3}
-  Gear1Prefab: {fileID: 1267495385696220, guid: ddf140f8709ea9b4f97429c55753df8c, type: 3}
-  Gear2Prefab: {fileID: 1782623961747334, guid: 194b89998f398cf41ab5dd5ed37f2b5a, type: 3}
-  RewardSpawnPoints:
+  gridPosition: {x: 0, y: 0}
+  closedChestPrefab: {fileID: 1998873333861008, guid: a566a4ec74b362446811254d0c887410, type: 3}
+  healthPrefab: {fileID: 3044192955997078429, guid: 26dd60b06c55e1b4e9fbf9b86bc800de, type: 3}
+  gear1Prefab: {fileID: 1267495385696220, guid: ddf140f8709ea9b4f97429c55753df8c, type: 3}
+  gear2Prefab: {fileID: 1782623961747334, guid: 194b89998f398cf41ab5dd5ed37f2b5a, type: 3}
+  rewardSpawnPoints:
   - {fileID: 2464698920419071736}
-  rewardSpawned: 0
-  IsBossRoom: 0
-  BossSpawnPoint: {fileID: 0}
-  BossPrefab: {fileID: 0}
-  IsStarter: 0
-  IsCleared: 0
-  LeftDoor: {fileID: 5712760884607361031}
-  RightDoor: {fileID: 3665897982281421979}
-  TopDoor: {fileID: 4768787101625274808}
-  BottomDoor: {fileID: 6157424912745802107}
-  LeftPoint: {fileID: 2631976391092524664}
-  RightPoint: {fileID: 5432797274275104852}
-  TopPoint: {fileID: 9084069672319503554}
-  BottomPoint: {fileID: 7837906978296357208}
-  EnemySpawnPoints:
+  isBossRoom: 0
+  bossSpawnPoint: {fileID: 0}
+  bossPrefab: {fileID: 0}
+  roomType: 0
+  isStarter: 0
+  leftDoor: {fileID: 5712760884607361031}
+  rightDoor: {fileID: 3665897982281421979}
+  topDoor: {fileID: 4768787101625274808}
+  bottomDoor: {fileID: 6157424912745802107}
+  leftPoint: {fileID: 2631976391092524664}
+  rightPoint: {fileID: 5432797274275104852}
+  topPoint: {fileID: 9084069672319503554}
+  bottomPoint: {fileID: 7837906978296357208}
+  enemySpawnPoints:
   - {fileID: 9072499244122535226}
   - {fileID: 6710657782894546908}
   - {fileID: 4243499248247253501}
   - {fileID: 7317811811886547669}
   - {fileID: 310471761624631014}
+  - {fileID: 9049113749713061034}
 --- !u!114 &252973721570615511
 MonoBehaviour:
   m_ObjectHideFlags: 0

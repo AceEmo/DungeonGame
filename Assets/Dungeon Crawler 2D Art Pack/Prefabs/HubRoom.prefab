@@ -1372,27 +1372,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aff7fe997a1c264fb5dc68be2d560ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rooms
-  GridPosition: {x: 0, y: 0}
-  ClosedChestPrefab: {fileID: 0}
-  HealthPrefab: {fileID: 0}
-  Gear1Prefab: {fileID: 0}
-  Gear2Prefab: {fileID: 0}
-  RewardSpawnPoints: []
-  rewardSpawned: 0
-  IsBossRoom: 0
-  BossSpawnPoint: {fileID: 0}
-  BossPrefab: {fileID: 0}
-  IsStarter: 1
-  IsCleared: 1
-  LeftDoor: {fileID: 465579656363804385}
-  RightDoor: {fileID: 4827033022899731663}
-  TopDoor: {fileID: 3688856878388854206}
-  BottomDoor: {fileID: 434048382596901805}
-  LeftPoint: {fileID: 4051843535913875411}
-  RightPoint: {fileID: 3225854840172609292}
-  TopPoint: {fileID: 1465640409189900886}
-  BottomPoint: {fileID: 2034686430066137499}
-  EnemySpawnPoints: []
+  gridPosition: {x: 0, y: 0}
+  closedChestPrefab: {fileID: 0}
+  healthPrefab: {fileID: 0}
+  gear1Prefab: {fileID: 0}
+  gear2Prefab: {fileID: 0}
+  rewardSpawnPoints: []
+  isBossRoom: 0
+  bossSpawnPoint: {fileID: 0}
+  bossPrefab: {fileID: 0}
+  roomType: 5
+  isStarter: 1
+  leftDoor: {fileID: 465579656363804385}
+  rightDoor: {fileID: 4827033022899731663}
+  topDoor: {fileID: 3688856878388854206}
+  bottomDoor: {fileID: 434048382596901805}
+  leftPoint: {fileID: 4051843535913875411}
+  rightPoint: {fileID: 3225854840172609292}
+  topPoint: {fileID: 1465640409189900886}
+  bottomPoint: {fileID: 2034686430066137499}
+  enemySpawnPoints: []
 --- !u!114 &5144121622115275493
 MonoBehaviour:
   m_ObjectHideFlags: 0

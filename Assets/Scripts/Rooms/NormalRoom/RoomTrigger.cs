@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RoomTrigger : MonoBehaviour
 {
-    private bool triggered = false;
+    private bool isTriggered = false;
     private Rooms room;
     private EnemyManager enemyManager;
 
@@ -14,17 +14,14 @@ public class RoomTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (triggered) return;
+        if (isTriggered) return;
         if (!other.CompareTag("Player")) return;
 
-        triggered = true;
+        isTriggered = true;
 
-        if (!room.IsStarter)
+        if (room != null)
         {
-            if (room.LeftDoor) room.LeftDoor.Lock();
-            if (room.RightDoor) room.RightDoor.Lock();
-            if (room.TopDoor) room.TopDoor.Lock();
-            if (room.BottomDoor) room.BottomDoor.Lock();
+            room.LockAllDoors();
         }
 
         if (enemyManager != null)
