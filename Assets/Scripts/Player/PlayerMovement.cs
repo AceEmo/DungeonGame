@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private PlayerStats stats;
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Rigidbody2D rigidBody;
     [SerializeField] private Animator animator;
 
     private IInputProvider inputProvider;
@@ -44,9 +44,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (rb != null && stats != null)
+        if (rigidBody != null && stats != null)
         {
-            rb.MovePosition(rb.position +
+            rigidBody.MovePosition(rigidBody.position +
                 movement.normalized *
                 stats.moveSpeed *
                 Time.fixedDeltaTime);

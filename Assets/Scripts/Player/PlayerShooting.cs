@@ -68,9 +68,9 @@ public class PlayerShooting : MonoBehaviour
 
         GameObject bullet = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
 
-        Rigidbody2D rb = bullet.GetComponent<Rigidbody2D>();
-        if (rb != null)
-            rb.linearVelocity = new Vector2(x, y).normalized * stats.bulletSpeed;
+        Rigidbody2D rigidBody = bullet.GetComponent<Rigidbody2D>();
+        if (rigidBody != null)
+            rigidBody.linearVelocity = new Vector2(x, y).normalized * stats.bulletSpeed;
 
         BulletLogic logic = bullet.GetComponent<BulletLogic>();
         if (logic != null)

@@ -7,7 +7,7 @@ public class LevelEntrance : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            GameManager.Instance.currentLevel = 0;
+            GameManager.Instance.ResetGameProgress();
             GameManager.Instance.LoadNextLevel();
         }
     }
