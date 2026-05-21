@@ -88,28 +88,38 @@ public class GameManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         EnsureEventSystemExists();
+
         if (scene.name == "MainMenu")
         {
             SetGameState(GameState.MainMenu);
+            return;
         }
-        else
-        {
-            InitializeSceneData();
-        }
+
+        InitializeSceneData(scene.name);
     }
 
-    private void InitializeSceneData()
+    private void InitializeSceneData(string sceneName)
     {
         FindAndAssignSceneReferences();
         SetGameState(GameState.Gameplay);
 
         if (playerHealth != null)
         {
-            playerHealth.ResetHealth();
-            playerHealth.OnPlayerDied += HandleGameOver;
+            HandlePlayerHealthInitialization(sceneName);
         }
 
         currentBlackjackTable = null;
+    }
+
+    private void HandlePlayerHealthInitialization(string sceneName)
+    {
+        if (sceneName == "HubRoom")
+        {
+            playerHealth.ResetHealth();
+        }
+
+        playerHealth.OnPlayerDied -= HandleGameOver;
+        playerHealth.OnPlayerDied += HandleGameOver;
     }
 
     private void FindAndAssignSceneReferences()

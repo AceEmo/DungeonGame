@@ -20,8 +20,8 @@ MonoBehaviour:
   baseDamage: 1
   startHealth: 7
   maxHealth: 12
-  moveSpeed: 5
+  moveSpeed: 3
   fireRate: 0.5
-  bulletSpeed: 10
+  bulletSpeed: 8
   damage: 1
   scrap: 0
