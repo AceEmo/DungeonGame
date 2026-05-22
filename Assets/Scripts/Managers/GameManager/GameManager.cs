@@ -34,6 +34,12 @@ public class GameManager : MonoBehaviour
     public void ExitGame() => Application.Quit();
     #endregion
 
+    [Header("UI Audio")]
+    [SerializeField] private AudioClip restartSound;
+    [SerializeField] [Range(0f, 1f)] private float restartVolume = 1f;
+
+    private AudioSource audioSource;
+
     private void Awake()
     {
         if (Instance == null)
@@ -42,6 +48,8 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             InitializeComponents();
             SceneManager.sceneLoaded += OnSceneLoaded;
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
         }
         else
         {
@@ -140,6 +148,10 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        if (audioSource != null && restartSound != null)
+        {
+            audioSource.PlayOneShot(restartSound, restartVolume);
+        }
         if (playerStats != null) playerStats.ResetAll();
         SceneManager.LoadScene("HubRoom");
     }

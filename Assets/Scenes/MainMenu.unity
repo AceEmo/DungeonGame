@@ -1167,6 +1167,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameScripts::GameManager
   playerStats: {fileID: 11400000, guid: e0cb57d0a68b2844e9f68609a87dd496, type: 2}
+  restartSound: {fileID: 8300000, guid: 2efb3a0d0215a804f81516d90d2eb79c, type: 3}
+  restartVolume: 1
 --- !u!4 &1080171669
 Transform:
   m_ObjectHideFlags: 0

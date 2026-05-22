@@ -13,16 +13,17 @@ MonoBehaviour:
   m_Name: BossStats
   m_EditorClassIdentifier: Assembly-CSharp::BossData
   MaxHealth: 20
-  speed: 3
+  speed: 4
   attackRange: 2
-  attackDamage: 2
-  attackRadius: 0.8
+  attackDamage: 4
+  attackRadius: 1
   hitColor: {r: 1, g: 0.5, b: 0.5, a: 1}
   wallCheckDistance: 1
   steeringSmooth: 0.15
   wallLayer:
     serializedVersion: 2
     m_Bits: 2048
+  bodyRadius: 0.6
   rageThreshold: 0.3
   rageSpeedMultiplier: 1.5
   rageDamageMultiplier: 1.5

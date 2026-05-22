@@ -20,6 +20,14 @@ public class MinimapController : MonoBehaviour
     private Vector2Int lastPlayerGridPos = new Vector2Int(-999, -999);
     private Transform playerTransform;
 
+    private void Awake()
+    {
+        mapView = GetComponent<MinimapView>();
+        coordinateCalculator = new MinimapCoordinateCalculator(worldRoomSize, invalidGridPosition);
+        
+        InitializeInput();
+    }
+
     private void OnEnable()
     {
         LevelGenerator.OnLevelGenerated += InitializeMinimap;
@@ -34,10 +42,6 @@ public class MinimapController : MonoBehaviour
 
     private void Start()
     {
-        mapView = GetComponent<MinimapView>();
-        coordinateCalculator = new MinimapCoordinateCalculator(worldRoomSize, invalidGridPosition);
-        
-        InitializeInput();
         FindPlayer();
         EvaluateCurrentSceneMap(SceneManager.GetActiveScene().name);
     }
@@ -91,7 +95,11 @@ public class MinimapController : MonoBehaviour
     private void ResetMinimapState()
     {
         mapData.Clear();
-        mapView.ClearIcons();
+        
+        if (mapView != null)
+        {
+            mapView.ClearIcons();
+        }
     }
 
     private void SetupDefaultHubMap()
@@ -99,9 +107,12 @@ public class MinimapController : MonoBehaviour
         ResetMinimapState();
         mapData.InitializeDefaultHubState();
 
-        foreach (Vector2Int position in mapData.RoomTypes.Keys)
+        if (mapView != null)
         {
-            mapView.CreateIcon(position);
+            foreach (Vector2Int position in mapData.RoomTypes.Keys)
+            {
+                mapView.CreateIcon(position);
+            }
         }
 
         lastPlayerGridPos = invalidGridPosition;
@@ -116,7 +127,11 @@ public class MinimapController : MonoBehaviour
         foreach (var pair in generatedRooms)
         {
             mapData.AddRoom(pair.Key, pair.Value.Type);
-            mapView.CreateIcon(pair.Key);
+            
+            if (mapView != null)
+            {
+                mapView.CreateIcon(pair.Key);
+            }
         }
 
         lastPlayerGridPos = invalidGridPosition;
@@ -125,7 +140,7 @@ public class MinimapController : MonoBehaviour
 
     private void UpdatePlayerMovement()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null || coordinateCalculator == null) return;
 
         Vector2Int currentPlayerGridPos = coordinateCalculator.GetPlayerGridPosition(playerTransform);
 
@@ -139,6 +154,7 @@ public class MinimapController : MonoBehaviour
 
     private void HandleMapToggle()
     {
+        if (inputHandler == null || mapView == null) return;
         if (!inputHandler.ShouldToggleMap()) return;
 
         if (inputHandler.IsLargeMapOpen)
@@ -155,6 +171,8 @@ public class MinimapController : MonoBehaviour
 
     private void RefreshMapLayout(Vector2Int currentPlayerPos)
     {
+        if (mapView == null || inputHandler == null) return;
+
         mapView.UpdateIconsState(mapData, currentPlayerPos);
 
         if (inputHandler.IsLargeMapOpen)

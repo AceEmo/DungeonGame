@@ -2,26 +2,46 @@ using UnityEngine;
 using System;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class PlayerHealth : MonoBehaviour
 {
+    [Serializable]
+    public struct AudioConfig
+    {
+        public AudioClip clip;
+        [Range(0f, 1f)] public float volume;
+    }
+
+    [Header("Dependencies")]
     [SerializeField] private PlayerStats stats;
+    [SerializeField] private PlayerMovement movement;
+
+    [Header("Settings")]
     [SerializeField] private float invincibilityDuration = 1f;
     [SerializeField] private float knockbackForce = 8f;
+    [SerializeField] private float deathSequenceDelay = 1.5f;
+
+    [Header("Audio Configurations")]
+    [SerializeField] private AudioConfig hitAudio = new AudioConfig { volume = 1f };
+    [SerializeField] private AudioConfig healAudio = new AudioConfig { volume = 1f };
+    [SerializeField] private AudioConfig dieAudio = new AudioConfig { volume = 1f };
 
     public event Action<float, float> OnHealthChanged;
     public event Action OnPlayerDied;
 
-    private float currentHealth;
-
-    public float CurrentHealth => currentHealth;
+    public float CurrentHealth { get; private set; }
     public float MaxHealth => stats.maxHealth;
+    public bool IsDead => CurrentHealth <= 0;
+
     private bool isInvincible;
+    private const float DamagedVisualAlpha = 0.5f;
+    private const float NormalVisualAlpha = 1f;
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
     private Animator animator;
     private Collider2D col;
-    private PlayerMovement movement;
+    private AudioSource audioSource;
 
     private void Awake()
     {
@@ -29,7 +49,9 @@ public class PlayerHealth : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         col = GetComponent<Collider2D>();
-        movement = GetComponent<PlayerMovement>();
+        audioSource = GetComponent<AudioSource>();
+        
+        if (movement == null) movement = GetComponent<PlayerMovement>();
     }
 
     private void Start()
@@ -37,112 +59,149 @@ public class PlayerHealth : MonoBehaviour
         InitializeHealth();
     }
 
-    private void InitializeHealth()
-    {
-        currentHealth = stats.startHealth;
-        isInvincible = false;
-
-        if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
-        if (col != null) col.enabled = true;
-        if (movement != null) movement.enabled = true;
-
-        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
-    }
-
     public void ResetHealth()
     {
         InitializeHealth();
-
-        if (animator != null)
-        {
-            animator.ResetTrigger("Die");
-
-            animator.SetFloat("Horizontal", 0f);
-            animator.SetFloat("Vertical", 0f);
-            animator.SetFloat("Speed", 0f);
-
-            animator.Play("IdleTree", 0, 0f);
-        }
+        ResetAnimations();
     }
 
-    public void TakeDamage(float amount, Vector2 source)
+    public void TakeDamage(float amount, Vector2 damageSourcePosition)
     {
-        if (isInvincible || currentHealth <= 0) return;
+        if (isInvincible || IsDead) return;
 
-        currentHealth -= amount;
-        currentHealth = Mathf.Max(0, currentHealth);
+        ReduceHealth(amount);
+        PlayHitFeedback(damageSourcePosition);
 
-        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
-        ApplyKnockback(source);
-
-        if (currentHealth <= 0)
+        if (IsDead)
         {
             Die();
             return;
         }
 
-        StartCoroutine(Invincibility());
+        StartCoroutine(InvincibilitySequence());
+    }
+
+    public void Heal(float amount)
+    {
+        if (IsDead) return;
+
+        CurrentHealth = Mathf.Min(CurrentHealth + amount, stats.maxHealth);
+        PlaySound(healAudio);
+        NotifyHealthChanged();
+    }
+
+    public void ApplyStats()
+    {
+        if (CurrentHealth > stats.maxHealth)
+        {
+            CurrentHealth = stats.maxHealth;
+        }
+        NotifyHealthChanged();
+    }
+
+    private void InitializeHealth()
+    {
+        CurrentHealth = stats.startHealth;
+        isInvincible = false;
+
+        ConfigureComponentsForLife();
+        NotifyHealthChanged();
+    }
+
+    private void ConfigureComponentsForLife()
+    {
+        if (rb != null) rb.bodyType = RigidbodyType2D.Dynamic;
+        if (col != null) col.enabled = true;
+        if (movement != null) movement.enabled = true;
+    }
+
+    private void ReduceHealth(float amount)
+    {
+        CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
+        NotifyHealthChanged();
+    }
+
+    private void PlayHitFeedback(Vector2 damageSourcePosition)
+    {
+        ApplyKnockback(damageSourcePosition);
+        PlaySound(hitAudio);
+    }
+
+    private void PlaySound(AudioConfig config)
+    {
+        if (audioSource != null && config.clip != null)
+        {
+            audioSource.PlayOneShot(config.clip, config.volume);
+        }
     }
 
     private void ApplyKnockback(Vector2 source)
     {
+        if (rb == null) return;
+        
         Vector2 direction = (transform.position - (Vector3)source).normalized;
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
     }
 
-    private IEnumerator Invincibility()
+    private IEnumerator InvincibilitySequence()
     {
         isInvincible = true;
-        SetAlpha(0.5f);
+        SetSpriteAlpha(DamagedVisualAlpha);
+        
         yield return new WaitForSeconds(invincibilityDuration);
-        SetAlpha(1f);
+        
+        SetSpriteAlpha(NormalVisualAlpha);
         isInvincible = false;
     }
 
-    private void SetAlpha(float alpha)
+    private void SetSpriteAlpha(float alpha)
     {
         if (sr == null) return;
-        Color c = sr.color;
-        c.a = alpha;
-        sr.color = c;
+        Color color = sr.color;
+        color.a = alpha;
+        sr.color = color;
     }
 
     private void Die()
     {
+        DisableComponentsOnDeath();
+        PlaySound(dieAudio);
+        if (animator != null) animator.SetTrigger("Die");
+
+        StartCoroutine(DeathDelaySequence());
+    }
+
+    private void DisableComponentsOnDeath()
+    {
         if (movement != null) movement.enabled = false;
+        if (col != null) col.enabled = false;
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
             rb.bodyType = RigidbodyType2D.Static;
         }
-        if (col != null) col.enabled = false;
-        if (animator != null) animator.SetTrigger("Die");
-
-        StartCoroutine(DeathSequence());
     }
 
-    private IEnumerator DeathSequence()
+    private IEnumerator DeathDelaySequence()
     {
-        yield return new WaitForSecondsRealtime(1.5f);
+        yield return new WaitForSecondsRealtime(deathSequenceDelay);
         OnPlayerDied?.Invoke();
     }
 
-    public void Heal(float amount)
+    private void ResetAnimations()
     {
-        if (currentHealth <= 0) return;
+        if (animator == null) return;
 
-        currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, stats.maxHealth);
-
-        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
+        animator.ResetTrigger("Die");
+        animator.SetFloat("Horizontal", 0f);
+        animator.SetFloat("Vertical", 0f);
+        animator.SetFloat("Speed", 0f);
+        animator.Play("IdleTree", 0, 0f);
     }
 
-    public void ApplyStats()
+    private void NotifyHealthChanged()
     {
-        if (currentHealth > stats.maxHealth)
-            currentHealth = stats.maxHealth;
-
-        OnHealthChanged?.Invoke(currentHealth, stats.maxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, stats.maxHealth);
     }
 }

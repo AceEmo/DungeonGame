@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::PlayerStats
   baseStartHealth: 7
   baseMaxHealth: 12
-  baseMoveSpeed: 5
-  baseFireRate: 0.5
-  baseBulletSpeed: 10
+  baseMoveSpeed: 4
+  baseFireRate: 0.6
+  baseBulletSpeed: 8
   baseDamage: 1
   startHealth: 7
   maxHealth: 12
-  moveSpeed: 3
-  fireRate: 0.5
+  moveSpeed: 4
+  fireRate: 0.6
   bulletSpeed: 8
   damage: 1
   scrap: 0
