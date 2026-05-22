@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Collections;
 
@@ -7,6 +8,7 @@ public class MinimapController : MonoBehaviour
 {
     [Header("Configuration")]
     [SerializeField] private float worldRoomSize = 30f;
+    [SerializeField] private string hubSceneName = "HubRoom";
 
     private readonly MinimapData mapData = new MinimapData();
     private MinimapView mapView;
@@ -21,19 +23,37 @@ public class MinimapController : MonoBehaviour
     private void OnEnable()
     {
         LevelGenerator.OnLevelGenerated += InitializeMinimap;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
         LevelGenerator.OnLevelGenerated -= InitializeMinimap;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void Start()
     {
         mapView = GetComponent<MinimapView>();
         InitializeInput();
-        ResetMinimapState();
         FindPlayer();
+        
+        // Ръчно извикване за първоначалното стартиране на играта
+        EvaluateCurrentSceneMap(SceneManager.GetActiveScene().name);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        FindPlayer();
+        EvaluateCurrentSceneMap(scene.name);
+    }
+
+    private void EvaluateCurrentSceneMap(string sceneName)
+    {
+        if (sceneName == hubSceneName)
+        {
+            SetupDefaultHubMap();
+        }
     }
 
     private void Update()
@@ -71,6 +91,21 @@ public class MinimapController : MonoBehaviour
     {
         mapData.Clear();
         mapView.ClearIcons();
+    }
+
+    private void SetupDefaultHubMap()
+    {
+        ResetMinimapState();
+
+        mapData.InitializeDefaultHubState();
+
+        foreach (Vector2Int position in mapData.RoomTypes.Keys)
+        {
+            mapView.CreateIcon(position);
+        }
+
+        lastPlayerGridPos = invalidGridPosition;
+        UpdatePlayerMovement();
     }
 
     private void InitializeMinimap(Dictionary<Vector2Int, Rooms> generatedRooms)

@@ -19,6 +19,8 @@ public class MinimapView : MonoBehaviour
     [SerializeField] private RectTransform gridContainer;
     [SerializeField] private GameObject roomMinimapPrefab;
 
+    [SerializeField] private RectTransform playerIndicator;
+
     [Header("Sprites Configuration")]
     [SerializeField] private RoomSprites sprites;
     [SerializeField] private float uiRoomSpacing = 35f;
@@ -34,6 +36,7 @@ public class MinimapView : MonoBehaviour
     private void Awake()
     {
         SaveOriginalLayout();
+        if (playerIndicator != null) playerIndicator.gameObject.SetActive(false);
     }
 
     public void ClearIcons()
@@ -69,18 +72,20 @@ public class MinimapView : MonoBehaviour
             Vector2Int pos = pair.Key;
             Image iconImage = pair.Value;
 
-            SetIconVisibilityAndSprite(pos, iconImage, data, currentPlayerPos);
+            SetIconVisibilityAndSprite(pos, iconImage, data);
         }
+        
+        UpdatePlayerIndicator(currentPlayerPos);
     }
 
-    private void SetIconVisibilityAndSprite(Vector2Int pos, Image iconImage, MinimapData data, Vector2Int currentPlayerPos)
+    private void SetIconVisibilityAndSprite(Vector2Int pos, Image iconImage, MinimapData data)
     {
-        if (pos == currentPlayerPos || data.IsExplored(pos))
+        if (data.IsExplored(pos))
         {
             iconImage.gameObject.SetActive(true);
             iconImage.sprite = GetSpriteForRoom(data.RoomTypes[pos]);
         }
-        else if (data.IsNeighborOf(pos, currentPlayerPos))
+        else if (data.IsDiscovered(pos))
         {
             iconImage.gameObject.SetActive(true);
             iconImage.sprite = sprites.unexploredRoom;
@@ -97,6 +102,27 @@ public class MinimapView : MonoBehaviour
 
         float spacing = isLargeMapOpen ? uiRoomSpacing * 2f : uiRoomSpacing;
         gridContainer.anchoredPosition = new Vector2(-gridPos.x * spacing, -gridPos.y * spacing);
+    }
+
+    private void UpdatePlayerIndicator(Vector2Int currentPlayerPos)
+    {
+        if (playerIndicator == null) return;
+
+        if (minimapIcons.ContainsKey(currentPlayerPos))
+        {
+            playerIndicator.gameObject.SetActive(true);
+            
+            playerIndicator.anchoredPosition = new Vector2(
+                currentPlayerPos.x * uiRoomSpacing, 
+                currentPlayerPos.y * uiRoomSpacing
+            );
+            
+            playerIndicator.SetAsLastSibling();
+        }
+        else
+        {
+            playerIndicator.gameObject.SetActive(false);
+        }
     }
 
     public void AutoZoomToExplored(List<Vector2Int> knownRooms, Vector2Int lastPlayerGridPos)
