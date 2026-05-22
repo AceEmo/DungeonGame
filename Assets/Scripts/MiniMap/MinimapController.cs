@@ -11,14 +11,14 @@ public class MinimapController : MonoBehaviour
     [SerializeField] private string hubSceneName = "HubRoom";
 
     private readonly MinimapData mapData = new MinimapData();
-    private MinimapView mapView;
-    
     private readonly Vector2Int invalidGridPosition = new Vector2Int(-999, -999);
+    
+    private MinimapView mapView;
+    private MinimapCoordinateCalculator coordinateCalculator;
+    private MinimapInputHandler inputHandler;
+    
     private Vector2Int lastPlayerGridPos = new Vector2Int(-999, -999);
-
     private Transform playerTransform;
-    private IInputProvider inputProvider;
-    private bool isLargeMapOpen = false;
 
     private void OnEnable()
     {
@@ -35,11 +35,19 @@ public class MinimapController : MonoBehaviour
     private void Start()
     {
         mapView = GetComponent<MinimapView>();
+        coordinateCalculator = new MinimapCoordinateCalculator(worldRoomSize, invalidGridPosition);
+        
         InitializeInput();
         FindPlayer();
-        
-        // Ръчно извикване за първоначалното стартиране на играта
         EvaluateCurrentSceneMap(SceneManager.GetActiveScene().name);
+    }
+
+    private void Update()
+    {
+        if (!IsGameplayActive()) return;
+
+        UpdatePlayerMovement();
+        HandleMapToggle();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -48,34 +56,14 @@ public class MinimapController : MonoBehaviour
         EvaluateCurrentSceneMap(scene.name);
     }
 
-    private void EvaluateCurrentSceneMap(string sceneName)
-    {
-        if (sceneName == hubSceneName)
-        {
-            SetupDefaultHubMap();
-        }
-    }
-
-    private void Update()
-    {
-        if (!IsGameplayActive()) return;
-
-        UpdatePlayerMovement();
-        HandleMapToggleInput();
-    }
-
-    private bool IsGameplayActive()
-    {
-        return GameManager.Instance != null && GameManager.Instance.IsGameplayActive();
-    }
-
     private void InitializeInput()
     {
-        inputProvider = GetComponent<IInputProvider>();
-        if (inputProvider == null)
+        var provider = GetComponent<IInputProvider>();
+        if (provider == null)
         {
-            inputProvider = gameObject.AddComponent<StandardInputProvider>();
+            provider = gameObject.AddComponent<StandardInputProvider>();
         }
+        inputHandler = new MinimapInputHandler(provider);
     }
 
     private void FindPlayer()
@@ -84,6 +72,19 @@ public class MinimapController : MonoBehaviour
         if (playerObj != null)
         {
             playerTransform = playerObj.transform;
+        }
+    }
+
+    private bool IsGameplayActive()
+    {
+        return GameManager.Instance != null && GameManager.Instance.IsGameplayActive();
+    }
+
+    private void EvaluateCurrentSceneMap(string sceneName)
+    {
+        if (sceneName == hubSceneName)
+        {
+            SetupDefaultHubMap();
         }
     }
 
@@ -96,7 +97,6 @@ public class MinimapController : MonoBehaviour
     private void SetupDefaultHubMap()
     {
         ResetMinimapState();
-
         mapData.InitializeDefaultHubState();
 
         foreach (Vector2Int position in mapData.RoomTypes.Keys)
@@ -115,11 +115,8 @@ public class MinimapController : MonoBehaviour
 
         foreach (var pair in generatedRooms)
         {
-            Vector2Int gridPos = pair.Key;
-            Rooms room = pair.Value;
-
-            mapData.AddRoom(gridPos, room.Type);
-            mapView.CreateIcon(gridPos);
+            mapData.AddRoom(pair.Key, pair.Value.Type);
+            mapView.CreateIcon(pair.Key);
         }
 
         lastPlayerGridPos = invalidGridPosition;
@@ -130,56 +127,47 @@ public class MinimapController : MonoBehaviour
     {
         if (playerTransform == null) return;
 
-        Vector2Int currentPlayerGridPos = GetPlayerGridPosition();
+        Vector2Int currentPlayerGridPos = coordinateCalculator.GetPlayerGridPosition(playerTransform);
 
         if (currentPlayerGridPos != lastPlayerGridPos)
         {
             lastPlayerGridPos = currentPlayerGridPos;
             mapData.MarkAsExplored(currentPlayerGridPos);
-            
             RefreshMapLayout(currentPlayerGridPos);
         }
     }
 
-    private Vector2Int GetPlayerGridPosition()
+    private void HandleMapToggle()
     {
-        if (playerTransform == null) return invalidGridPosition;
+        if (!inputHandler.ShouldToggleMap()) return;
 
-        int playerGridX = Mathf.RoundToInt(playerTransform.position.x / worldRoomSize);
-        int playerGridY = Mathf.RoundToInt(playerTransform.position.y / worldRoomSize);
-        return new Vector2Int(playerGridX, playerGridY);
+        if (inputHandler.IsLargeMapOpen)
+        {
+            mapView.DisplayLargeMap();
+        }
+        else
+        {
+            mapView.DisplayMinimap();
+        }
+
+        StartCoroutine(DelayedRefreshRoutine());
     }
 
     private void RefreshMapLayout(Vector2Int currentPlayerPos)
     {
         mapView.UpdateIconsState(mapData, currentPlayerPos);
 
-        if (isLargeMapOpen)
+        if (inputHandler.IsLargeMapOpen)
         {
             mapView.AutoZoomToExplored(mapData.GetKnownRooms(), lastPlayerGridPos);
         }
         else
         {
-            mapView.CenterOn(currentPlayerPos, isLargeMapOpen);
+            mapView.CenterOn(currentPlayerPos, inputHandler.IsLargeMapOpen);
         }
     }
 
-    private void HandleMapToggleInput()
-    {
-        if (inputProvider.GetButtonDown("Map"))
-        {
-            isLargeMapOpen = !isLargeMapOpen;
-
-            if (isLargeMapOpen)
-                mapView.DisplayLargeMap();
-            else
-                mapView.DisplayMinimap();
-
-            StartCoroutine(DelayedRefresh());
-        }
-    }
-
-    private IEnumerator DelayedRefresh()
+    private IEnumerator DelayedRefreshRoutine()
     {
         yield return null;
         RefreshMapLayout(lastPlayerGridPos);

@@ -35,22 +35,19 @@ public class MinimapData
         return DiscoveredRooms.Contains(position);
     }
 
-    public bool IsNeighborOf(Vector2Int target, Vector2Int center)
+    public void InitializeDefaultHubState()
     {
-        return (target - center).sqrMagnitude == 1;
-    }
+        Clear();
 
-    private void DiscoverNeighbors(Vector2Int center)
-    {
-        Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        Vector2Int centerPos = Vector2Int.zero;
         
+        AddRoom(centerPos, RoomType.Normal);
+        MarkAsExplored(centerPos);
+
+        Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
         foreach (Vector2Int dir in directions)
         {
-            Vector2Int neighborPos = center + dir;
-            if (RoomTypes.ContainsKey(neighborPos))
-            {
-                DiscoveredRooms.Add(neighborPos);
-            }
+            AddRoom(centerPos + dir, RoomType.Normal);
         }
     }
 
@@ -67,19 +64,17 @@ public class MinimapData
         return knownRooms;
     }
 
-    public void InitializeDefaultHubState()
+    private void DiscoverNeighbors(Vector2Int center)
     {
-        Clear();
-
-        Vector2Int centerPos = Vector2Int.zero;
-        
-        AddRoom(centerPos, RoomType.Normal);
-        MarkAsExplored(centerPos);
-
         Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+        
         foreach (Vector2Int dir in directions)
         {
-            AddRoom(centerPos + dir, RoomType.Normal);
+            Vector2Int neighborPos = center + dir;
+            if (RoomTypes.ContainsKey(neighborPos))
+            {
+                DiscoveredRooms.Add(neighborPos);
+            }
         }
     }
 }

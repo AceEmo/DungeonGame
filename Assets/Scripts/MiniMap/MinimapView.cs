@@ -14,11 +14,20 @@ public class MinimapView : MonoBehaviour
         public Sprite unexploredRoom;
     }
 
+    [System.Serializable]
+    public struct OriginalLayoutData
+    {
+        public Vector2 sizeDelta;
+        public Vector3 anchoredPosition;
+        public Vector2 anchorMin;
+        public Vector2 anchorMax;
+        public Vector2 pivot;
+    }
+
     [Header("UI Containers")]
     [SerializeField] private RectTransform minimapPanel;
     [SerializeField] private RectTransform gridContainer;
     [SerializeField] private GameObject roomMinimapPrefab;
-
     [SerializeField] private RectTransform playerIndicator;
 
     [Header("Sprites Configuration")]
@@ -26,17 +35,15 @@ public class MinimapView : MonoBehaviour
     [SerializeField] private float uiRoomSpacing = 35f;
 
     private readonly Dictionary<Vector2Int, Image> minimapIcons = new Dictionary<Vector2Int, Image>();
-
-    private Vector2 originalPanelSize;
-    private Vector3 originalPanelPosition;
-    private Vector2 originalPanelAnchorMin;
-    private Vector2 originalPanelAnchorMax;
-    private Vector2 originalPanelPivot;
+    private OriginalLayoutData originalLayout;
 
     private void Awake()
     {
         SaveOriginalLayout();
-        if (playerIndicator != null) playerIndicator.gameObject.SetActive(false);
+        if (playerIndicator != null)
+        {
+            playerIndicator.gameObject.SetActive(false);
+        }
     }
 
     public void ClearIcons()
@@ -69,13 +76,61 @@ public class MinimapView : MonoBehaviour
 
         foreach (var pair in minimapIcons)
         {
-            Vector2Int pos = pair.Key;
-            Image iconImage = pair.Value;
-
-            SetIconVisibilityAndSprite(pos, iconImage, data);
+            SetIconVisibilityAndSprite(pair.Key, pair.Value, data);
         }
         
         UpdatePlayerIndicator(currentPlayerPos);
+    }
+
+    public void CenterOn(Vector2Int gridPos, bool isLargeMapOpen)
+    {
+        if (gridContainer == null) return;
+
+        float spacing = isLargeMapOpen ? uiRoomSpacing * 2f : uiRoomSpacing;
+        gridContainer.anchoredPosition = new Vector2(-gridPos.x * spacing, -gridPos.y * spacing);
+    }
+
+    public void AutoZoomToExplored(List<Vector2Int> knownRooms, Vector2Int lastPlayerGridPos)
+    {
+        if (minimapPanel == null || knownRooms.Count == 0) return;
+
+        CalculateBounds(knownRooms, out int minX, out int maxX, out int minY, out int maxY);
+
+        float width = (maxX - minX + 1) * uiRoomSpacing;
+        float height = (maxY - minY + 1) * uiRoomSpacing;
+
+        gridContainer.anchoredPosition = new Vector2(-lastPlayerGridPos.x * uiRoomSpacing, -lastPlayerGridPos.y * uiRoomSpacing);
+
+        float scaleX = minimapPanel.rect.width / width;
+        float scaleY = minimapPanel.rect.height / height;
+
+        float finalScale = Mathf.Clamp(Mathf.Min(scaleX, scaleY), 1f, 3f);
+        gridContainer.localScale = new Vector3(finalScale, finalScale, 1f);
+    }
+
+    public void DisplayLargeMap()
+    {
+        if (minimapPanel == null) return;
+
+        minimapPanel.anchorMin = new Vector2(0.05f, 0.05f);
+        minimapPanel.anchorMax = new Vector2(0.95f, 0.95f);
+        minimapPanel.pivot = new Vector2(0.5f, 0.5f);
+        minimapPanel.anchoredPosition = Vector2.zero;
+        minimapPanel.offsetMin = Vector2.zero;
+        minimapPanel.offsetMax = Vector2.zero;
+    }
+
+    public void DisplayMinimap()
+    {
+        if (minimapPanel == null) return;
+
+        minimapPanel.anchorMin = originalLayout.anchorMin;
+        minimapPanel.anchorMax = originalLayout.anchorMax;
+        minimapPanel.pivot = originalLayout.pivot;
+        minimapPanel.anchoredPosition = originalLayout.anchoredPosition;
+        minimapPanel.sizeDelta = originalLayout.sizeDelta;
+
+        gridContainer.localScale = Vector3.one;
     }
 
     private void SetIconVisibilityAndSprite(Vector2Int pos, Image iconImage, MinimapData data)
@@ -96,14 +151,6 @@ public class MinimapView : MonoBehaviour
         }
     }
 
-    public void CenterOn(Vector2Int gridPos, bool isLargeMapOpen)
-    {
-        if (gridContainer == null) return;
-
-        float spacing = isLargeMapOpen ? uiRoomSpacing * 2f : uiRoomSpacing;
-        gridContainer.anchoredPosition = new Vector2(-gridPos.x * spacing, -gridPos.y * spacing);
-    }
-
     private void UpdatePlayerIndicator(Vector2Int currentPlayerPos)
     {
         if (playerIndicator == null) return;
@@ -111,12 +158,7 @@ public class MinimapView : MonoBehaviour
         if (minimapIcons.ContainsKey(currentPlayerPos))
         {
             playerIndicator.gameObject.SetActive(true);
-            
-            playerIndicator.anchoredPosition = new Vector2(
-                currentPlayerPos.x * uiRoomSpacing, 
-                currentPlayerPos.y * uiRoomSpacing
-            );
-            
+            playerIndicator.anchoredPosition = new Vector2(currentPlayerPos.x * uiRoomSpacing, currentPlayerPos.y * uiRoomSpacing);
             playerIndicator.SetAsLastSibling();
         }
         else
@@ -125,60 +167,18 @@ public class MinimapView : MonoBehaviour
         }
     }
 
-    public void AutoZoomToExplored(List<Vector2Int> knownRooms, Vector2Int lastPlayerGridPos)
-    {
-        if (minimapPanel == null || knownRooms.Count == 0) return;
-
-        CalculateBounds(knownRooms, out int minX, out int maxX, out int minY, out int maxY);
-
-        float width = (maxX - minX + 1) * uiRoomSpacing;
-        float height = (maxY - minY + 1) * uiRoomSpacing;
-
-        gridContainer.anchoredPosition = new Vector2(-lastPlayerGridPos.x * uiRoomSpacing, -lastPlayerGridPos.y * uiRoomSpacing);
-
-        float scaleX = minimapPanel.rect.width / width;
-        float scaleY = minimapPanel.rect.height / height;
-
-        float finalScale = Mathf.Min(scaleX, scaleY);
-        finalScale = Mathf.Clamp(finalScale, 1f, 3f);
-
-        gridContainer.localScale = new Vector3(finalScale, finalScale, 1f);
-    }
-
-    public void DisplayLargeMap()
-    {
-        if (minimapPanel == null) return;
-
-        minimapPanel.anchorMin = new Vector2(0.05f, 0.05f);
-        minimapPanel.anchorMax = new Vector2(0.95f, 0.95f);
-        minimapPanel.pivot = new Vector2(0.5f, 0.5f);
-        minimapPanel.anchoredPosition = Vector2.zero;
-        minimapPanel.offsetMin = Vector2.zero;
-        minimapPanel.offsetMax = Vector2.zero;
-    }
-
-    public void DisplayMinimap()
-    {
-        if (minimapPanel == null) return;
-
-        minimapPanel.anchorMin = originalPanelAnchorMin;
-        minimapPanel.anchorMax = originalPanelAnchorMax;
-        minimapPanel.pivot = originalPanelPivot;
-        minimapPanel.anchoredPosition = originalPanelPosition;
-        minimapPanel.sizeDelta = originalPanelSize;
-
-        gridContainer.localScale = Vector3.one;
-    }
-
     private void SaveOriginalLayout()
     {
         if (minimapPanel == null) return;
 
-        originalPanelSize = minimapPanel.sizeDelta;
-        originalPanelPosition = minimapPanel.anchoredPosition;
-        originalPanelAnchorMin = minimapPanel.anchorMin;
-        originalPanelAnchorMax = minimapPanel.anchorMax;
-        originalPanelPivot = minimapPanel.pivot;
+        originalLayout = new OriginalLayoutData
+        {
+            sizeDelta = minimapPanel.sizeDelta,
+            anchoredPosition = minimapPanel.anchoredPosition,
+            anchorMin = minimapPanel.anchorMin,
+            anchorMax = minimapPanel.anchorMax,
+            pivot = minimapPanel.pivot
+        };
     }
 
     private Sprite GetSpriteForRoom(RoomType type)
