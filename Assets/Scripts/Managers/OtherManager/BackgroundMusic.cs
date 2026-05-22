@@ -3,20 +3,25 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class BackgroundMusic : MonoBehaviour
 {
-    private static BackgroundMusic instance;
+    private const string VolumeKey = "MusicVolume";
+    private const float DefaultVolume = 0.5f;
 
+    private static BackgroundMusic instance;
     private AudioSource audioSource;
 
     public static BackgroundMusic Instance => instance;
 
     public float Volume
     {
-        get => audioSource != null ? audioSource.volume : 0f;
+        get => audioSource != null ? audioSource.volume : DefaultVolume;
         set
         {
             if (audioSource != null)
             {
-                audioSource.volume = Mathf.Clamp01(value);
+                float clampedValue = Mathf.Clamp01(value);
+                audioSource.volume = clampedValue;
+                
+                PlayerPrefs.SetFloat(VolumeKey, clampedValue);
             }
         }
     }
@@ -25,6 +30,7 @@ public class BackgroundMusic : MonoBehaviour
     {
         InitializeSingleton();
         audioSource = GetComponent<AudioSource>();
+        LoadVolumeSettings();
     }
 
     private void InitializeSingleton()
@@ -38,5 +44,18 @@ public class BackgroundMusic : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void LoadVolumeSettings()
+    {
+        if (audioSource != null)
+        {
+            audioSource.volume = PlayerPrefs.GetFloat(VolumeKey, DefaultVolume);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.Save();
     }
 }
