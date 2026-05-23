@@ -7,6 +7,7 @@ public class PanelController
     public GameObject BlackjackCanvas { get; set; }
     public GameObject TerminalPanel { get; set; }
     public GameObject UpgradePanel { get; set; }
+    public GameObject WinScreenPanel { get; set; }
 
     public void FindSceneReferences()
     {
@@ -28,7 +29,9 @@ public class PanelController
 
     private void TogglePanel(GameObject panel, bool isActive)
     {
-        if (panel != null)
+        if (panel == null) return;
+
+        if (panel.activeSelf != isActive)
         {
             panel.SetActive(isActive);
         }

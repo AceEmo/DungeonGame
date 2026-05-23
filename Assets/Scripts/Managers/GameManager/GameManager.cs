@@ -71,7 +71,10 @@ public class GameManager : MonoBehaviour
 
     private void HandleInput()
     {
-        if (stateManager.CurrentState == GameState.Blackjack) return;
+        if (stateManager.CurrentState == GameState.Blackjack || 
+            stateManager.CurrentState == GameState.WinScreen || 
+            stateManager.CurrentState == GameState.GameOver) 
+            return;
 
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
@@ -197,6 +200,11 @@ public class GameManager : MonoBehaviour
             es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
             DontDestroyOnLoad(es);
         }
+    }
+
+    public void HandleGameWin()
+    {
+        stateManager.SetState(GameState.WinScreen);
     }
 
     private void OnDestroy()

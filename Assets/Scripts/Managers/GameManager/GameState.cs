@@ -6,5 +6,6 @@ public enum GameState
     GameOver,
     Blackjack,
     Terminal,
-    Upgrade
+    Upgrade,
+    WinScreen
 }

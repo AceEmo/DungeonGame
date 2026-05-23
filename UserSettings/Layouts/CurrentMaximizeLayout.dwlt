@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 112}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 52916
+  controlID: 58235
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 112}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 52917
+  controlID: 58236
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 56}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 52855
+  controlID: 58184
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -254,6 +254,31 @@ MonoBehaviour:
       m_LastClickedID:
         m_Data: 0
       m_ExpandedIDs:
+      - m_Data: -138268
+      - m_Data: -137878
+      - m_Data: -111744
+      - m_Data: -111338
+      - m_Data: -111230
+      - m_Data: -110776
+      - m_Data: -110376
+      - m_Data: -110328
+      - m_Data: -110290
+      - m_Data: -110240
+      - m_Data: -109982
+      - m_Data: -109932
+      - m_Data: -109882
+      - m_Data: -109832
+      - m_Data: -109794
+      - m_Data: -109756
+      - m_Data: -109706
+      - m_Data: -109668
+      - m_Data: -109278
+      - m_Data: -109228
+      - m_Data: -104162
+      - m_Data: -104112
+      - m_Data: -104006
+      - m_Data: -103956
+      - m_Data: -103906
       - m_Data: -36436
       - m_Data: -36342
       - m_Data: -36332
@@ -268,6 +293,8 @@ MonoBehaviour:
       - m_Data: -1430
       - m_Data: 52018
       - m_Data: 52096
+      - m_Data: 103618
+      - m_Data: 103710
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -846,9 +873,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 865.6404, y: 475.6952, z: -4.486407}
+    m_Target: {x: 936.98315, y: 559.668, z: -5.00743}
     speed: 2
-    m_Value: {x: 865.6404, y: 475.6952, z: -4.486407}
+    m_Value: {x: 936.98315, y: 559.668, z: -5.00743}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -898,9 +925,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 643.12573
+    m_Target: 695.2273
     speed: 2
-    m_Value: 643.12573
+    m_Value: 695.2273
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -955,10 +982,10 @@ MonoBehaviour:
     m_TextWithWhitespace: "Animator\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 262.4
+    x: 308.80002
     y: 79.200005
-    width: 827.6
-    height: 399.6
+    width: 770.00006
+    height: 400.4
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1119,7 +1146,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts/Managers/GameManager
+    - Assets/Scenes
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1129,18 +1156,18 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts/Managers/GameManager
+  - Assets/Scenes
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\unityProjects\DungeonGame
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 347.6}
+    scrollPos: {x: 0, y: 75.600006}
     m_SelectedIDs:
-    - m_Data: 53620
+    - m_Data: 53562
     m_LastClickedID:
-      m_Data: 53620
+      m_Data: 53562
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 53424
@@ -1150,7 +1177,6 @@ MonoBehaviour:
     - m_Data: 53432
     - m_Data: 53434
     - m_Data: 53436
-    - m_Data: 53580
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1218,7 +1244,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: []
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs:
     - m_Data: 73784
     m_RenameOverlay:
