@@ -4,8 +4,8 @@ using UnityEngine.SceneManagement;
 public class LevelProgressionManager
 {
     private int currentLevel = 0;
-    private const int MaxLevels = 5;
 
+    public int MaxLevels { get; set; } = GameSettings.DefaultLevels;
     public int CurrentLevel => currentLevel;
 
     public void ResetLevels()

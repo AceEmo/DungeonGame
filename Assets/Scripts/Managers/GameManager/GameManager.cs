@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
@@ -20,41 +19,35 @@ public class GameManager : MonoBehaviour
 
     public int currentLevel => levelManager.CurrentLevel;
     public GameState CurrentState => stateManager.CurrentState;
+    public GameSettings Settings { get; private set; } = new GameSettings();
 
-    #region Public API
-    public void ResetGameProgress() => levelManager.ResetLevels();
-    public void OpenTerminal() => stateManager.SetState(GameState.Terminal);
-    public void CloseTerminal() => stateManager.SetState(GameState.Gameplay);
-    public void OpenUpgrade() => stateManager.SetState(GameState.Upgrade);
-    public void CloseUpgrade() => stateManager.SetState(GameState.Gameplay);
-    public bool IsGameplayActive() => stateManager.CurrentState == GameState.Gameplay;
-    public void LoadNextLevel() => levelManager.LoadNextLevel();
-    public void RegisterBlackjackCanvas(GameObject canvas) => panelController.BlackjackCanvas = canvas;
-    public void RegisterBlackjackTable(BlackjackInteract table) => currentBlackjackTable = table;
-    public void ExitGame() => Application.Quit();
-    #endregion
+    private AudioSource audioSource;
 
     [Header("UI Audio")]
     [SerializeField] private AudioClip restartSound;
     [SerializeField] [Range(0f, 1f)] private float restartVolume = 1f;
 
-    private AudioSource audioSource;
-
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeComponents();
-            SceneManager.sceneLoaded += OnSceneLoaded;
-            audioSource = GetComponent<AudioSource>();
-            if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
-        }
-        else
+        if (Instance != null)
         {
             Destroy(gameObject);
+            return;
         }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
+        Settings.LoadFromPrefs();
+
+        InitializeComponents();
+        ApplySettingsToGame();
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void InitializeComponents()
@@ -62,7 +55,13 @@ public class GameManager : MonoBehaviour
         panelController = new PanelController();
         stateManager = new GameStateManager(panelController);
         levelManager = new LevelProgressionManager();
+
         EnsureEventSystemExists();
+    }
+
+    private void ApplySettingsToGame()
+    {
+        levelManager.MaxLevels = Settings.MaxLevels;
     }
 
     private void Update()
@@ -74,7 +73,7 @@ public class GameManager : MonoBehaviour
     {
         if (stateManager.CurrentState == GameState.Blackjack) return;
 
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             if (stateManager.CurrentState == GameState.Gameplay)
                 stateManager.SetState(GameState.Paused);
@@ -102,26 +101,57 @@ public class GameManager : MonoBehaviour
         stateManager.SetState(GameState.Gameplay);
 
         playerHealth = FindFirstObjectByType<PlayerHealth>();
+
         if (playerHealth != null)
         {
-            HandlePlayerHealthInitialization(sceneName);
+            playerHealth.OnPlayerDied -= HandleGameOver;
+            playerHealth.OnPlayerDied += HandleGameOver;
+
+            if (sceneName == "HubRoom")
+                playerHealth.ResetHealth();
         }
 
         currentBlackjackTable = null;
     }
 
-    private void HandlePlayerHealthInitialization(string sceneName)
+    private void HandleGameOver()
     {
-        if (sceneName == "HubRoom")
-        {
-            playerHealth.ResetHealth();
-        }
-
-        playerHealth.OnPlayerDied -= HandleGameOver;
-        playerHealth.OnPlayerDied += HandleGameOver;
+        stateManager.SetState(GameState.GameOver);
     }
 
-    private void HandleGameOver() => stateManager.SetState(GameState.GameOver);
+    public void ResetGameProgress()
+    {
+        levelManager.ResetLevels();
+    }
+
+    public void OpenTerminal() => stateManager.SetState(GameState.Terminal);
+    public void CloseTerminal() => stateManager.SetState(GameState.Gameplay);
+    public void OpenUpgrade() => stateManager.SetState(GameState.Upgrade);
+    public void CloseUpgrade() => stateManager.SetState(GameState.Gameplay);
+
+    public bool IsGameplayActive() => stateManager.CurrentState == GameState.Gameplay;
+
+    public void LoadNextLevel() => levelManager.LoadNextLevel();
+
+    public void RegisterBlackjackCanvas(GameObject canvas)
+    {
+        panelController.BlackjackCanvas = canvas;
+    }
+
+    public void RegisterBlackjackTable(BlackjackInteract table)
+    {
+        currentBlackjackTable = table;
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void ApplySettingsFromUI()
+    {
+        levelManager.MaxLevels = Settings.MaxLevels;
+    }
 
     public void OpenBlackjack()
     {
@@ -141,18 +171,20 @@ public class GameManager : MonoBehaviour
     public void CloseBlackjack()
     {
         if (stateManager.CurrentState == GameState.Blackjack)
-        {
             stateManager.SetState(GameState.Gameplay);
-        }
     }
 
     public void RestartGame()
     {
         if (audioSource != null && restartSound != null)
-        {
             audioSource.PlayOneShot(restartSound, restartVolume);
-        }
-        if (playerStats != null) playerStats.ResetAll();
+
+        levelManager.ResetLevels();
+        ApplySettingsToGame();
+
+        if (playerStats != null)
+            playerStats.ResetAll();
+
         SceneManager.LoadScene("HubRoom");
     }
 
@@ -162,7 +194,7 @@ public class GameManager : MonoBehaviour
         {
             GameObject es = new GameObject("EventSystem");
             es.AddComponent<EventSystem>();
-            es.AddComponent<InputSystemUIInputModule>();
+            es.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
             DontDestroyOnLoad(es);
         }
     }
