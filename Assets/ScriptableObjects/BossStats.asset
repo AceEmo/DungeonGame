@@ -27,7 +27,7 @@ MonoBehaviour:
   rageThreshold: 0.3
   rageSpeedMultiplier: 1.5
   rageDamageMultiplier: 1.5
-  rageColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  rageColor: {r: 1, g: 0.3, b: 0.3, a: 0.87058824}
   dashSpeed: 4.5
   dashDuration: 0.5
   dashTriggerDistance: 20
