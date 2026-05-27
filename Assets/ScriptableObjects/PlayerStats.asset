@@ -17,11 +17,11 @@ MonoBehaviour:
   baseMoveSpeed: 4
   baseFireRate: 0.6
   baseBulletSpeed: 8
-  baseDamage: 1
+  baseDamage: 100
   startHealth: 7
   maxHealth: 12
   moveSpeed: 4
   fireRate: 0.6
   bulletSpeed: 8
-  damage: 1
+  damage: 100
   scrap: 0

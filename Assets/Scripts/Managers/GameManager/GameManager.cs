@@ -73,7 +73,10 @@ public class GameManager : MonoBehaviour
     {
         if (stateManager.CurrentState == GameState.Blackjack || 
             stateManager.CurrentState == GameState.WinScreen || 
-            stateManager.CurrentState == GameState.GameOver) 
+            stateManager.CurrentState == GameState.GameOver  ||
+            stateManager.CurrentState == GameState.Terminal  ||
+            stateManager.CurrentState == GameState.Upgrade   ||
+            stateManager.CurrentState == GameState.MainMenu) 
             return;
 
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)

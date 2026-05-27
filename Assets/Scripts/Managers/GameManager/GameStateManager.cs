@@ -23,7 +23,7 @@ public class GameStateManager
 
     private void UpdateTimeScale()
     {
-        Time.timeScale = (currentState == GameState.Gameplay) ? 1f : 0f;
+        Time.timeScale = (currentState == GameState.Paused) ? 0f : 1f;
     }
 
     private void UpdateCursorState()

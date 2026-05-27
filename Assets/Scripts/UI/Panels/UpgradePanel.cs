@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-public class UpdatePanel : MonoBehaviour
+public class UpgradePanel : MonoBehaviour
 {
     public PlayerStats playerStats;
     public PlayerHealth playerHealth;

@@ -21,6 +21,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (!GameManager.Instance.IsGameplayActive())
+        {
+            ResetMovementAndAnimations();
+            return;
+        }
+
         GatherInput();
         UpdateLookDirection();
         UpdateAnimator();
@@ -28,6 +34,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameManager.Instance.IsGameplayActive()) 
+        {
+            return;
+        }
+
         MovePlayer();
     }
 
@@ -72,6 +83,16 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector2 targetPosition = rigidBody.position + movement.normalized * stats.moveSpeed * Time.fixedDeltaTime;
             rigidBody.MovePosition(targetPosition);
+        }
+    }
+
+    private void ResetMovementAndAnimations()
+    {
+        movement = Vector2.zero;
+        
+        if (animator != null && animator.runtimeAnimatorController != null)
+        {
+            animator.SetFloat("Speed", 0f);
         }
     }
 }

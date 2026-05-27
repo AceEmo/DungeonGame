@@ -14,8 +14,9 @@ public class PanelController
         PausePanel = Object.FindFirstObjectByType<PausePanel>(FindObjectsInactive.Include)?.gameObject;
         GameOverPanel = Object.FindFirstObjectByType<GameOverPanel>(FindObjectsInactive.Include)?.gameObject;
         TerminalPanel = Object.FindFirstObjectByType<TerminalPanel>(FindObjectsInactive.Include)?.gameObject;
-        UpgradePanel = Object.FindFirstObjectByType<UpdatePanel>(FindObjectsInactive.Include)?.gameObject;
         BlackjackCanvas = Object.FindFirstObjectByType<BlackjackGame>(FindObjectsInactive.Include)?.gameObject;
+        WinScreenPanel = Object.FindFirstObjectByType<WinScreenPanel>(FindObjectsInactive.Include)?.gameObject;
+        UpgradePanel = Object.FindFirstObjectByType<UpgradePanel>(FindObjectsInactive.Include)?.gameObject;
     }
 
     public void UpdateUIStates(GameState state)
@@ -25,6 +26,7 @@ public class PanelController
         TogglePanel(BlackjackCanvas, state == GameState.Blackjack);
         TogglePanel(TerminalPanel, state == GameState.Terminal);
         TogglePanel(UpgradePanel, state == GameState.Upgrade);
+        TogglePanel(WinScreenPanel, state == GameState.WinScreen);
     }
 
     private void TogglePanel(GameObject panel, bool isActive)

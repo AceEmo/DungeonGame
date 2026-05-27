@@ -3,26 +3,29 @@ using UnityEngine;
 public class VentController : MonoBehaviour
 {
     [Header("References")]
-    public GameObject closedVent;
-    public GameObject openVent;
+    [SerializeField] private GameObject closedVent;
+    [SerializeField] private GameObject openVent;
 
     private void Start()
     {
-        if (closedVent == null || openVent == null)
-        {
-            return;
-        }
-
-        closedVent.SetActive(true);
-        openVent.SetActive(false);
+        SetVentState(isClosed: true);
     }
     
     public void OpenVent()
     {
-        if (closedVent != null && openVent != null)
+        SetVentState(isClosed: false);
+    }
+
+    private void SetVentState(bool isClosed)
+    {
+        if (closedVent != null)
         {
-            closedVent.SetActive(false);
-            openVent.SetActive(true);
+            closedVent.SetActive(isClosed);
+        }
+
+        if (openVent != null)
+        {
+            openVent.SetActive(!isClosed);
         }
     }
 }
