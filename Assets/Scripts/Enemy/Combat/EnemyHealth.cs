@@ -20,11 +20,15 @@ public class EnemyHealth : MonoBehaviour, IDamageable
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
-        CurrentHealth = enemy.Data.MaxHealth;
-        HitColor = enemy.Data.hitColor;
         Sr = GetComponent<SpriteRenderer>();
         Colliders = GetComponents<Collider2D>();
         if (Sr != null) OriginalColor = Sr.color;
+    }
+
+    private void Start()
+    {
+        CurrentHealth = enemy.CurrentMaxHealth;
+        HitColor = enemy.Data.hitColor;
     }
 
     public void TakeDamage(int amount)
@@ -110,5 +114,6 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         Destroy(gameObject);
     }
+
     public bool IsEnemyDead() => IsDead;
 }

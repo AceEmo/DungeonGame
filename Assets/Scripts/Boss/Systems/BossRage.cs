@@ -17,9 +17,8 @@ public class BossRage
         {
             raging = true;
 
-            context.CurrentSpeed = context.Data.speed * context.Data.rageSpeedMultiplier;
-            context.CurrentDamage = Mathf.RoundToInt(
-                context.Data.attackDamage * context.Data.rageDamageMultiplier);
+            context.CurrentSpeed = context.CurrentSpeed * context.Data.rageSpeedMultiplier;
+            context.CurrentDamage = Mathf.RoundToInt(context.CurrentDamage * context.Data.rageDamageMultiplier);
 
             if (context.SpriteRenderer != null)
                 context.SpriteRenderer.color = context.Data.rageColor;

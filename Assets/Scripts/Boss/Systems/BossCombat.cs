@@ -36,7 +36,7 @@ public class BossCombat
 
                 if (player != null)
                     player.TakeDamage(
-                        context.Data.attackDamage,
+                        context.CurrentDamage,
                         context.BossTransform.position);
             }
         }

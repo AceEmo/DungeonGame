@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class FlyingMovement : MonoBehaviour, IEnemyMovement
 {
     private Enemy enemy;
@@ -12,6 +13,6 @@ public class FlyingMovement : MonoBehaviour, IEnemyMovement
 
     public void Move(Vector2 direction)
     {
-        rb.linearVelocity = direction * enemy.Data.speed;
+        rb.linearVelocity = direction * enemy.CurrentSpeed;
     }
 }

@@ -132,7 +132,7 @@ public class ChaseState : IBossState
         context.Animator.SetFloat("MoveX", smoothedSteering.x);
         context.Animator.SetFloat("MoveY", smoothedSteering.y);
 
-        context.Movement.Move(smoothedSteering, context.Data.speed);
+        context.Movement.Move(smoothedSteering, context.CurrentSpeed);
     }
 
     private float GetDistanceToPlayer(BossContext context)

@@ -22,9 +22,14 @@ public class Boss : MonoBehaviour, IDamageable
     private BossBrain brain;
     private BossContext context;
 
+    private int currentMaxHealth;
+    private float currentSpeed;
+    private float currentDamage;
+
     private void Awake()
     {
         InitializeComponents();
+        ApplyDifficultyMultiplier();
         InitializeContext();
         InitializeBrain();
     }
@@ -46,6 +51,23 @@ public class Boss : MonoBehaviour, IDamageable
         originalColor = spriteRenderer.color;
     }
 
+    private void ApplyDifficultyMultiplier()
+    {
+        if (data == null || GameManager.Instance == null)
+        {
+            currentMaxHealth = data != null ? data.MaxHealth : 20;
+            currentSpeed = data != null ? data.speed : 3f;
+            currentDamage = data != null ? data.attackDamage : 2;
+            return;
+        }
+
+        float multiplier = GameManager.Instance.Settings.Difficulty.GetStatMultiplier();
+
+        currentMaxHealth = Mathf.RoundToInt(data.MaxHealth * multiplier);
+        currentDamage = Mathf.RoundToInt(data.attackDamage * multiplier);
+        currentSpeed = data.speed * multiplier;
+    }
+
     private void InitializeContext()
     {
         Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -59,7 +81,10 @@ public class Boss : MonoBehaviour, IDamageable
             Animator = GetComponent<Animator>(),
             SpriteRenderer = spriteRenderer,
 
-            Health = new BossHealth(data.MaxHealth),
+            CurrentSpeed = currentSpeed,
+            CurrentDamage = Mathf.RoundToInt(currentDamage),
+
+            Health = new BossHealth(currentMaxHealth),
             Movement = new BossMovement(GetComponent<Rigidbody2D>()),
             Rage = new BossRage(),
 

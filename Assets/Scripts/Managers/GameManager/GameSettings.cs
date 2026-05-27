@@ -7,6 +7,20 @@ public enum GameDifficulty
     Hard
 }
 
+public static class GameDifficultyExtensions
+{
+    public static float GetStatMultiplier(this GameDifficulty difficulty)
+    {
+        return difficulty switch
+        {
+            GameDifficulty.Easy => 0.75f,
+            GameDifficulty.Normal => 1.00f,
+            GameDifficulty.Hard => 1.25f,
+            _ => 1.00f
+        };
+    }
+}
+
 public class GameSettings
 {
     public const int MinLevelsLimit = 3;

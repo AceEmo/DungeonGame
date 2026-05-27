@@ -8,6 +8,7 @@ public class EnemyDamage : MonoBehaviour
     {
         enemy = GetComponent<Enemy>();
     }
+
     private void OnTriggerStay2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
@@ -15,7 +16,7 @@ public class EnemyDamage : MonoBehaviour
         PlayerHealth player = other.GetComponent<PlayerHealth>();
         if (player != null)
         {
-            player.TakeDamage(enemy.Data.damage, transform.position);
+            player.TakeDamage(enemy.CurrentDamage, transform.position);
         }
     }
 }

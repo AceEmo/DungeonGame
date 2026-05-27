@@ -42,7 +42,7 @@ public class GroundMovement : MonoBehaviour, IEnemyMovement
         if (smoothedSteering.sqrMagnitude > 1f)
             smoothedSteering.Normalize();
 
-        rb.linearVelocity = smoothedSteering * enemy.Data.speed;
+        rb.linearVelocity = smoothedSteering * enemy.CurrentSpeed;
     }
 
     private Vector2 WallAvoidance(Vector2 moveDir)
