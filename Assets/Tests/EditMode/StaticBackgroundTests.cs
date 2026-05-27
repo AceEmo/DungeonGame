@@ -11,6 +11,7 @@ public class StaticBackgroundTests
     public void Setup()
     {
         backgroundObject = new GameObject("StaticBackgroundTest");
+        
         staticBackground = backgroundObject.AddComponent<StaticBackground>();
     }
 

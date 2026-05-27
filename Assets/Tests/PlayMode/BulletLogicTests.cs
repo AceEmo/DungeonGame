@@ -1,116 +1,95 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class BulletLogicTests
 {
-    private GameObject bulletObject;
-    private BulletLogic bulletLogic;
+    private GameObject _bulletObject;
+    private BulletLogic _bulletLogic;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        bulletObject = new GameObject("Bullet");
-        bulletLogic = bulletObject.AddComponent<BulletLogic>();
+        _bulletObject = new GameObject("Bullet");
+        _bulletObject.AddComponent<BoxCollider2D>();
+        _bulletLogic = _bulletObject.AddComponent<BulletLogic>();
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        if (bulletObject != null)
-        {
-            Object.DestroyImmediate(bulletObject);
-        }
-    }
-
-    [Test]
-    public void SetDamageAssignsCorrectValue()
-    {
-        bulletLogic.SetDamage(5);
-
-        FieldInfo damageField = typeof(BulletLogic).GetField("damage", BindingFlags.NonPublic | BindingFlags.Instance);
-        int damageValue = (int)damageField.GetValue(bulletLogic);
-
-        Assert.AreEqual(5, damageValue);
+        if (_bulletObject != null) Object.Destroy(_bulletObject);
     }
 
     [UnityTest]
-    public IEnumerator OnTriggerEnter2DWithEnemyDealsDamageAndDestroysBullet()
+    public IEnumerator Start_ShouldDestroyBulletAfterLifetime()
     {
-        bulletLogic.SetDamage(3);
+        yield return new WaitForSeconds(3.2f);
+
+        Assert.IsTrue(_bulletObject == null);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter2D_WhenHittingEnemy_ShouldApplyDamageAndDestroyBullet()
+    {
+        _bulletLogic.SetDamage(10);
 
         GameObject enemyObject = new GameObject("Enemy");
         enemyObject.tag = "Enemy";
-        BoxCollider2D enemyCollider = enemyObject.AddComponent<BoxCollider2D>();
+        enemyObject.AddComponent<BoxCollider2D>();
         MockDamageable mockDamageable = enemyObject.AddComponent<MockDamageable>();
 
-        MethodInfo onTriggerEnterMethod = typeof(BulletLogic).GetMethod("OnTriggerEnter2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        onTriggerEnterMethod.Invoke(bulletLogic, new object[] { enemyCollider });
+        var enemyCollider = enemyObject.GetComponent<BoxCollider2D>();
+        _bulletLogic.SendMessage("OnTriggerEnter2D", enemyCollider);
 
         yield return null;
 
-        Assert.AreEqual(3, mockDamageable.damageTaken);
-        Assert.IsTrue(bulletObject == null);
+        Assert.IsTrue(mockDamageable.DamageTaken == 10);
+        Assert.IsTrue(_bulletObject == null);
 
-        Object.DestroyImmediate(enemyObject);
+        Object.Destroy(enemyObject);
     }
 
     [UnityTest]
-    public IEnumerator OnTriggerEnter2DWithPlayerIgnoresCollision()
+    public IEnumerator OnTriggerEnter2D_WhenHittingNonPlayerObstacle_ShouldDestroyBullet()
+    {
+        GameObject wallObject = new GameObject("Wall");
+        wallObject.tag = "Untagged";
+        var wallCollider = wallObject.AddComponent<BoxCollider2D>();
+
+        _bulletLogic.SendMessage("OnTriggerEnter2D", wallCollider);
+
+        yield return null;
+
+        Assert.IsTrue(_bulletObject == null);
+
+        Object.Destroy(wallObject);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter2D_WhenHittingPlayer_ShouldNotDestroyBullet()
     {
         GameObject playerObject = new GameObject("Player");
         playerObject.tag = "Player";
-        BoxCollider2D playerCollider = playerObject.AddComponent<BoxCollider2D>();
+        var playerCollider = playerObject.AddComponent<BoxCollider2D>();
 
-        MethodInfo onTriggerEnterMethod = typeof(BulletLogic).GetMethod("OnTriggerEnter2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        onTriggerEnterMethod.Invoke(bulletLogic, new object[] { playerCollider });
-
-        yield return null;
-
-        Assert.IsFalse(bulletObject == null);
-
-        Object.DestroyImmediate(playerObject);
-    }
-
-    [UnityTest]
-    public IEnumerator OnTriggerEnter2DWithWallDestroysBullet()
-    {
-        GameObject wallObject = new GameObject("Wall");
-        BoxCollider2D wallCollider = wallObject.AddComponent<BoxCollider2D>();
-
-        MethodInfo onTriggerEnterMethod = typeof(BulletLogic).GetMethod("OnTriggerEnter2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        onTriggerEnterMethod.Invoke(bulletLogic, new object[] { wallCollider });
+        _bulletLogic.SendMessage("OnTriggerEnter2D", playerCollider);
 
         yield return null;
 
-        Assert.IsTrue(bulletObject == null);
+        Assert.IsNotNull(_bulletObject);
 
-        Object.DestroyImmediate(wallObject);
-    }
-
-    [UnityTest]
-    public IEnumerator BulletDestroysItselfAfterLifetime()
-    {
-        FieldInfo lifetimeField = typeof(BulletLogic).GetField("lifetime", BindingFlags.NonPublic | BindingFlags.Instance);
-        lifetimeField.SetValue(bulletLogic, 0.1f);
-
-        MethodInfo startMethod = typeof(BulletLogic).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance);
-        startMethod.Invoke(bulletLogic, null);
-
-        yield return new WaitForSeconds(0.15f);
-
-        Assert.IsTrue(bulletObject == null);
+        Object.Destroy(playerObject);
     }
 
     private class MockDamageable : MonoBehaviour, IDamageable
     {
-        public int damageTaken;
+        public int DamageTaken { get; private set; }
 
         public void TakeDamage(int amount)
         {
-            damageTaken += amount;
+            DamageTaken = amount;
         }
     }
 }

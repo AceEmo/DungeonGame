@@ -1,168 +1,180 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class InteractablesTests
 {
-    private GameObject testEnvironment;
+    private GameObject _chestObject;
+    private GameObject _terminalObject;
+    private GameObject _gearObject;
+    private GameObject _healthBoxObject;
+    private GameObject _upgradeMachineObject;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        testEnvironment = new GameObject("TestEnvironment");
+        _chestObject = new GameObject("Chest");
+        _terminalObject = new GameObject("Terminal");
+        _gearObject = new GameObject("Gear");
+        _healthBoxObject = new GameObject("HealthBox");
+        _upgradeMachineObject = new GameObject("UpgradeMachine");
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        Object.DestroyImmediate(testEnvironment);
-    }
-
-    [Test]
-    public void ChestInteractGetHintTextReturnsCorrectValue()
-    {
-        GameObject chestObject = new GameObject();
-        ChestInteract chestInteract = chestObject.AddComponent<ChestInteract>();
-
-        Assert.AreEqual("[E] Open", chestInteract.GetHintText());
-
-        Object.DestroyImmediate(chestObject);
+        if (_chestObject != null) Object.Destroy(_chestObject);
+        if (_terminalObject != null) Object.Destroy(_terminalObject);
+        if (_gearObject != null) Object.Destroy(_gearObject);
+        if (_healthBoxObject != null) Object.Destroy(_healthBoxObject);
+        if (_upgradeMachineObject != null) Object.Destroy(_upgradeMachineObject);
     }
 
     [UnityTest]
-    public IEnumerator ChestInteractInstantiatesPrefabAndDestroysItself()
+    public IEnumerator ChestInteract_GetHintText_ShouldReturnCorrectString()
     {
-        GameObject chestObject = new GameObject();
-        ChestInteract chestInteract = chestObject.AddComponent<ChestInteract>();
-        
-        GameObject mockPrefab = new GameObject("MockPrefab");
-        chestInteract.OpenChestPrefab = mockPrefab;
-        chestInteract.HealthPrefab = mockPrefab;
-        chestInteract.Gear1Prefab = mockPrefab;
-        chestInteract.Gear2Prefab = mockPrefab;
+        var chest = _chestObject.AddComponent<ChestInteract>();
 
-        chestInteract.Interact();
+        string hint = chest.GetHintText();
 
+        Assert.AreEqual("[E] Open", hint);
         yield return null;
-
-        Assert.IsTrue(chestObject == null);
-        Object.DestroyImmediate(mockPrefab);
-    }
-
-    [Test]
-    public void GearInteractGetHintTextReturnsCorrectValue()
-    {
-        GameObject gearObject = new GameObject();
-        GearInteract gearInteract = gearObject.AddComponent<GearInteract>();
-
-        Assert.AreEqual("[E] Collect", gearInteract.GetHintText());
-
-        Object.DestroyImmediate(gearObject);
     }
 
     [UnityTest]
-    public IEnumerator GearInteractDestroysItselfOnInteract()
+    public IEnumerator ChestInteract_Interact_ShouldSpawnPrefabsAndDestroyItself()
     {
-        GameObject gearObject = new GameObject();
-        GearInteract gearInteract = gearObject.AddComponent<GearInteract>();
-        
-        GameObject gameManagerObject = new GameObject("GameManager");
-        gameManagerObject.AddComponent<GameManager>(); 
+        var chest = _chestObject.AddComponent<ChestInteract>();
+        chest.OpenChestPrefab = new GameObject("OpenChestPrefab");
+        chest.HealthPrefab = new GameObject("HealthPrefab");
+        chest.Gear1Prefab = new GameObject("Gear1Prefab");
+        chest.Gear2Prefab = new GameObject("Gear2Prefab");
 
-        gearInteract.Interact();
-
+        chest.Interact();
         yield return null;
 
-        Assert.IsTrue(gearObject == null);
-        Object.DestroyImmediate(gameManagerObject);
-    }
-
-    [Test]
-    public void HealthBoxInteractGetHintTextReturnsCorrectValue()
-    {
-        GameObject healthBoxObject = new GameObject();
-        HealthBoxInteract healthBoxInteract = healthBoxObject.AddComponent<HealthBoxInteract>();
-
-        Assert.AreEqual("[E] Heal", healthBoxInteract.GetHintText());
-
-        Object.DestroyImmediate(healthBoxObject);
+        Assert.IsTrue(_chestObject == null);
+        Object.Destroy(chest.OpenChestPrefab);
+        Object.Destroy(chest.HealthPrefab);
+        Object.Destroy(chest.Gear1Prefab);
+        Object.Destroy(chest.Gear2Prefab);
     }
 
     [UnityTest]
-    public IEnumerator HealthBoxInteractDoesNotDestroyWhenPlayerHealthIsMax()
+    public IEnumerator GameInfoTerminal_GetHintText_ShouldReturnCorrectString()
     {
-        GameObject healthBoxObject = new GameObject();
-        HealthBoxInteract healthBoxInteract = healthBoxObject.AddComponent<HealthBoxInteract>();
+        var terminal = _terminalObject.AddComponent<GameInfoTerminal>();
 
-        GameObject playerObject = new GameObject();
-        playerObject.SetActive(false);
+        string hint = terminal.GetHintText();
 
-        playerObject.AddComponent<Rigidbody2D>();
-        playerObject.AddComponent<SpriteRenderer>();
-        playerObject.AddComponent<Animator>();
-        playerObject.AddComponent<BoxCollider2D>();
-        
-        PlayerMovement playerMovement = playerObject.AddComponent<PlayerMovement>();
-        playerMovement.enabled = false;
-
-        PlayerHealth playerHealth = playerObject.AddComponent<PlayerHealth>();
-        
-        PlayerStats mockStats = ScriptableObject.CreateInstance<PlayerStats>();
-        mockStats.startHealth = 10f;
-        mockStats.maxHealth = 10f;
-        FieldInfo statsField = typeof(PlayerHealth).GetField("stats", BindingFlags.NonPublic | BindingFlags.Instance);
-        statsField.SetValue(playerHealth, mockStats);
-        
-        playerObject.SetActive(true);
-        
-        healthBoxInteract.Interact();
-
+        Assert.AreEqual("[E] Examine Terminal", hint);
         yield return null;
-
-        Assert.IsFalse(healthBoxObject == null);
-
-        Object.DestroyImmediate(healthBoxObject);
-        Object.DestroyImmediate(playerObject);
-        Object.DestroyImmediate(mockStats);
     }
 
     [UnityTest]
-    public IEnumerator HealthBoxInteractHealsAndDestroysItselfWhenPlayerNeedsHealth()
+    public IEnumerator GearInteract_GetHintText_ShouldReturnCorrectString()
     {
-        GameObject healthBoxObject = new GameObject();
-        HealthBoxInteract healthBoxInteract = healthBoxObject.AddComponent<HealthBoxInteract>();
+        var gear = _gearObject.AddComponent<GearInteract>();
 
-        GameObject playerObject = new GameObject();
-        playerObject.SetActive(false);
+        string hint = gear.GetHintText();
 
-        playerObject.AddComponent<Rigidbody2D>();
-        playerObject.AddComponent<SpriteRenderer>();
-        playerObject.AddComponent<Animator>();
-        playerObject.AddComponent<BoxCollider2D>();
-        
-        PlayerMovement playerMovement = playerObject.AddComponent<PlayerMovement>();
-        playerMovement.enabled = false;
+        Assert.AreEqual("[E] Collect", hint);
+        yield return null;
+    }
 
-        PlayerHealth playerHealth = playerObject.AddComponent<PlayerHealth>();
-        
-        PlayerStats mockStats = ScriptableObject.CreateInstance<PlayerStats>();
-        mockStats.startHealth = 5f;
-        mockStats.maxHealth = 10f;
-        FieldInfo statsField = typeof(PlayerHealth).GetField("stats", BindingFlags.NonPublic | BindingFlags.Instance);
-        statsField.SetValue(playerHealth, mockStats);
-        
-        playerObject.SetActive(true);
+    [UnityTest]
+    public IEnumerator GearInteract_Interact_ShouldAddScrapAndDestroyItself()
+    {
+        var gear = _gearObject.AddComponent<GearInteract>();
+        var statsObject = new GameObject("PlayerStats");
+        var playerStats = statsObject.AddComponent<PlayerStats>();
+        gear.scrapAmount = 5;
+        gear.GetType().GetField("playerStats", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(gear, playerStats);
 
-        healthBoxInteract.Interact();
-
+        gear.Interact();
         yield return null;
 
-        Assert.IsTrue(healthBoxObject == null);
-        Assert.IsTrue(playerHealth.CurrentHealth > 5f);
+        Assert.AreEqual(5, playerStats.ScrapAmount);
+        Assert.IsTrue(_gearObject == null);
+        Object.Destroy(statsObject);
+    }
 
-        Object.DestroyImmediate(playerObject);
-        Object.DestroyImmediate(mockStats);
+    [UnityTest]
+    public IEnumerator HealthBoxInteract_GetHintText_ShouldReturnCorrectString()
+    {
+        var healthBox = _healthBoxObject.AddComponent<HealthBoxInteract>();
+
+        string hint = healthBox.GetHintText();
+
+        Assert.AreEqual("[E] Heal", hint);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator HealthBoxInteract_Interact_WhenPlayerNeedsHealing_ShouldHealAndDestroyItself()
+    {
+        var healthBox = _healthBoxObject.AddComponent<HealthBoxInteract>();
+        var playerObject = new GameObject("Player");
+        var mockHealth = playerObject.AddComponent<MockPlayerHealth>();
+        mockHealth.CurrentHealth = 5f;
+        mockHealth.MaxHealth = 10f;
+
+        healthBox.Interact();
+        yield return null;
+
+        Assert.IsTrue(mockHealth.HealCalled);
+        Assert.IsTrue(_healthBoxObject == null);
+        Object.Destroy(playerObject);
+    }
+
+    [UnityTest]
+    public IEnumerator HealthBoxInteract_Interact_WhenPlayerAtMaxHealth_ShouldNotHealOrDestroyItself()
+    {
+        var healthBox = _healthBoxObject.AddComponent<HealthBoxInteract>();
+        var playerObject = new GameObject("Player");
+        var mockHealth = playerObject.AddComponent<MockPlayerHealth>();
+        mockHealth.CurrentHealth = 10f;
+        mockHealth.MaxHealth = 10f;
+
+        healthBox.Interact();
+        yield return null;
+
+        Assert.IsFalse(mockHealth.HealCalled);
+        Assert.IsNotNull(_healthBoxObject);
+        Object.Destroy(playerObject);
+    }
+
+    [UnityTest]
+    public IEnumerator UpgradeMachineInteract_GetHintText_ShouldReturnCorrectString()
+    {
+        var upgradeMachine = _upgradeMachineObject.AddComponent<UpgradeMachineInteract>();
+
+        string hint = upgradeMachine.GetHintText();
+
+        Assert.AreEqual("[E] Upgrade Station", hint);
+        yield return null;
+    }
+
+    private class MockPlayerHealth : MonoBehaviour
+    {
+        public float CurrentHealth;
+        public float MaxHealth;
+        public bool HealCalled { get; private set; }
+
+        public void Heal(float amount)
+        {
+            HealCalled = true;
+        }
+    }
+
+    private class PlayerStats : MonoBehaviour
+    {
+        public int ScrapAmount { get; private set; }
+
+        public void AddScrap(int amount)
+        {
+            ScrapAmount += amount;
+        }
     }
 }

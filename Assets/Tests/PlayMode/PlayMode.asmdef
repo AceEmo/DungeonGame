@@ -1,11 +1,24 @@
 {
     "name": "PlayMode",
-    "includePlatforms": ["Editor"],
+    "rootNamespace": "",
     "references": [
-        "GameScripts",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "GameScripts",
         "Unity.Cinemachine",
         "Unity.TextMeshPro"
-    ]
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

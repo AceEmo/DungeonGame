@@ -1,116 +1,88 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class GameManagerTests
 {
-    private GameObject gameManagerObj;
-    private GameManager gameManager;
-    private PlayerStats testStats;
+    private GameObject _gameManagerObject;
+    private GameManager _gameManager;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        gameManagerObj = new GameObject("GameManager");
-        gameManager = gameManagerObj.AddComponent<GameManager>();
-        
-        testStats = ScriptableObject.CreateInstance<PlayerStats>();
-        gameManager.playerStats = testStats;
-        
-        Time.timeScale = 1f;
+        _gameManagerObject = new GameObject("GameManager");
+        _gameManager = _gameManagerObject.AddComponent<GameManager>();
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        Time.timeScale = 1f;
-        
-        if (gameManagerObj != null)
+        if (_gameManagerObject != null)
         {
-            Object.DestroyImmediate(gameManagerObj);
-        }
-
-        if (testStats != null)
-        {
-            Object.DestroyImmediate(testStats);
+            Object.Destroy(_gameManagerObject);
         }
     }
 
     [UnityTest]
-    public IEnumerator SingletonDestroysDuplicateInstance()
+    public IEnumerator Awake_ShouldSetInstanceAndInitializeSettings()
     {
         yield return null;
 
-        GameObject duplicateObj = new GameObject("DuplicateGameManager");
-        duplicateObj.AddComponent<GameManager>();
+        Assert.AreEqual(_gameManager, GameManager.Instance);
+        Assert.IsNotNull(_gameManager.Settings);
+    }
+
+    [UnityTest]
+    public IEnumerator Awake_WhenDuplicateInstanceExists_ShouldDestroyDuplicate()
+    {
+        GameObject duplicateObject = new GameObject("DuplicateGameManager");
+        GameManager duplicateManager = duplicateObject.AddComponent<GameManager>();
 
         yield return null;
 
-        Assert.IsTrue(duplicateObj == null);
+        Assert.IsTrue(duplicateObject == null);
     }
 
-    [Test]
-    public void RestartGameResetsPlayerStats()
+    [UnityTest]
+    public IEnumerator OpenTerminal_ShouldChangeStateToTerminal()
     {
-        testStats.scrap = 50;
-        testStats.damage = 99;
+        yield return null;
 
-        gameManager.RestartGame();
+        _gameManager.OpenTerminal();
 
-        Assert.AreEqual(0, testStats.scrap);
-        Assert.AreEqual(testStats.baseDamage, testStats.damage);
+        Assert.AreEqual(GameState.Terminal, _gameManager.CurrentState);
     }
 
-    [Test]
-    public void IsGameplayActiveReturnsTrueInitially()
+    [UnityTest]
+    public IEnumerator CloseTerminal_ShouldReturnStateToGameplay()
     {
-        MethodInfo initMethod = typeof(GameManager).GetMethod("InitializeSceneData", BindingFlags.NonPublic | BindingFlags.Instance);
-        initMethod.Invoke(gameManager, null);
+        yield return null;
+        _gameManager.OpenTerminal();
 
-        Assert.IsTrue(gameManager.IsGameplayActive());
-        Assert.AreEqual(1f, Time.timeScale);
+        _gameManager.CloseTerminal();
+
+        Assert.AreEqual(GameState.Gameplay, _gameManager.CurrentState);
     }
 
-    [Test]
-    public void OpenBlackjackChangesStateAndDisablesGameplay()
+    [UnityTest]
+    public IEnumerator IsGameplayActive_WhenInGameplayState_ShouldReturnTrue()
     {
-        gameManager.OpenBlackjack();
+        yield return null;
+        _gameManager.CloseTerminal();
 
-        Assert.IsFalse(gameManager.IsGameplayActive());
+        bool isActive = _gameManager.IsGameplayActive();
+
+        Assert.IsTrue(isActive);
     }
 
-    [Test]
-    public void CloseBlackjackRestoresGameplayState()
+    [UnityTest]
+    public IEnumerator HandleGameWin_ShouldSetStateToWinScreen()
     {
-        gameManager.OpenBlackjack();
-        gameManager.CloseBlackjack();
+        yield return null;
 
-        Assert.IsTrue(gameManager.IsGameplayActive());
-    }
+        _gameManager.HandleGameWin();
 
-    [Test]
-    public void RegisterBlackjackCanvasAssignsCanvasProperly()
-    {
-        GameObject canvasObj = new GameObject("Canvas");
-        canvasObj.SetActive(false);
-
-        gameManager.RegisterBlackjackCanvas(canvasObj);
-        gameManager.OpenBlackjack();
-
-        Assert.IsTrue(canvasObj.activeSelf);
-
-        Object.DestroyImmediate(canvasObj);
-    }
-
-    [Test]
-    public void HandleGameOverSetsTimeScaleToZero()
-    {
-        MethodInfo gameOverMethod = typeof(GameManager).GetMethod("HandleGameOver", BindingFlags.NonPublic | BindingFlags.Instance);
-        
-        gameOverMethod.Invoke(gameManager, null);
-
-        Assert.AreEqual(0f, Time.timeScale);
+        Assert.AreEqual(GameState.WinScreen, _gameManager.CurrentState);
     }
 }

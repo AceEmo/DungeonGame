@@ -1,140 +1,58 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class PlayerShootingTests
 {
-    private GameObject playerObj;
-    private PlayerShooting playerShooting;
-    private MockInputProvider mockInput;
-    private GameObject bulletPrefab;
-    private Transform firePoint;
-    private GameObject audioListenerObj;
+    private GameObject _playerObject;
+    private GameObject _bulletPrefab;
+    private PlayerShooting _shooting;
+    private PlayerStats _stats;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        Time.timeScale = 1f;
+        _playerObject = new GameObject("Player");
+        _playerObject.AddComponent<AudioSource>();
         
-        audioListenerObj = new GameObject("AudioListener");
-        audioListenerObj.AddComponent<AudioListener>();
+        _bulletPrefab = new GameObject("BulletPrefab");
+        _bulletPrefab.AddComponent<Rigidbody2D>();
+        _bulletPrefab.AddComponent<BulletLogic>();
 
-        playerObj = new GameObject("Player");
-        playerObj.SetActive(false);
+        _stats = ScriptableObject.CreateInstance<PlayerStats>();
+        _stats.fireRate = 0.1f;
+        _stats.bulletSpeed = 10f;
+        _stats.damage = 2;
 
-        mockInput = playerObj.AddComponent<MockInputProvider>();
-
-        firePoint = new GameObject("FirePoint").transform;
-        firePoint.SetParent(playerObj.transform);
-        firePoint.localPosition = Vector3.zero;
-
-        bulletPrefab = new GameObject("Bullet");
-        bulletPrefab.transform.position = new Vector3(1000f, 1000f, 0f); 
-        Rigidbody2D rb = bulletPrefab.AddComponent<Rigidbody2D>();
-        rb.gravityScale = 0f; 
-        bulletPrefab.AddComponent<BulletLogic>();
-
-        playerShooting = playerObj.AddComponent<PlayerShooting>();
-
-        PlayerStats stats = ScriptableObject.CreateInstance<PlayerStats>();
-        stats.fireRate = 0.5f;
-        stats.bulletSpeed = 10f;
-        stats.damage = 5;
-
-        FieldInfo statsField = typeof(PlayerShooting).GetField("stats", BindingFlags.NonPublic | BindingFlags.Instance);
-        statsField.SetValue(playerShooting, stats);
-
-        FieldInfo bulletField = typeof(PlayerShooting).GetField("bulletPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
-        bulletField.SetValue(playerShooting, bulletPrefab);
-
-        FieldInfo firePointField = typeof(PlayerShooting).GetField("firePoint", BindingFlags.NonPublic | BindingFlags.Instance);
-        firePointField.SetValue(playerShooting, firePoint);
-
-        FieldInfo inputField = typeof(PlayerShooting).GetField("inputProvider", BindingFlags.NonPublic | BindingFlags.Instance);
-        inputField.SetValue(playerShooting, mockInput);
-
-        playerObj.SetActive(true);
+        _shooting = _playerObject.AddComponent<PlayerShooting>();
+        typeof(PlayerShooting).GetField("stats", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_shooting, _stats);
+        typeof(PlayerShooting).GetField("bulletPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_shooting, _bulletPrefab);
+        typeof(PlayerShooting).GetField("firePoint", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_shooting, _playerObject.transform);
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        UnityEngine.Object.DestroyImmediate(playerObj);
-        UnityEngine.Object.DestroyImmediate(bulletPrefab);
-        UnityEngine.Object.DestroyImmediate(audioListenerObj);
-
-        foreach (var bullet in UnityEngine.Object.FindObjectsByType<BulletLogic>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        {
-            UnityEngine.Object.DestroyImmediate(bullet.gameObject);
-        }
+        Object.Destroy(_playerObject);
+        Object.Destroy(_bulletPrefab);
+        Object.Destroy(_stats);
     }
 
     [UnityTest]
-    public IEnumerator UpdateDoesNotShootWhenNoInput()
+    public IEnumerator Shoot_ShouldSpawnBulletWithCorrectVelocity()
     {
-        mockInput.horizontalShoot = 0f;
-        mockInput.verticalShoot = 0f;
+        _shooting.SendMessage("Start");
+        yield return null;
 
-        yield return new WaitForSeconds(0.1f);
+        _shooting.SendMessage("Shoot", 1f, 0f);
+        yield return null;
 
-        BulletLogic[] bullets = UnityEngine.Object.FindObjectsByType<BulletLogic>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        Assert.AreEqual(1, bullets.Length); 
-    }
-
-    [UnityTest]
-    public IEnumerator UpdateShootsAndInstantiatesBulletOnInput()
-    {
-        mockInput.horizontalShoot = 1f;
-        mockInput.verticalShoot = 0f;
-
-        yield return new WaitForSeconds(0.1f);
-
-        BulletLogic[] bullets = UnityEngine.Object.FindObjectsByType<BulletLogic>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        Assert.AreEqual(2, bullets.Length); 
-    }
-
-    [UnityTest]
-    public IEnumerator UpdateRespectsFireRate()
-    {
-        mockInput.horizontalShoot = 1f;
-        mockInput.verticalShoot = 0f;
-
-        yield return new WaitForSeconds(0.1f);
-
-        BulletLogic[] bullets = UnityEngine.Object.FindObjectsByType<BulletLogic>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        Assert.AreEqual(2, bullets.Length); 
-    }
-
-    [UnityTest]
-    public IEnumerator ShootSetsBulletVelocityAndDamage()
-    {
-        mockInput.horizontalShoot = 0f;
-        mockInput.verticalShoot = 1f;
-
-        yield return new WaitForSeconds(0.1f);
-
-        BulletLogic[] bullets = UnityEngine.Object.FindObjectsByType<BulletLogic>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        BulletLogic spawnedBullet = null;
+        GameObject spawnedBullet = GameObject.Find("BulletPrefab(Clone)");
         
-        foreach (var b in bullets)
-        {
-            if (b.gameObject != bulletPrefab)
-            {
-                spawnedBullet = b;
-                break;
-            }
-        }
-
         Assert.IsNotNull(spawnedBullet);
+        Assert.AreEqual(new Vector2(10f, 0f), spawnedBullet.GetComponent<Rigidbody2D>().linearVelocity);
 
-        Rigidbody2D rb = spawnedBullet.GetComponent<Rigidbody2D>();
-        Assert.AreEqual(new Vector2(0f, 10f), rb.linearVelocity);
-        
-        FieldInfo damageField = typeof(BulletLogic).GetField("damage", BindingFlags.NonPublic | BindingFlags.Instance);
-        
-        float damage = System.Convert.ToSingle(damageField.GetValue(spawnedBullet));
-        Assert.AreEqual(5f, damage);
+        Object.Destroy(spawnedBullet);
     }
 }

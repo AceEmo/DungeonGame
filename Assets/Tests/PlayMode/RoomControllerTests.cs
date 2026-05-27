@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -7,105 +6,109 @@ using Unity.Cinemachine;
 
 public class RoomControllerTests
 {
-    private GameObject roomObject;
-    private RoomController roomController;
-    private GameObject cameraObject;
-    private CinemachineCamera cinemachineCamera;
-    private GameObject playerObject;
-    private BoxCollider2D playerCollider;
+    private GameObject _roomObject;
+    private GameObject _cameraObject;
+    private GameObject _playerObject;
+    private RoomController _roomController;
+    private CinemachineCamera _cinemachineCamera;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        Time.timeScale = 1f;
-        
-        playerObject = new GameObject("PlayerTest");
-        playerObject.SetActive(false);
-        playerObject.tag = "Player";
-        playerCollider = playerObject.AddComponent<BoxCollider2D>();
+        _roomObject = new GameObject("Room");
+        _roomObject.AddComponent<BoxCollider2D>();
 
-        cameraObject = new GameObject("RoomCamera");
-        cameraObject.SetActive(false);
-        cinemachineCamera = cameraObject.AddComponent<CinemachineCamera>();
+        _cameraObject = new GameObject("CinemachineCamera");
+        _cinemachineCamera = _cameraObject.AddComponent<CinemachineCamera>();
 
-        roomObject = new GameObject("Room");
-        roomObject.SetActive(false);
-        roomController = roomObject.AddComponent<RoomController>();
-        
-        roomController.roomCamera = cinemachineCamera;
+        _playerObject = new GameObject("Player");
+        _playerObject.tag = "Player";
+        _playerObject.AddComponent<BoxCollider2D>();
 
-        playerObject.SetActive(true);
-        cameraObject.SetActive(true);
-        roomObject.SetActive(true);
+        _roomController = _roomObject.AddComponent<RoomController>();
+        _roomController.roomCamera = _cinemachineCamera;
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        Object.DestroyImmediate(playerObject);
-        Object.DestroyImmediate(roomObject);
-        Object.DestroyImmediate(cameraObject);
-        
-        foreach (var boss in Object.FindObjectsByType<Boss>(FindObjectsSortMode.None))
-        {
-            Object.DestroyImmediate(boss.gameObject);
-        }
+        Object.Destroy(_roomObject);
+        Object.Destroy(_cameraObject);
+        Object.Destroy(_playerObject);
     }
 
     [UnityTest]
-    public IEnumerator StartSetsPriorityToZero()
+    public IEnumerator Start_ShouldSetCameraPriorityToZero()
     {
-        cinemachineCamera.Priority = 10;
-        roomController.isBossRoom = false;
-
-        MethodInfo startMethod = typeof(RoomController).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance);
-        startMethod.Invoke(roomController, null);
-
-        Assert.AreEqual(0, cinemachineCamera.Priority.Value);
+        _roomController.isBossRoom = false;
 
         yield return null;
+
+        Assert.AreEqual(0, _cinemachineCamera.Priority);
     }
 
     [UnityTest]
-    public IEnumerator OnTriggerEnter2DWithPlayerSetsPriorityToTen()
+    public IEnumerator Start_WhenIsBossRoom_ShouldSetupBossCameraTargets()
     {
-        MethodInfo onTriggerEnterMethod = typeof(RoomController).GetMethod("OnTriggerEnter2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        
-        onTriggerEnterMethod.Invoke(roomController, new object[] { playerCollider });
-
-        Assert.AreEqual(10, cinemachineCamera.Priority.Value);
+        _roomController.isBossRoom = true;
 
         yield return null;
+
+        Assert.AreEqual(_playerObject.transform, _cinemachineCamera.Follow);
+        Assert.AreEqual(_playerObject.transform, _cinemachineCamera.LookAt);
     }
 
     [UnityTest]
-    public IEnumerator OnTriggerExit2DWithPlayerSetsPriorityToZero()
+    public IEnumerator Start_WhenIsBossRoom_ShouldConfigureConfinerBoundingShape()
     {
-        cinemachineCamera.Priority = 10;
-        MethodInfo onTriggerExitMethod = typeof(RoomController).GetMethod("OnTriggerExit2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        
-        onTriggerExitMethod.Invoke(roomController, new object[] { playerCollider });
-
-        Assert.AreEqual(0, cinemachineCamera.Priority.Value);
+        _roomController.isBossRoom = true;
+        var confiner = _cameraObject.AddComponent<CinemachineConfiner2D>();
+        var boxCollider = _roomObject.GetComponent<BoxCollider2D>();
 
         yield return null;
+
+        Assert.AreEqual(boxCollider, confiner.BoundingShape2D);
     }
 
     [UnityTest]
-    public IEnumerator StartWithBossRoomSetsBossCameraProperties()
+    public IEnumerator OnTriggerEnter2D_WhenPlayerEnters_ShouldRaiseCameraPriority()
     {
-        roomController.isBossRoom = true;
-        BoxCollider2D roomCollider = roomObject.AddComponent<BoxCollider2D>();
-        
-        CinemachineConfiner2D confiner = cameraObject.AddComponent<CinemachineConfiner2D>();
-
-        MethodInfo startMethod = typeof(RoomController).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance);
-        startMethod.Invoke(roomController, null);
-
-        Assert.AreEqual(playerObject.transform, cinemachineCamera.Follow);
-        Assert.AreEqual(playerObject.transform, cinemachineCamera.LookAt);
-        Assert.AreEqual(roomCollider, confiner.BoundingShape2D);
-
+        _roomController.isBossRoom = false;
         yield return null;
+
+        var playerCollider = _playerObject.GetComponent<BoxCollider2D>();
+        _roomController.SendMessage("OnTriggerEnter2D", playerCollider);
+
+        Assert.AreEqual(10, _cinemachineCamera.Priority);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerExit2D_WhenPlayerExits_ShouldLowerCameraPriority()
+    {
+        _roomController.isBossRoom = false;
+        yield return null;
+
+        var playerCollider = _playerObject.GetComponent<BoxCollider2D>();
+        _roomController.SendMessage("OnTriggerEnter2D", playerCollider);
+        _roomController.SendMessage("OnTriggerExit2D", playerCollider);
+
+        Assert.AreEqual(0, _cinemachineCamera.Priority);
+    }
+
+    [UnityTest]
+    public IEnumerator OnTriggerEnter2D_WhenNonPlayerEnters_ShouldNotChangePriority()
+    {
+        _roomController.isBossRoom = false;
+        yield return null;
+
+        GameObject nonPlayer = new GameObject("Enemy");
+        nonPlayer.tag = "Untagged";
+        var enemyCollider = nonPlayer.AddComponent<BoxCollider2D>();
+
+        _roomController.SendMessage("OnTriggerEnter2D", enemyCollider);
+
+        Assert.AreEqual(0, _cinemachineCamera.Priority);
+
+        Object.Destroy(nonPlayer);
     }
 }

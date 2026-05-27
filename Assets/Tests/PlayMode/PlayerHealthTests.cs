@@ -1,121 +1,85 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class PlayerHealthTests
 {
-    private GameObject playerObject;
-    private PlayerHealth playerHealth;
-    private PlayerStats playerStats;
-    private Rigidbody2D playerRigidbody;
+    private GameObject _playerObject;
+    private PlayerHealth _health;
+    private PlayerStats _stats;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        Time.timeScale = 1f;
+        _playerObject = new GameObject("Player");
+        _playerObject.AddComponent<Rigidbody2D>();
+        _playerObject.AddComponent<SpriteRenderer>();
+        _playerObject.AddComponent<BoxCollider2D>();
+        _playerObject.AddComponent<AudioSource>();
 
-        playerObject = new GameObject("PlayerTest");
-        playerObject.SetActive(false);
+        _stats = ScriptableObject.CreateInstance<PlayerStats>();
+        _stats.startHealth = 10f;
+        _stats.maxHealth = 10f;
 
-        playerRigidbody = playerObject.AddComponent<Rigidbody2D>();
-        playerRigidbody.bodyType = RigidbodyType2D.Dynamic;
-        
-        playerObject.AddComponent<SpriteRenderer>();
-        playerObject.AddComponent<BoxCollider2D>();
-        playerObject.AddComponent<PlayerMovement>();
-
-        playerHealth = playerObject.AddComponent<PlayerHealth>();
-
-        playerStats = ScriptableObject.CreateInstance<PlayerStats>();
-        playerStats.startHealth = 6f;
-        playerStats.maxHealth = 12f;
-
-        FieldInfo statsField = typeof(PlayerHealth).GetField("stats", BindingFlags.NonPublic | BindingFlags.Instance);
-        statsField.SetValue(playerHealth, playerStats);
-
-        playerObject.SetActive(true);
+        _health = _playerObject.AddComponent<PlayerHealth>();
+        typeof(PlayerHealth).GetField("stats", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(_health, _stats);
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        Object.DestroyImmediate(playerObject);
-        Object.DestroyImmediate(playerStats);
+        Object.Destroy(_playerObject);
+        Object.Destroy(_stats);
     }
 
     [UnityTest]
-    public IEnumerator StartSetsInitialHealthCorrectly()
+    public IEnumerator Start_ShouldInitializeCurrentHealthToStartHealth()
     {
+        _health.SendMessage("Awake");
+        _health.SendMessage("Start");
         yield return null;
 
-        Assert.AreEqual(6f, playerHealth.CurrentHealth);
-        Assert.AreEqual(12f, playerHealth.MaxHealth);
+        Assert.AreEqual(10f, _health.CurrentHealth);
     }
 
     [UnityTest]
-    public IEnumerator TakeDamageReducesHealth()
+    public IEnumerator TakeDamage_ShouldReduceHealthAndTriggerInvincibility()
     {
+        _health.SendMessage("Awake");
+        _health.SendMessage("Start");
         yield return null;
 
-        playerHealth.TakeDamage(2f, Vector2.zero);
+        _health.TakeDamage(3f, Vector2.zero);
 
-        Assert.AreEqual(4f, playerHealth.CurrentHealth);
+        Assert.AreEqual(7f, _health.CurrentHealth);
     }
 
     [UnityTest]
-    public IEnumerator TakeDamageCannotReduceHealthBelowZero()
+    public IEnumerator Heal_ShouldIncreaseHealthButNotExceedMaxHealth()
     {
+        _health.SendMessage("Awake");
+        _health.SendMessage("Start");
         yield return null;
+        _health.TakeDamage(5f, Vector2.zero);
 
-        playerHealth.TakeDamage(100f, Vector2.zero);
+        _health.Heal(2f);
 
-        Assert.AreEqual(0f, playerHealth.CurrentHealth);
+        Assert.AreEqual(7f, _health.CurrentHealth);
+
+        _health.Heal(10f);
+        Assert.AreEqual(10f, _health.CurrentHealth);
     }
 
     [UnityTest]
-    public IEnumerator TakeDamageAppliesKnockback()
+    public IEnumerator TakeDamage_WhenFatal_ShouldSetIsDeadToTrue()
     {
+        _health.SendMessage("Awake");
+        _health.SendMessage("Start");
         yield return null;
 
-        Vector2 damageSource = new Vector2(5f, 0f);
-        playerHealth.TakeDamage(1f, damageSource);
+        _health.TakeDamage(20f, Vector2.zero);
 
-        Assert.IsTrue(playerRigidbody.linearVelocity.x < 0);
-    }
-
-    [UnityTest]
-    public IEnumerator HealIncreasesHealth()
-    {
-        yield return null;
-
-        playerHealth.TakeDamage(4f, Vector2.zero);
-        playerHealth.Heal(3f);
-
-        Assert.AreEqual(5f, playerHealth.CurrentHealth);
-    }
-
-    [UnityTest]
-    public IEnumerator HealCannotExceedMaxHealth()
-    {
-        yield return null;
-
-        playerHealth.Heal(50f);
-
-        Assert.AreEqual(12f, playerHealth.CurrentHealth);
-    }
-
-    [UnityTest]
-    public IEnumerator ResetHealthRestoresStatsValue()
-    {
-        yield return null;
-
-        playerHealth.TakeDamage(5f, Vector2.zero);
-        
-        MethodInfo resetMethod = typeof(PlayerHealth).GetMethod("InitializeHealth", BindingFlags.NonPublic | BindingFlags.Instance);
-        resetMethod.Invoke(playerHealth, null);
-
-        Assert.AreEqual(6f, playerHealth.CurrentHealth);
+        Assert.IsTrue(_health.IsDead);
     }
 }

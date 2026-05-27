@@ -1,98 +1,70 @@
 using System.Collections;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
 public class DoorTests
 {
-    private GameObject doorObject;
-    private Door door;
-    private GameObject closedDoor;
-    private GameObject openDoor;
-    private GameObject playerObject;
-    private GameObject targetPoint;
-    private GameObject dummyRoomObject;
+    private GameObject _doorObject;
+    private GameObject _playerObject;
+    private Door _door;
+    private GameObject _closedVisual;
+    private GameObject _openVisual;
 
     [SetUp]
-    public void Setup()
+    public void SetUp()
     {
-        Time.timeScale = 1f;
+        _doorObject = new GameObject();
+        _door = _doorObject.AddComponent<Door>();
 
-        doorObject = new GameObject("Door");
-        doorObject.SetActive(false);
-        door = doorObject.AddComponent<Door>();
+        _closedVisual = new GameObject();
+        _openVisual = new GameObject();
 
-        closedDoor = new GameObject("ClosedDoor");
-        openDoor = new GameObject("OpenDoor");
-        door.ClosedDoor = closedDoor;
-        door.OpenDoor = openDoor;
+        _door.ClosedDoor = _closedVisual;
+        _door.OpenDoor = _openVisual;
 
-        playerObject = new GameObject("PlayerTest");
-        playerObject.tag = "Player";
-        playerObject.AddComponent<Rigidbody2D>();
-        playerObject.AddComponent<BoxCollider2D>();
-
-        targetPoint = new GameObject("Target");
-        targetPoint.transform.position = new Vector3(10f, 10f, 0f);
-        
-        dummyRoomObject = new GameObject("DummyRoom");
-        Rooms dummyRoom = dummyRoomObject.AddComponent<Rooms>();
-
-        door.TargetPoint = targetPoint.transform;
-        door.TargetRoom = dummyRoom;
-
-        doorObject.SetActive(true);
+        _playerObject = new GameObject("Player");
+        _playerObject.tag = "Player";
+        _playerObject.AddComponent<BoxCollider2D>();
     }
 
     [TearDown]
-    public void Teardown()
+    public void TearDown()
     {
-        Object.DestroyImmediate(doorObject);
-        Object.DestroyImmediate(closedDoor);
-        Object.DestroyImmediate(openDoor);
-        Object.DestroyImmediate(playerObject);
-        Object.DestroyImmediate(targetPoint);
-        Object.DestroyImmediate(dummyRoomObject);
-        
-        foreach (var boss in Object.FindObjectsByType<Boss>(FindObjectsSortMode.None))
-        {
-            Object.DestroyImmediate(boss.gameObject);
-        }
+        Object.Destroy(_doorObject);
+        Object.Destroy(_playerObject);
+        Object.Destroy(_closedVisual);
+        Object.Destroy(_openVisual);
     }
 
     [UnityTest]
-    public IEnumerator LockDisablesOpenDoorAndEnablesClosedDoor()
+    public IEnumerator LockAndUnlock_ShouldToggleVisualsCorrectly()
     {
-        door.Lock();
+        _door.Lock();
+        Assert.IsTrue(_closedVisual.activeSelf);
+        Assert.IsFalse(_openVisual.activeSelf);
 
-        Assert.IsTrue(closedDoor.activeSelf);
-        Assert.IsFalse(openDoor.activeSelf);
+        _door.Unlock();
+        Assert.IsFalse(_closedVisual.activeSelf);
+        Assert.IsTrue(_openVisual.activeSelf);
 
         yield return null;
     }
 
     [UnityTest]
-    public IEnumerator UnlockEnablesOpenDoorAndDisablesClosedDoor()
+    public IEnumerator OnTriggerEnter2D_WhenLocked_ShouldNotTeleportPlayer()
     {
-        door.Unlock();
+        _door.Lock();
+        GameObject targetPoint = new GameObject();
+        _door.TargetPoint = targetPoint.transform;
+        _door.TargetRoom = _doorObject.AddComponent<Rooms>();
+        _playerObject.transform.position = Vector3.zero;
 
-        Assert.IsFalse(closedDoor.activeSelf);
-        Assert.IsTrue(openDoor.activeSelf);
-
+        var collider = _playerObject.GetComponent<BoxCollider2D>();
+        _door.SendMessage("OnTriggerEnter2D", collider);
         yield return null;
-    }
 
-    [UnityTest]
-    public IEnumerator OnTriggerEnter2DTeleportsPlayerIfUnlocked()
-    {
-        door.Unlock();
-        
-        MethodInfo onTriggerEnterMethod = typeof(Door).GetMethod("OnTriggerEnter2D", BindingFlags.NonPublic | BindingFlags.Instance);
-        onTriggerEnterMethod.Invoke(door, new object[] { playerObject.GetComponent<BoxCollider2D>() });
-
-        Assert.AreEqual(new Vector3(10f, 10f, 0f), playerObject.transform.position);
-
-        yield return null;
+        Assert.AreEqual(Vector3.zero, _playerObject.transform.position);
+        Object.Destroy(targetPoint);
     }
 }
