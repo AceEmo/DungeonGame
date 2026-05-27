@@ -8,11 +8,13 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 movement;
     private Vector2 lookDirection = new Vector2(0, -1);
+
     private IInputProvider inputProvider;
 
     private void Awake()
     {
         inputProvider = GetComponent<IInputProvider>();
+
         if (inputProvider == null)
         {
             inputProvider = gameObject.AddComponent<StandardInputProvider>();
@@ -21,9 +23,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (!GameManager.Instance.IsGameplayActive())
+        if (!CanMove())
         {
-            ResetMovementAndAnimations();
+            StopMovementImmediately();
             return;
         }
 
@@ -34,18 +36,27 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!GameManager.Instance.IsGameplayActive()) 
+        if (!CanMove())
         {
+            StopPhysicsMovement();
             return;
         }
 
         MovePlayer();
     }
 
+    private bool CanMove()
+    {
+        return GameManager.Instance != null &&
+               GameManager.Instance.IsGameplayActive();
+    }
+
     private void GatherInput()
     {
         movement.x = inputProvider.GetAxisRaw("Horizontal");
         movement.y = inputProvider.GetAxisRaw("Vertical");
+
+        movement = Vector2.ClampMagnitude(movement, 1f);
     }
 
     private void UpdateLookDirection()
@@ -55,13 +66,13 @@ public class PlayerMovement : MonoBehaviour
             inputProvider.GetAxisRaw("VerticalArrows")
         );
 
-        if (shootingInput.sqrMagnitude > 0)
+        if (shootingInput.sqrMagnitude > 0.01f)
         {
-            lookDirection = shootingInput;
+            lookDirection = shootingInput.normalized;
         }
-        else if (movement.sqrMagnitude > 0)
+        else if (movement.sqrMagnitude > 0.01f)
         {
-            lookDirection = movement;
+            lookDirection = movement.normalized;
         }
     }
 
@@ -79,20 +90,44 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        if (rigidBody != null && stats != null)
+        if (rigidBody == null || stats == null)
         {
-            Vector2 targetPosition = rigidBody.position + movement.normalized * stats.moveSpeed * Time.fixedDeltaTime;
-            rigidBody.MovePosition(targetPosition);
+            return;
         }
+
+        Vector2 targetPosition =
+            rigidBody.position +
+            movement * stats.moveSpeed * Time.fixedDeltaTime;
+
+        rigidBody.MovePosition(targetPosition);
     }
 
-    private void ResetMovementAndAnimations()
+    private void StopMovementImmediately()
     {
         movement = Vector2.zero;
-        
-        if (animator != null && animator.runtimeAnimatorController != null)
+
+        StopPhysicsMovement();
+        UpdateIdleAnimation();
+    }
+
+    private void StopPhysicsMovement()
+    {
+        if (rigidBody == null)
         {
-            animator.SetFloat("Speed", 0f);
+            return;
         }
+
+        rigidBody.linearVelocity = Vector2.zero;
+        rigidBody.angularVelocity = 0f;
+    }
+
+    private void UpdateIdleAnimation()
+    {
+        if (animator == null || animator.runtimeAnimatorController == null)
+        {
+            return;
+        }
+
+        animator.SetFloat("Speed", 0f);
     }
 }

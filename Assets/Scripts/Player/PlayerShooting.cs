@@ -26,7 +26,12 @@ public class PlayerShooting : MonoBehaviour
 
     private void Update()
     {
-        if (IsMissingRequiredComponents()) 
+        if (!CanShootGameplay())
+        {
+            return;
+        }
+
+        if (IsMissingRequiredComponents())
         {
             return;
         }
@@ -39,6 +44,12 @@ public class PlayerShooting : MonoBehaviour
             Shoot(horizontalInput, verticalInput);
             nextFireTime = Time.time + stats.fireRate;
         }
+    }
+
+    private bool CanShootGameplay()
+    {
+        return GameManager.Instance != null &&
+            GameManager.Instance.IsGameplayActive();
     }
 
     private void InitializeComponents()
@@ -63,8 +74,15 @@ public class PlayerShooting : MonoBehaviour
 
     private bool CanShoot(float horizontal, float vertical)
     {
+        if (!CanShootGameplay())
+        {
+            return false;
+        }
+
         bool hasShootingInput = horizontal != 0 || vertical != 0;
-        return hasShootingInput && Time.time > nextFireTime;
+
+        return hasShootingInput &&
+            Time.time > nextFireTime;
     }
 
     private void Shoot(float horizontal, float vertical)
