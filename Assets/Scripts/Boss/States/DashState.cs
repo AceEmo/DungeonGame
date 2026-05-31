@@ -41,3 +41,4 @@ public class DashState : IBossState
         context.Movement.Stop();
     }
 }
+

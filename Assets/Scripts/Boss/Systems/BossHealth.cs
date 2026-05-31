@@ -28,3 +28,4 @@ public class BossHealth
         return (float)currentHealth / MaxHealth;
     }
 }
+

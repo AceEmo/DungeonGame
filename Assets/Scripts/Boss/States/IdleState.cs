@@ -16,3 +16,4 @@ public class IdleState : IBossState
 
     public void ExitState(BossContext context) { }
 }
+

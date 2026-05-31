@@ -4,3 +4,4 @@ public interface IBossState
     void UpdateState(BossContext context);
     void ExitState(BossContext context);
 }
+

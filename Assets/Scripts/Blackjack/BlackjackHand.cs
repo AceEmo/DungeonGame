@@ -56,3 +56,4 @@ public class BlackjackHand
     public int CardCount => cards.Count;
     public List<Card> Cards => cards;
 }
+
