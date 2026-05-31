@@ -21,3 +21,4 @@ public class DeathState : IBossState
     public void UpdateState(BossContext context) {}
     public void ExitState(BossContext context) {}
 }
+

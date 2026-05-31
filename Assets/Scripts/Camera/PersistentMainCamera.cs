@@ -18,3 +18,4 @@ public class PersistentMainCamera : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 }
+
