@@ -8,37 +8,11 @@ public class GameOverPanel : MonoBehaviour
 
     private void Start()
     {
-        if (restartButton != null)
-        {
-            restartButton.onClick.AddListener(OnRestartClicked);
-        }
-
-        if (exitButton != null)
-        {
-            exitButton.onClick.AddListener(OnExitClicked);
-        }
+        GameFlowButtons.Bind(restartButton, exitButton);
     }
 
-    private void OnRestartClicked()
-    {
-        GameManager.Instance.RestartGame(); 
-    }
-
-    private void OnExitClicked()
-    {
-        GameManager.Instance.ExitGame();
-    }
-    
     private void OnDestroy()
     {
-        if (restartButton != null)
-        {
-            restartButton.onClick.RemoveListener(OnRestartClicked);
-        }
-
-        if (exitButton != null)
-        {
-            exitButton.onClick.RemoveListener(OnExitClicked);
-        }
+        GameFlowButtons.Unbind(restartButton, exitButton);
     }
 }

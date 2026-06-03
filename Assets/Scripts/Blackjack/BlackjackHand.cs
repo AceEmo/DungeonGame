@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class BlackjackHand
 {
-    private List<Card> cards = new List<Card>();
+    private readonly List<Card> cards = new List<Card>();
 
     public void Clear()
     {
@@ -54,5 +54,5 @@ public class BlackjackHand
     }
 
     public int CardCount => cards.Count;
-    public List<Card> Cards => cards;
+    public IReadOnlyList<Card> Cards => cards;
 }

@@ -19,10 +19,10 @@ public class LevelProgressionManager
 
         if (currentLevel > MaxLevels)
         {
-            SceneManager.LoadScene("WinScreen");
+            SceneManager.LoadScene(SceneNames.WinScreen);
             return;
         }
 
-        SceneManager.LoadScene("Level" + currentLevel);
+        SceneManager.LoadScene(SceneNames.GetLevelName(currentLevel));
     }
 }

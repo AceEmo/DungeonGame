@@ -8,7 +8,7 @@ public class MinimapController : MonoBehaviour
 {
     [Header("Configuration")]
     [SerializeField] private float worldRoomSize = 30f;
-    [SerializeField] private string hubSceneName = "HubRoom";
+    [SerializeField] private string hubSceneName = SceneNames.HubRoom;
 
     private readonly MinimapData mapData = new MinimapData();
     private readonly Vector2Int invalidGridPosition = new Vector2Int(-999, -999);

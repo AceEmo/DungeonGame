@@ -13,12 +13,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        inputProvider = GetComponent<IInputProvider>();
-
-        if (inputProvider == null)
-        {
-            inputProvider = gameObject.AddComponent<StandardInputProvider>();
-        }
+        inputProvider = InputProviderBootstrap.EnsureInputProvider(gameObject);
     }
 
     private void Update()

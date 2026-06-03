@@ -16,17 +16,13 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Slider levelsSlider;
     [SerializeField] private Slider difficultySlider;
 
-    private GameSettings temporarySettings;
+    private GameSettingsUIController settingsController;
 
     private void Start()
     {
-        temporarySettings = new GameSettings(GameManager.Instance.Settings);
-
-        ConfigureSliders();
-        ApplySlidersFromSettings();
-        UpdateUI();
-        
-        RegisterSliderListeners();
+        settingsController = new GameSettingsUIController(
+            levelsSlider, difficultySlider, levelsValueLabel, difficultyValueLabel);
+        settingsController.Initialize();
     }
 
     public void StartGame()
@@ -43,11 +39,7 @@ public class MainMenuUI : MonoBehaviour
     {
         mainMenuPanel.SetActive(false);
         settingsPanel.SetActive(true);
-
-        temporarySettings = new GameSettings(GameManager.Instance.Settings);
-
-        ApplySlidersFromSettings();
-        UpdateUI();
+        settingsController.ReloadFromGameManager();
     }
 
     public void CloseSettings()
@@ -58,65 +50,12 @@ public class MainMenuUI : MonoBehaviour
 
     public void SaveSettings()
     {
-        GameManager.Instance.Settings.MaxLevels = temporarySettings.MaxLevels;
-        GameManager.Instance.Settings.Difficulty = temporarySettings.Difficulty;
-
-        GameManager.Instance.Settings.SaveToPrefs();
-        GameManager.Instance.ApplySettingsFromUI();
-
+        settingsController.SaveToGameManager();
         CloseSettings();
-    }
-
-    private void ConfigureSliders()
-    {
-        levelsSlider.wholeNumbers = true;
-        levelsSlider.minValue = GameSettings.MinLevelsLimit;
-        levelsSlider.maxValue = GameSettings.MaxLevelsLimit;
-
-        difficultySlider.wholeNumbers = true;
-        difficultySlider.minValue = 0;
-        difficultySlider.maxValue = (int)GameDifficulty.Hard;
-    }
-
-    private void ApplySlidersFromSettings()
-    {
-        levelsSlider.SetValueWithoutNotify(temporarySettings.MaxLevels);
-        difficultySlider.SetValueWithoutNotify((int)temporarySettings.Difficulty);
-    }
-
-    private void RegisterSliderListeners()
-    {
-        levelsSlider.onValueChanged.AddListener(UpdateMaxLevelsFromSlider);
-        difficultySlider.onValueChanged.AddListener(UpdateDifficultyFromSlider);
-    }
-
-    private void UpdateMaxLevelsFromSlider(float value)
-    {
-        temporarySettings.MaxLevels = Mathf.RoundToInt(value);
-        UpdateUI();
-    }
-
-    private void UpdateDifficultyFromSlider(float value)
-    {
-        temporarySettings.Difficulty = (GameDifficulty)Mathf.RoundToInt(value);
-        UpdateUI();
-    }
-
-    private void UpdateUI()
-    {
-        if (levelsValueLabel != null)
-            levelsValueLabel.text = $"Levels: {temporarySettings.MaxLevels}";
-
-        if (difficultyValueLabel != null)
-            difficultyValueLabel.text = $"Difficulty: {temporarySettings.Difficulty}";
     }
 
     private void OnDestroy()
     {
-        if (levelsSlider != null)
-            levelsSlider.onValueChanged.RemoveListener(UpdateMaxLevelsFromSlider);
-
-        if (difficultySlider != null)
-            difficultySlider.onValueChanged.RemoveListener(UpdateDifficultyFromSlider);
+        settingsController?.UnregisterListeners();
     }
 }

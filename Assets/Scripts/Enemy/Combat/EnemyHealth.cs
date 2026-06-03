@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(Enemy))]
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
     public event System.Action<EnemyHealth> OnEnemyDied;
@@ -9,56 +10,73 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     public Animator Animator;
 
-    private int CurrentHealth;
-    private Color HitColor;
-    private bool IsDead = false;
-    private SpriteRenderer Sr;
-    private Collider2D[] Colliders;
+    private int currentHealth;
+    private Color hitColor;
+    private bool isDead;
+    private SpriteRenderer spriteRenderer;
+    private Collider2D[] colliders;
+    private Coroutine hitFlashCoroutine;
 
-    private Color OriginalColor;
+    private Color originalColor;
 
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
-        Sr = GetComponent<SpriteRenderer>();
-        Colliders = GetComponents<Collider2D>();
-        if (Sr != null) OriginalColor = Sr.color;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        colliders = GetComponents<Collider2D>();
+        if (spriteRenderer != null) originalColor = spriteRenderer.color;
     }
 
     private void Start()
     {
-        CurrentHealth = enemy.CurrentMaxHealth;
-        HitColor = enemy.Data.hitColor;
+        if (!ValidateRequiredComponents())
+        {
+            enabled = false;
+            return;
+        }
+
+        currentHealth = enemy.CurrentMaxHealth;
+        hitColor = enemy.Data.hitColor;
     }
 
     public void TakeDamage(int amount)
     {
-        if (IsDead) return;
-        CurrentHealth -= amount;
-        StopCoroutine("HitFlash");
-        StartCoroutine(HitFlash());
+        if (isDead) return;
+        currentHealth -= amount;
+
+        if (hitFlashCoroutine != null)
+        {
+            StopCoroutine(hitFlashCoroutine);
+        }
+
+        hitFlashCoroutine = StartCoroutine(HitFlash());
 
         if (Animator != null)
             Animator.SetTrigger("Hit");
 
-        if (CurrentHealth <= 0)
+        if (currentHealth <= 0)
             Die();
     }
 
     private IEnumerator HitFlash()
     {
-        if (Sr == null) yield break;
-        Sr.color = HitColor;
+        if (spriteRenderer == null) yield break;
+        spriteRenderer.color = hitColor;
         yield return new WaitForSeconds(0.1f);
-        Sr.color = OriginalColor;
+        spriteRenderer.color = originalColor;
+        hitFlashCoroutine = null;
     }
 
     private void Die()
     {
-        if (IsDead) return;
-        IsDead = true;
+        if (isDead) return;
+        isDead = true;
 
-        StopCoroutine("HitFlash");
+        if (hitFlashCoroutine != null)
+        {
+            StopCoroutine(hitFlashCoroutine);
+            hitFlashCoroutine = null;
+        }
 
         if (Animator != null)
         {
@@ -66,9 +84,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             Animator.SetTrigger("Die");
         }
 
-        if (Colliders != null)
+        if (colliders != null)
         {
-            foreach (Collider2D col in Colliders)
+            foreach (Collider2D col in colliders)
                 col.enabled = false;
         }
 
@@ -97,23 +115,22 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private IEnumerator FadeAndDestroy()
     {
-        float duration = 1.5f;
-        float t = 0f;
-        Color startColor = Sr != null ? Sr.color : Color.white;
-
-        while (t < duration)
-        {
-            t += Time.deltaTime;
-            if (Sr != null)
-            {
-                float alpha = Mathf.Lerp(1f, 0f, t / duration);
-                Sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-            }
-            yield return null;
-        }
-
-        Destroy(gameObject);
+        yield return SpriteFadeHelper.FadeSpriteRenderer(
+            spriteRenderer,
+            SpriteFadeHelper.DefaultFadeDuration,
+            () => Destroy(gameObject));
     }
 
-    public bool IsEnemyDead() => IsDead;
+    public bool IsEnemyDead() => isDead;
+
+    private bool ValidateRequiredComponents()
+    {
+        if (enemy != null && enemy.Data != null)
+        {
+            return true;
+        }
+
+        Debug.LogError($"{nameof(EnemyHealth)} on {name} requires {nameof(Enemy)} with assigned {nameof(EnemyData)}.", this);
+        return false;
+    }
 }

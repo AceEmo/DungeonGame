@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection; // Добавено за Reflection
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -42,21 +43,32 @@ public class BlackjackGameTests
 
     private void SetupMockUI(BlackjackUI ui)
     {
-        ui.playerCardArea = new GameObject("PlayerArea").transform;
-        ui.dealerCardArea = new GameObject("DealerArea").transform;
+        var playerArea = new GameObject("PlayerArea").transform;
+        var dealerArea = new GameObject("DealerArea").transform;
         
-        ui.cardPrefab = new GameObject("CardPrefab");
-        ui.cardPrefab.AddComponent<Image>();
+        var cardPrefab = new GameObject("CardPrefab");
+        cardPrefab.AddComponent<Image>();
 
-        ui.resultText = new GameObject("ResultText").AddComponent<TextMeshProUGUI>();
-        ui.playerScoreText = new GameObject("PlayerScore").AddComponent<TextMeshProUGUI>();
-        ui.dealerScoreText = new GameObject("DealerScore").AddComponent<TextMeshProUGUI>();
+        var resultText = new GameObject("ResultText").AddComponent<TextMeshProUGUI>();
+        var playerScoreText = new GameObject("PlayerScore").AddComponent<TextMeshProUGUI>();
+        var dealerScoreText = new GameObject("DealerScore").AddComponent<TextMeshProUGUI>();
 
-        ui.hitButton = new GameObject("HitBtn").AddComponent<Button>();
-        ui.standButton = new GameObject("StandBtn").AddComponent<Button>();
-        ui.exitButton = new GameObject("ExitBtn").AddComponent<Button>();
+        var hitButton = new GameObject("HitBtn").AddComponent<Button>();
+        var standButton = new GameObject("StandBtn").AddComponent<Button>();
+        var exitButton = new GameObject("ExitBtn").AddComponent<Button>();
         
-        ui.backCardSprite = CreateMockSprite("back");
+        var backCardSprite = CreateMockSprite("back");
+
+        SetPrivateField(ui, "playerCardArea", playerArea);
+        SetPrivateField(ui, "dealerCardArea", dealerArea);
+        SetPrivateField(ui, "cardPrefab", cardPrefab);
+        SetPrivateField(ui, "resultText", resultText);
+        SetPrivateField(ui, "playerScoreText", playerScoreText);
+        SetPrivateField(ui, "dealerScoreText", dealerScoreText);
+        SetPrivateField(ui, "hitButton", hitButton);
+        SetPrivateField(ui, "standButton", standButton);
+        SetPrivateField(ui, "exitButton", exitButton);
+        SetPrivateField(ui, "backCardSprite", backCardSprite);
     }
 
     private Sprite CreateMockSprite(string name)
@@ -73,9 +85,13 @@ public class BlackjackGameTests
 
         yield return new WaitForSeconds(1.5f);
 
-        Assert.AreEqual(" ", _ui.resultText.text);
-        Assert.AreEqual(1, _ui.playerCardArea.childCount);
-        Assert.AreEqual(1, _ui.dealerCardArea.childCount);
+        var resultText = GetPrivateField<TextMeshProUGUI>(_ui, "resultText");
+        var playerCardArea = GetPrivateField<Transform>(_ui, "playerCardArea");
+        var dealerCardArea = GetPrivateField<Transform>(_ui, "dealerCardArea");
+
+        Assert.AreEqual(" ", resultText.text);
+        Assert.AreEqual(1, playerCardArea.childCount);
+        Assert.AreEqual(1, dealerCardArea.childCount);
     }
 
     [UnityTest]
@@ -84,11 +100,27 @@ public class BlackjackGameTests
         _blackjackGame.StartBlackjack();
         yield return new WaitForSeconds(1.5f);
 
-        int initialCardCount = _ui.playerCardArea.childCount;
+        var playerCardArea = GetPrivateField<Transform>(_ui, "playerCardArea");
+        int initialCardCount = playerCardArea.childCount;
 
         _blackjackGame.Hit();
         yield return new WaitForSeconds(0.5f);
 
-        Assert.Greater(_ui.playerCardArea.childCount, initialCardCount);
+        Assert.Greater(playerCardArea.childCount, initialCardCount);
+    }
+
+    private void SetPrivateField(object obj, string fieldName, object value)
+    {
+        var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        if (field != null)
+        {
+            field.SetValue(obj, value);
+        }
+    }
+
+    private T GetPrivateField<T>(object obj, string fieldName) where T : class
+    {
+        var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+        return field != null ? field.GetValue(obj) as T : null;
     }
 }

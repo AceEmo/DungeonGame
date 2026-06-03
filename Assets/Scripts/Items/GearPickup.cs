@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GearInteract : MonoBehaviour, IInteractable
+public class GearPickup : MonoBehaviour, IInteractable
 {
     [SerializeField] private PlayerStats playerStats;
     public int scrapAmount = 1;

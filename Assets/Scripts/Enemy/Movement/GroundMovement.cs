@@ -1,5 +1,7 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Enemy))]
 public class GroundMovement : MonoBehaviour, IEnemyMovement
 {
     [Header("Movement")]
@@ -16,15 +18,24 @@ public class GroundMovement : MonoBehaviour, IEnemyMovement
     private Rigidbody2D rb;
     private Vector2 smoothedSteering;
     private Enemy enemy;
+    private readonly Collider2D[] separationResults = new Collider2D[16];
 
     private void Awake()
     {
         enemy = GetComponent<Enemy>();
         rb = GetComponent<Rigidbody2D>();
+
+        if (enemy == null || rb == null)
+        {
+            Debug.LogError($"{nameof(GroundMovement)} on {name} requires {nameof(Enemy)} and {nameof(Rigidbody2D)}.", this);
+            enabled = false;
+        }
     }
 
     public void Move(Vector2 desiredDirection)
     {
+        if (rb == null || enemy == null) return;
+
         if (desiredDirection.sqrMagnitude < 0.0001f)
         {
             rb.linearVelocity = Vector2.zero;
@@ -86,16 +97,23 @@ public class GroundMovement : MonoBehaviour, IEnemyMovement
 
     private Vector2 Separation()
     {
-        Collider2D[] others = Physics2D.OverlapCircleAll(
+        ContactFilter2D contactFilter = new ContactFilter2D();
+        contactFilter.useLayerMask = true;
+        contactFilter.SetLayerMask(enemyLayer);
+
+        int hitCount = Physics2D.OverlapCircle(
             transform.position,
             separationRadius,
-            enemyLayer
+            contactFilter,
+            separationResults
         );
 
         Vector2 push = Vector2.zero;
 
-        foreach (var col in others)
+        for (int i = 0; i < hitCount; i++)
         {
+            Collider2D col = separationResults[i];
+            if (col == null) continue;
             if (col.transform == transform) continue;
 
             Vector2 diff = (Vector2)(transform.position - col.transform.position);

@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
     {
         EnsureEventSystemExists();
 
-        if (scene.name == "MainMenu")
+        if (scene.name == SceneNames.MainMenu)
         {
             stateManager.SetState(GameState.MainMenu);
             return;
@@ -113,7 +113,7 @@ public class GameManager : MonoBehaviour
             playerHealth.OnPlayerDied -= HandleGameOver;
             playerHealth.OnPlayerDied += HandleGameOver;
 
-            if (sceneName == "HubRoom")
+            if (sceneName == SceneNames.HubRoom)
                 playerHealth.ResetHealth();
         }
 
@@ -191,7 +191,7 @@ public class GameManager : MonoBehaviour
         if (playerStats != null)
             playerStats.ResetAll();
 
-        SceneManager.LoadScene("HubRoom");
+        SceneManager.LoadScene(SceneNames.HubRoom);
     }
 
     private void EnsureEventSystemExists()

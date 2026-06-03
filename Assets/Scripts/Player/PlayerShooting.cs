@@ -54,11 +54,7 @@ public class PlayerShooting : MonoBehaviour
 
     private void InitializeComponents()
     {
-        inputProvider = GetComponent<IInputProvider>();
-        if (inputProvider == null)
-        {
-            inputProvider = gameObject.AddComponent<StandardInputProvider>();
-        }
+        inputProvider = InputProviderBootstrap.EnsureInputProvider(gameObject);
 
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)

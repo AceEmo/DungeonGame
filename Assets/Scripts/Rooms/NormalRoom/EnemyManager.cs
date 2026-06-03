@@ -12,9 +12,9 @@ public class EnemyManager : MonoBehaviour
     [SerializeField] private float initialSpawnDelay = 0.5f;
 
     private readonly List<EnemyHealth> spawnedEnemies = new List<EnemyHealth>();
-    private bool hasSpawned = false;
-    private bool bossAlive = false;
-    
+    private bool hasSpawned;
+    private bool bossAlive;
+
     private BossRoomController bossRoomController;
 
     private void Awake()
@@ -32,7 +32,7 @@ public class EnemyManager : MonoBehaviour
         {
             return;
         }
-        
+
         hasSpawned = true;
         StartCoroutine(SpawnAllEnemies());
     }
@@ -41,46 +41,53 @@ public class EnemyManager : MonoBehaviour
     {
         yield return new WaitForSeconds(initialSpawnDelay);
 
-        if (room.IsBossRoom && room.BossSpawnPoint != null && room.BossPrefab != null)
-        {
-            GameObject bossInstance = Instantiate(room.BossPrefab, room.BossSpawnPoint.position, Quaternion.identity);
-            Boss boss = bossInstance.GetComponent<Boss>();
-            
-            if (boss != null)
-            {
-                bossAlive = true;
-                boss.OnBossDied += OnBossDied;
-
-                if (bossRoomController != null)
-                {
-                    bossRoomController.InitializeBoss(boss);
-                }
-            }
-        }
-
-        if (room.EnemySpawnPoints != null)
-        {
-            foreach (Transform spawnPoint in room.EnemySpawnPoints)
-            {
-                GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-                GameObject enemyInstance = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity, transform);
-
-                if (enemyInstance.TryGetComponent(out EnemyHealth enemyHealth))
-                {
-                    spawnedEnemies.Add(enemyHealth);
-                    enemyHealth.OnEnemyDied += OnEnemyDied;
-                }
-            }
-        }
-
+        TrySpawnBoss();
+        SpawnRegularEnemies();
         CheckRoomClear();
+    }
+
+    private void TrySpawnBoss()
+    {
+        if (!room.IsBossRoom || room.BossSpawnPoint == null || room.BossPrefab == null)
+        {
+            return;
+        }
+
+        GameObject bossInstance = Instantiate(room.BossPrefab, room.BossSpawnPoint.position, Quaternion.identity);
+        if (!bossInstance.TryGetComponent(out Boss boss))
+        {
+            return;
+        }
+
+        bossAlive = true;
+        boss.OnBossDied += OnBossDied;
+        bossRoomController?.InitializeBoss(boss);
+    }
+
+    private void SpawnRegularEnemies()
+    {
+        if (room.EnemySpawnPoints == null || enemyPrefabs == null || enemyPrefabs.Length == 0)
+        {
+            return;
+        }
+
+        foreach (Transform spawnPoint in room.EnemySpawnPoints)
+        {
+            GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+            GameObject enemyInstance = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity, transform);
+
+            if (enemyInstance.TryGetComponent(out EnemyHealth enemyHealth))
+            {
+                spawnedEnemies.Add(enemyHealth);
+                enemyHealth.OnEnemyDied += OnEnemyDied;
+            }
+        }
     }
 
     private void OnEnemyDied(EnemyHealth enemy)
     {
         enemy.OnEnemyDied -= OnEnemyDied;
         spawnedEnemies.Remove(enemy);
-
         CheckRoomClear();
     }
 
@@ -92,16 +99,11 @@ public class EnemyManager : MonoBehaviour
 
     private void CheckRoomClear()
     {
-        bool hasActiveEnemies = spawnedEnemies.Count > 0;
-        
-        if (hasActiveEnemies || bossAlive)
+        if (spawnedEnemies.Count > 0 || bossAlive)
         {
             return;
         }
 
-        if (room != null)
-        {
-            room.OnRoomCleared();
-        }
+        room?.OnRoomCleared();
     }
 }

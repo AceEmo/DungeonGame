@@ -8,7 +8,7 @@ public class ChestInteract : MonoBehaviour, IInteractable
     public GameObject Gear1Prefab;
     public GameObject Gear2Prefab;
 
-    private bool opened = false;
+    private bool opened;
 
     public string GetHintText()
     {
@@ -17,26 +17,34 @@ public class ChestInteract : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (opened) return;
-        opened = true;
-
-        if (OpenChestPrefab != null)
-            Instantiate(OpenChestPrefab, transform.position, Quaternion.identity);
-
-        int reward = Random.Range(0, 3);
-
-        GameObject prefab = null;
-
-        if (reward == 0) prefab = HealthPrefab;
-        if (reward == 1) prefab = Gear1Prefab;
-        if (reward == 2) prefab = Gear2Prefab;
-
-        if (prefab != null)
+        if (opened)
         {
-            Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
-            Instantiate(prefab, spawnPos, Quaternion.identity);
+            return;
         }
 
+        opened = true;
+        SpawnOpenChestVisual();
+        SpawnLoot();
         Destroy(gameObject);
+    }
+
+    private void SpawnOpenChestVisual()
+    {
+        if (OpenChestPrefab != null)
+        {
+            Instantiate(OpenChestPrefab, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void SpawnLoot()
+    {
+        GameObject prefab = RewardSpawner.PickRandomReward(HealthPrefab, Gear1Prefab, Gear2Prefab);
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
+        Instantiate(prefab, spawnPos, Quaternion.identity);
     }
 }

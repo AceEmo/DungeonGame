@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private EnemyData data;
@@ -23,13 +24,18 @@ public class Enemy : MonoBehaviour
     private void Awake()
     {
         InitializeComponents();
+        if (!ValidateRequiredComponents())
+        {
+            enabled = false;
+            return;
+        }
+
         ApplyDifficultyMultiplier();
     }
 
     private void FixedUpdate()
     {
-        Vector2 direction = behaviour.GetDirection();
-        movement.Move(direction);
+        movement.Move(behaviour.GetDirection());
     }
 
     private void Update()
@@ -48,19 +54,37 @@ public class Enemy : MonoBehaviour
 
     private void ApplyDifficultyMultiplier()
     {
-        if (data == null || GameManager.Instance == null)
+        DifficultyScaler.ScaledStats stats = DifficultyScaler.Scale(
+            data.MaxHealth, data.speed, Mathf.RoundToInt(data.damage));
+
+        currentMaxHealth = stats.MaxHealth;
+        currentSpeed = stats.Speed;
+        currentDamage = stats.Damage;
+    }
+
+    private bool ValidateRequiredComponents()
+    {
+        bool isValid = true;
+
+        if (data == null)
         {
-            currentMaxHealth = data != null ? data.MaxHealth : 3;
-            currentSpeed = data != null ? data.speed : 3f;
-            currentDamage = data != null ? Mathf.RoundToInt(data.damage) : 1;
-            return;
+            Debug.LogError($"{nameof(Enemy)} on {name} requires {nameof(EnemyData)}.", this);
+            isValid = false;
         }
 
-        float multiplier = GameManager.Instance.Settings.Difficulty.GetStatMultiplier();
+        if (movement == null)
+        {
+            Debug.LogError($"{nameof(Enemy)} on {name} requires an {nameof(IEnemyMovement)} component.", this);
+            isValid = false;
+        }
 
-        currentMaxHealth = Mathf.RoundToInt(data.MaxHealth * multiplier);
-        currentDamage = Mathf.RoundToInt(data.damage * multiplier);
-        currentSpeed = data.speed * multiplier; 
+        if (behaviour == null)
+        {
+            Debug.LogError($"{nameof(Enemy)} on {name} requires an {nameof(IEnemyBehaviour)} component.", this);
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     private void UpdateAnimation()

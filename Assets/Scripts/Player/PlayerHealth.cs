@@ -30,7 +30,7 @@ public class PlayerHealth : MonoBehaviour
     public event Action OnPlayerDied;
 
     public float CurrentHealth { get; private set; }
-    public float MaxHealth => stats.maxHealth;
+    public float MaxHealth => stats != null ? stats.maxHealth : 0f;
     public bool IsDead => CurrentHealth <= 0;
 
     private bool isInvincible;
@@ -52,6 +52,11 @@ public class PlayerHealth : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         
         if (movement == null) movement = GetComponent<PlayerMovement>();
+
+        if (!ValidateStats())
+        {
+            enabled = false;
+        }
     }
 
     private void Start()
@@ -67,6 +72,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount, Vector2 damageSourcePosition)
     {
+        if (stats == null) return;
         if (isInvincible || IsDead) return;
 
         ReduceHealth(amount);
@@ -83,6 +89,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void Heal(float amount)
     {
+        if (stats == null) return;
         if (IsDead) return;
 
         CurrentHealth = Mathf.Min(CurrentHealth + amount, stats.maxHealth);
@@ -92,6 +99,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void ApplyStats()
     {
+        if (stats == null) return;
+
         if (CurrentHealth > stats.maxHealth)
         {
             CurrentHealth = stats.maxHealth;
@@ -101,6 +110,8 @@ public class PlayerHealth : MonoBehaviour
 
     private void InitializeHealth()
     {
+        if (stats == null) return;
+
         CurrentHealth = stats.startHealth;
         isInvincible = false;
 
@@ -202,6 +213,17 @@ public class PlayerHealth : MonoBehaviour
 
     private void NotifyHealthChanged()
     {
-        OnHealthChanged?.Invoke(CurrentHealth, stats.maxHealth);
+        OnHealthChanged?.Invoke(CurrentHealth, MaxHealth);
+    }
+
+    private bool ValidateStats()
+    {
+        if (stats != null)
+        {
+            return true;
+        }
+
+        Debug.LogError($"{nameof(PlayerHealth)} on {name} requires {nameof(PlayerStats)}.", this);
+        return false;
     }
 }

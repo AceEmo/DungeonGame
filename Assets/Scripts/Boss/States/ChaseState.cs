@@ -31,6 +31,11 @@ public class ChaseState : IBossState
 
     private bool TryTransitionToAttack(BossContext context)
     {
+        if (!HasPlayerTarget(context))
+        {
+            return false;
+        }
+
         float distanceToPlayer = GetDistanceToPlayer(context);
         if (distanceToPlayer <= context.Data.attackRange)
         {
@@ -42,6 +47,11 @@ public class ChaseState : IBossState
 
     private bool TryTransitionToDash(BossContext context)
     {
+        if (!HasPlayerTarget(context))
+        {
+            return false;
+        }
+
         float distanceToPlayer = GetDistanceToPlayer(context);
         bool isCooldownOver = Time.time >= context.LastDashTime + context.Data.dashCooldown;
         bool isCloseEnough = distanceToPlayer <= context.Data.dashTriggerDistance;
@@ -57,6 +67,12 @@ public class ChaseState : IBossState
 
     private void ChasePlayer(BossContext context)
     {
+        if (!HasPlayerTarget(context))
+        {
+            context.Movement.Stop();
+            return;
+        }
+
         Vector2 desiredDirection = GetDirectionToPlayer(context);
         Vector2 avoidanceForce = CalculateAvoidance(context, desiredDirection);
         
@@ -143,6 +159,11 @@ public class ChaseState : IBossState
     private Vector2 GetDirectionToPlayer(BossContext context)
     {
         return (context.Player.position - context.BossTransform.position).normalized;
+    }
+
+    private bool HasPlayerTarget(BossContext context)
+    {
+        return context.Player != null;
     }
 
     public void ExitState(BossContext context)

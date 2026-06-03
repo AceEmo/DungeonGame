@@ -6,30 +6,38 @@ using DG.Tweening;
 public class BlackjackUI : MonoBehaviour
 {
     [Header("UI")]
-    public Transform playerCardArea;
-    public Transform dealerCardArea;
-    public GameObject cardPrefab;
-    public TextMeshProUGUI resultText;
-    public TMPro.TextMeshProUGUI playerScoreText;
-    public TMPro.TextMeshProUGUI dealerScoreText;
+    [SerializeField] private Transform playerCardArea;
+    [SerializeField] private Transform dealerCardArea;
+    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private TextMeshProUGUI resultText;
+    [SerializeField] private TextMeshProUGUI playerScoreText;
+    [SerializeField] private TextMeshProUGUI dealerScoreText;
 
-    public Button hitButton;
-    public Button standButton;
-    public Button exitButton;
+    [SerializeField] private Button hitButton;
+    [SerializeField] private Button standButton;
+    [SerializeField] private Button exitButton;
 
     [Header("Sprites")]
-    public Sprite backCardSprite;
+    [SerializeField] private Sprite backCardSprite;
 
     [Header("Sounds")]
-    public AudioSource audioSource;
-    public AudioClip dealSound;
-    public AudioClip flipSound;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip dealSound;
+    [SerializeField] private AudioClip flipSound;
+
+    public Transform PlayerCardArea => playerCardArea;
+    public Transform DealerCardArea => dealerCardArea;
+    public Sprite BackCardSprite => backCardSprite;
 
     public GameObject SpawnCard(Sprite sprite, Transform parent)
     {
+        if (cardPrefab == null || parent == null) return null;
+
         GameObject go = Instantiate(cardPrefab, parent);
 
         Image img = go.GetComponent<Image>();
+        if (img == null) return go;
+
         img.sprite = sprite;
 
         go.transform.localScale = Vector3.zero;
@@ -47,7 +55,10 @@ public class BlackjackUI : MonoBehaviour
 
     public void FlipCard(GameObject cardGO, Sprite newSprite)
     {
+        if (cardGO == null || newSprite == null) return;
+
         Image img = cardGO.GetComponent<Image>();
+        if (img == null) return;
 
         if (audioSource && flipSound)
             audioSource.PlayOneShot(flipSound);
@@ -66,27 +77,35 @@ public class BlackjackUI : MonoBehaviour
 
     public void SetResult(string text)
     {
+        if (resultText == null) return;
+
         resultText.text = text;
         resultText.transform.DOPunchScale(new Vector3(0.3f, 0.3f, 0), 0.4f, 10, 1).SetUpdate(true);
     }
 
     public void ClearTable()
     {
-        foreach (Transform child in playerCardArea)
-            Destroy(child.gameObject);
+        if (playerCardArea != null)
+        {
+            foreach (Transform child in playerCardArea)
+                Destroy(child.gameObject);
+        }
 
-        foreach (Transform child in dealerCardArea)
-            Destroy(child.gameObject);
+        if (dealerCardArea != null)
+        {
+            foreach (Transform child in dealerCardArea)
+                Destroy(child.gameObject);
+        }
     }
 
     public void EnableButtons(bool state)
     {
-        hitButton.interactable = state;
-        standButton.interactable = state;
+        if (hitButton != null) hitButton.interactable = state;
+        if (standButton != null) standButton.interactable = state;
     }
     public void SetExitButton(bool state)
     {
-        exitButton.interactable = state;
+        if (exitButton != null) exitButton.interactable = state;
     }
 
     public void UpdateScores(int playerScore, int dealerScore)

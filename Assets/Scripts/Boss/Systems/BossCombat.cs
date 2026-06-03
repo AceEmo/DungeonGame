@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class BossCombat
 {
-    private Transform attackUp;
-    private Transform attackDown;
-    private Transform attackLeft;
-    private Transform attackRight;
+    private const int MaxAttackHits = 8;
+
+    private readonly Transform attackUp;
+    private readonly Transform attackDown;
+    private readonly Transform attackLeft;
+    private readonly Transform attackRight;
+    private readonly Collider2D[] attackHits = new Collider2D[MaxAttackHits];
 
     public BossCombat(
         Transform up,
@@ -23,13 +26,15 @@ public class BossCombat
     {
         Transform point = GetAttackPoint(context.LastMoveDirection);
 
-        Collider2D[] hits =
-            Physics2D.OverlapCircleAll(
-                point.position,
-                context.Data.attackRadius);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            point.position,
+            context.Data.attackRadius);
 
-        foreach (var hit in hits)
+        for (int i = 0; i < hits.Length; i++)
         {
+            Collider2D hit = hits[i];
+            if (hit == null) continue;
+
             if (hit.CompareTag("Player"))
             {
                 PlayerHealth player = hit.GetComponent<PlayerHealth>();

@@ -2,6 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections;
 
+[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class Boss : MonoBehaviour, IDamageable
 {
     [Header("Boss Settings")]
@@ -21,6 +24,9 @@ public class Boss : MonoBehaviour, IDamageable
 
     private BossBrain brain;
     private BossContext context;
+    private Rigidbody2D rb;
+    private Animator animator;
+    private Transform playerTarget;
 
     private int currentMaxHealth;
     private float currentSpeed;
@@ -29,6 +35,12 @@ public class Boss : MonoBehaviour, IDamageable
     private void Awake()
     {
         InitializeComponents();
+        if (!ValidatePrefabSetup())
+        {
+            enabled = false;
+            return;
+        }
+
         ApplyDifficultyMultiplier();
         InitializeContext();
         InitializeBrain();
@@ -36,56 +48,60 @@ public class Boss : MonoBehaviour, IDamageable
 
     private void Start()
     {
-        brain.Start();
+        brain?.Start();
     }
 
     private void Update()
     {
-        brain.Update();
+        brain?.Update();
     }
 
     private void InitializeComponents()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         materialPropertyBlock = new MaterialPropertyBlock();
-        originalColor = spriteRenderer.color;
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+        }
     }
 
     private void ApplyDifficultyMultiplier()
     {
-        if (data == null || GameManager.Instance == null)
+        if (data == null)
         {
-            currentMaxHealth = data != null ? data.MaxHealth : 20;
-            currentSpeed = data != null ? data.speed : 3f;
-            currentDamage = data != null ? data.attackDamage : 2;
+            currentMaxHealth = 20;
+            currentSpeed = 3f;
+            currentDamage = 2;
             return;
         }
 
-        float multiplier = GameManager.Instance.Settings.Difficulty.GetStatMultiplier();
+        DifficultyScaler.ScaledStats stats = DifficultyScaler.Scale(
+            data.MaxHealth, data.speed, data.attackDamage);
 
-        currentMaxHealth = Mathf.RoundToInt(data.MaxHealth * multiplier);
-        currentDamage = Mathf.RoundToInt(data.attackDamage * multiplier);
-        currentSpeed = data.speed * multiplier;
+        currentMaxHealth = stats.MaxHealth;
+        currentSpeed = stats.Speed;
+        currentDamage = stats.Damage;
     }
 
     private void InitializeContext()
     {
-        Transform player = GameObject.FindGameObjectWithTag("Player")?.transform;
-
         context = new BossContext
         {
             BossTransform = transform,
-            Player = player,
+            Player = playerTarget,
             Data = data,
 
-            Animator = GetComponent<Animator>(),
+            Animator = animator,
             SpriteRenderer = spriteRenderer,
 
             CurrentSpeed = currentSpeed,
             CurrentDamage = Mathf.RoundToInt(currentDamage),
 
             Health = new BossHealth(currentMaxHealth),
-            Movement = new BossMovement(GetComponent<Rigidbody2D>()),
+            Movement = new BossMovement(rb),
             Rage = new BossRage(),
 
             Combat = new BossCombat(
@@ -104,6 +120,9 @@ public class Boss : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
+        if (context == null)
+            return;
+
         if (context.IsDead)
             return;
 
@@ -128,7 +147,7 @@ public class Boss : MonoBehaviour, IDamageable
 
     private void HandleHit()
     {
-        context.Animator.SetTrigger("Hit");
+        context.Animator?.SetTrigger("Hit");
     }
 
     private IEnumerator HitFlash()
@@ -142,6 +161,8 @@ public class Boss : MonoBehaviour, IDamageable
 
     private void SetSpriteColor(Color color)
     {
+        if (spriteRenderer == null) return;
+
         spriteRenderer.GetPropertyBlock(materialPropertyBlock);
         materialPropertyBlock.SetColor("_Color", color);
         spriteRenderer.SetPropertyBlock(materialPropertyBlock);
@@ -154,22 +175,55 @@ public class Boss : MonoBehaviour, IDamageable
 
     private IEnumerator FadeAndDestroy()
     {
-        float duration = 1.5f;
-        float animationTime = 0f;
+        yield return SpriteFadeHelper.FadeMaterialPropertyBlock(
+            spriteRenderer,
+            materialPropertyBlock,
+            SpriteFadeHelper.DefaultFadeDuration,
+            () => Destroy(gameObject));
+    }
 
-        Color startColor = spriteRenderer.color;
+    private bool ValidatePrefabSetup()
+    {
+        bool isValid = true;
 
-        while (animationTime < duration)
+        if (spriteRenderer == null)
         {
-            animationTime += Time.deltaTime;
-
-            float alpha = Mathf.Lerp(1f, 0f, animationTime / duration);
-            Color newColor = new Color(startColor.r, startColor.g, startColor.b, alpha);
-
-            SetSpriteColor(newColor);
-            yield return null;
+            Debug.LogError($"{nameof(Boss)} on {name} requires {nameof(SpriteRenderer)}.", this);
+            isValid = false;
         }
 
-        Destroy(gameObject);
+        if (rb == null)
+        {
+            Debug.LogError($"{nameof(Boss)} on {name} requires {nameof(Rigidbody2D)}.", this);
+            isValid = false;
+        }
+
+        if (animator == null)
+        {
+            Debug.LogError($"{nameof(Boss)} on {name} requires {nameof(Animator)}.", this);
+            isValid = false;
+        }
+
+        if (data == null)
+        {
+            Debug.LogError($"{nameof(Boss)} on {name} requires {nameof(BossData)}.", this);
+            isValid = false;
+        }
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        playerTarget = playerObject != null ? playerObject.transform : null;
+        if (playerTarget == null)
+        {
+            Debug.LogError($"{nameof(Boss)} on {name} requires a scene object tagged Player.", this);
+            isValid = false;
+        }
+
+        if (attackPointUp == null || attackPointDown == null || attackPointLeft == null || attackPointRight == null)
+        {
+            Debug.LogError($"{nameof(Boss)} on {name} requires all attack points to be assigned.", this);
+            isValid = false;
+        }
+
+        return isValid;
     }
 }

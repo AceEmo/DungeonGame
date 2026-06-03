@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HealthBoxInteract : MonoBehaviour, IInteractable
+public class HealthBox : MonoBehaviour, IInteractable
 {
     public string GetHintText()
     {
